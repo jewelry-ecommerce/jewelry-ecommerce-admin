@@ -1,0 +1,23 @@
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/Inter-Variable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+ul,
+p {
+  margin: 0;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+  transition:
+    background-color 99999s,
+    color 99999s;
+}
+
+input[data-autocompleted] {
+  background: transparent !important;
+}
