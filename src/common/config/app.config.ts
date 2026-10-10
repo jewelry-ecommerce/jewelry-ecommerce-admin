@@ -1,3 +1,5 @@
+import { composeApiBaseUrl } from "./api-base-url.util";
+
 export type DataSourceMode = "MOCK" | "HTTP";
 
 const readEnv = (value: string | undefined, fallback: string): string => {
@@ -24,4 +26,9 @@ export const getMockLatencyMs = (): number => {
 };
 
 /** Root of the future REST backend. Only read when the data source is `HTTP`. */
-export const getApiBaseUrl = (): string => readEnv(import.meta.env.VITE_API_BASE_URL, "http://localhost:8080/api").replace(/\/$/, "");
+export const getApiBaseUrl = (): string => {
+  const configuredBase = import.meta.env.VITE_API_BASE_URL?.trim();
+  const baseUrl = configuredBase || "http://localhost:8082";
+  const prefix = import.meta.env.VITE_API_PREFIX ?? (configuredBase ? "" : "/api/v1");
+  return composeApiBaseUrl(baseUrl, prefix);
+};

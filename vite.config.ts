@@ -32,6 +32,12 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     server: {
       port: devServerPort,
+      proxy: {
+        '/api/demo-cms': {
+          target: env.VITE_CMS_DEMO_CLIENT_URL || 'http://127.0.0.1:3100',
+          changeOrigin: true,
+        },
+      },
     },
     preview: {
       port: devServerPort,

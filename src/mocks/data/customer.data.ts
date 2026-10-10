@@ -1,5 +1,4 @@
 import type { Customer, LoyaltyAccount, MembershipTier } from "@/apis/customer/customer.interface";
-import { buildThumbImage } from "@/utils/media/placeholder.util";
 
 export const MEMBERSHIP_TIER_LABELS: Record<MembershipTier, string> = {
   MEMBER: "Member",
@@ -19,119 +18,7 @@ export const MEMBERSHIP_TIER_THRESHOLDS: Record<MembershipTier, number> = {
  * Customer fixtures. `cus-demo-linh` is the account the storefront demo signs in as, and the same
  * record appears in the admin CRM module.
  */
-export const CUSTOMERS: Customer[] = [
-  {
-    id: "cus-demo-linh",
-    code: "CUS-000148",
-    fullName: "Linh Nguyen",
-    email: "demo@aurelia.test",
-    phone: "0901234567",
-    avatar: buildThumbImage("Linh Nguyen", "blush"),
-    gender: "FEMALE",
-    dateOfBirth: "1995-04-18",
-    tier: "GOLD",
-    createdAt: "2025-06-14T08:20:00.000Z",
-    lifetimeValue: 96400000,
-    orderCount: 7,
-    notificationPreferences: { orderUpdates: true, promotions: true, newArrivals: false },
-    addresses: [
-      {
-        id: "adr-linh-home",
-        fullName: "Linh Nguyen",
-        phone: "0901234567",
-        line1: "24 Ly Tu Trong, Apartment 8B",
-        ward: "Ben Nghe",
-        district: "District 1",
-        province: "Ho Chi Minh City",
-        isDefault: true,
-        label: "HOME",
-      },
-      {
-        id: "adr-linh-office",
-        fullName: "Linh Nguyen",
-        phone: "0987654321",
-        line1: "Bitexco Tower, 15th floor",
-        ward: "Ben Nghe",
-        district: "District 1",
-        province: "Ho Chi Minh City",
-        isDefault: false,
-        label: "OFFICE",
-      },
-    ],
-  },
-  {
-    id: "cus-minh-tran",
-    code: "CUS-000092",
-    fullName: "Minh Tran",
-    email: "minh.tran@example.test",
-    phone: "0912223344",
-    avatar: buildThumbImage("Minh Tran", "charcoal"),
-    gender: "MALE",
-    dateOfBirth: "1990-11-02",
-    tier: "DIAMOND",
-    createdAt: "2024-11-02T08:20:00.000Z",
-    lifetimeValue: 248900000,
-    orderCount: 14,
-    notificationPreferences: { orderUpdates: true, promotions: false, newArrivals: true },
-    addresses: [
-      {
-        id: "adr-minh-home",
-        fullName: "Minh Tran",
-        phone: "0912223344",
-        line1: "88 Tran Duy Hung",
-        ward: "Trung Hoa",
-        district: "Cau Giay",
-        province: "Hanoi",
-        isDefault: true,
-        label: "HOME",
-      },
-    ],
-  },
-  {
-    id: "cus-hoa-pham",
-    code: "CUS-000311",
-    fullName: "Hoa Pham",
-    email: "hoa.pham@example.test",
-    phone: "0933445566",
-    avatar: null,
-    gender: "FEMALE",
-    dateOfBirth: null,
-    tier: "SILVER",
-    createdAt: "2026-02-19T08:20:00.000Z",
-    lifetimeValue: 34200000,
-    orderCount: 3,
-    notificationPreferences: { orderUpdates: true, promotions: true, newArrivals: true },
-    addresses: [
-      {
-        id: "adr-hoa-home",
-        fullName: "Hoa Pham",
-        phone: "0933445566",
-        line1: "12 Nguyen Van Linh",
-        ward: "Nam Duong",
-        district: "Hai Chau",
-        province: "Da Nang",
-        isDefault: true,
-        label: "HOME",
-      },
-    ],
-  },
-  {
-    id: "cus-an-le",
-    code: "CUS-000420",
-    fullName: "An Le",
-    email: "an.le@example.test",
-    phone: "0977889900",
-    avatar: null,
-    gender: "OTHER",
-    dateOfBirth: null,
-    tier: "MEMBER",
-    createdAt: "2026-07-30T08:20:00.000Z",
-    lifetimeValue: 6900000,
-    orderCount: 1,
-    notificationPreferences: { orderUpdates: true, promotions: false, newArrivals: false },
-    addresses: [],
-  },
-];
+export const CUSTOMERS: Customer[] = [];
 
 export const DEMO_CUSTOMER_ID = "cus-demo-linh";
 

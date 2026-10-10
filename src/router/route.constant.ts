@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/layouts/dashboard.layout";
-import { DashboardPage, LoginPage, ModuleListPage, NoAccessPage, NotFoundPage } from "@/router/route.lazy-pages";
+import { CmsDemoPage, CmsBannerPage, DashboardPage, LoginPage, ModuleListPage, NoAccessPage, NotFoundPage } from "@/router/route.lazy-pages";
 import { RouteType } from "@/router/route.enum";
 import type { AppRoute } from "@/router/route.interface";
 import { ROUTE_PATH, type RoutePathKey } from "@/router/route.path";
@@ -39,11 +39,11 @@ export const ROUTE: Record<RoutePathKey, AppRoute> = {
   SET_DETAIL: placeholderRoute(ROUTE_PATH.SET_DETAIL),
 
   // CMS
-  CMS_PAGE_LIST: placeholderRoute(ROUTE_PATH.CMS_PAGE_LIST),
-  CMS_PAGE_CREATE: placeholderRoute(ROUTE_PATH.CMS_PAGE_CREATE),
-  CMS_PAGE_DETAIL: placeholderRoute(ROUTE_PATH.CMS_PAGE_DETAIL),
-  CMS_PAGE_EDIT: placeholderRoute(ROUTE_PATH.CMS_PAGE_EDIT),
-  CMS_BANNER_LIST: placeholderRoute(ROUTE_PATH.CMS_BANNER_LIST),
+  CMS_PAGE_LIST: dashboardRoute(ROUTE_PATH.CMS_PAGE_LIST, CmsDemoPage),
+  CMS_PAGE_CREATE: dashboardRoute(ROUTE_PATH.CMS_PAGE_CREATE, CmsDemoPage),
+  CMS_PAGE_DETAIL: dashboardRoute(ROUTE_PATH.CMS_PAGE_DETAIL, CmsDemoPage),
+  CMS_PAGE_EDIT: dashboardRoute(ROUTE_PATH.CMS_PAGE_EDIT, CmsDemoPage),
+  CMS_BANNER_LIST: dashboardRoute(ROUTE_PATH.CMS_BANNER_LIST, CmsBannerPage),
   CMS_NAVIGATION: placeholderRoute(ROUTE_PATH.CMS_NAVIGATION),
 
   // Orders

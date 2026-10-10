@@ -14,3 +14,6 @@ export const NotFoundPage = lazy(() => import("@/pages/error/not-found.page"));
 /** Shared "coming next" screen — parameterised by route so it can name the module it stands in for. */
 export const ModulePlaceholderPage = lazy(() => import("@/pages/placeholder/module-placeholder.page"));
 export const ModuleListPage = lazy(() => import("@/pages/modules/module-list.page"));
+export const CmsDemoPage = lazy(() => import("@/pages/cms/cms-demo.page"));
+
+export const CmsBannerPage = lazy(() => import("@/pages/cms/cms-banner.page"));

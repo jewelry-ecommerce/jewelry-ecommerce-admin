@@ -11,6 +11,8 @@ interface ImportMetaEnv {
   readonly VITE_MOCK_LATENCY_MS?: string;
   /** Root of the REST backend, used only when VITE_DATA_SOURCE is `HTTP`. */
   readonly VITE_API_BASE_URL?: string;
+  /** Optional backend prefix, e.g. /api/v1. Empty when the base URL already includes it. */
+  readonly VITE_API_PREFIX?: string;
   /** Dev server / preview port. */
   readonly VITE_PORT?: string;
 }

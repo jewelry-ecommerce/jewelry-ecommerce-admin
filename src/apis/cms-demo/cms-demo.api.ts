@@ -1,0 +1,21 @@
+import type { CmsDemoPage } from "./cms-demo.interface";
+import { getDataSourceMode } from "@/common/config/app.config";
+export const CMS_DEMO_API_PATH = "/api/demo-cms/pages";
+export const CMS_DEMO_CLIENT_URL = (import.meta.env.VITE_CMS_DEMO_CLIENT_URL || "http://localhost:3100").replace(/\/$/, "");
+
+async function request<TResult>(body?: CmsDemoPage): Promise<TResult> {
+  if (getDataSourceMode() !== "MOCK") throw new Error("CMS demo chỉ dùng ở chế độ MOCK.");
+  const response = await fetch(CMS_DEMO_API_PATH, {
+    method: body ? "POST" : "GET",
+    cache: "no-store",
+    headers: { "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!response.ok) {
+    const error: { message?: string } = await response.json().catch(() => ({}));
+    throw new Error(error.message || "Không kết nối được CMS mock. Hãy chạy client dev server và khởi động lại admin.");
+  }
+  return response.json();
+}
+export const getCmsDemoPages = (): Promise<CmsDemoPage[]> => request<CmsDemoPage[]>();
+export const saveCmsDemoPage = (page: CmsDemoPage): Promise<CmsDemoPage> => request<CmsDemoPage>(page);
