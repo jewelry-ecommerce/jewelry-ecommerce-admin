@@ -1,4 +1,5 @@
 import { getDataSourceMode } from "@/common/config/app.config";
+import { backendRequest, toUiEntityIds } from "@/apis/backend-request";
 import type { Banner, Placement, PlacementLayout, PlacementLayoutItem } from "./banner.entities";
 import type {
   CreateBannerDto,
@@ -12,7 +13,10 @@ import type {
 import type { ProductListBannerConditionType } from "./banner.enum";
 const COMMAND_URL = "/api/demo-cms/banner";
 async function command<TResult>(operation: string, parameters: Record<string, unknown>): Promise<TResult> {
-  if (getDataSourceMode() !== "MOCK") throw new Error("Banner demo chỉ dùng ở chế độ MOCK.");
+  if (getDataSourceMode() === "HTTP") {
+    const result = await backendRequest("admin/banner/command", "POST", { operation, ...parameters });
+    return toUiEntityIds(result) as TResult;
+  }
   const response = await fetch(COMMAND_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

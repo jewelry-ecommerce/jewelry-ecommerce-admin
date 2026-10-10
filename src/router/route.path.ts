@@ -14,7 +14,13 @@ export const ROUTE_PATH = {
   PRODUCT_EDIT: "/products/:id/edit",
   CATEGORY_LIST: "/categories",
   COLLECTION_LIST: "/collections",
+  COLLECTION_CREATE: "/collections/create",
+  COLLECTION_DETAIL: "/collections/:collectionId",
+  COLLECTION_EDIT: "/collections/:collectionId/edit",
   ATTRIBUTE_LIST: "/attributes",
+  ATTRIBUTE_CREATE: "/attributes/create",
+  ATTRIBUTE_DETAIL: "/attributes/:attributeId",
+  ATTRIBUTE_EDIT: "/attributes/:attributeId/edit",
   MATERIAL_LIST: "/materials",
   GEMSTONE_LIST: "/gemstones",
   PRODUCT_IMPORT: "/product-import",
@@ -26,6 +32,10 @@ export const ROUTE_PATH = {
   SET_DETAIL: "/sets/:id",
 
   // CMS
+  LABEL_CONTENT_LIST: "/cms/labels",
+  LABEL_CONTENT_CREATE: "/cms/labels/create",
+  LABEL_CONTENT_DETAIL: "/cms/labels/:labelId",
+  LABEL_CONTENT_EDIT: "/cms/labels/:labelId/edit",
   CMS_PAGE_LIST: "/cms/pages",
   CMS_PAGE_CREATE: "/cms/pages/create",
   CMS_PAGE_DETAIL: "/cms/pages/:id",
@@ -109,3 +119,10 @@ export const getInquiryDetailPath = (inquiryCode: string): string => `/inquiries
 
 /** No-access redirect carrying the reason so the page can explain what was blocked. */
 export const getNoAccessPath = (reason: "permission" | "route" = "permission"): string => `${ROUTE_PATH.NO_ACCESS}?reason=${reason}`;
+export const getProductAttributeDetailPath = (id: string): string => "/attributes/" + encodeURIComponent(id);
+export const getLabelContentDetailPath = (id: string): string => "/cms/labels/" + encodeURIComponent(id);
+export const getLabelContentUpdatePath = (id: string): string => getLabelContentDetailPath(id) + "/edit";
+export const getProductAttributeUpdatePath = (id: string): string => getProductAttributeDetailPath(id) + "/edit";
+export const getProductCollectionCreatePath = (): string => ROUTE_PATH.COLLECTION_CREATE;
+export const getProductCollectionDetailPath = (id: string): string => ROUTE_PATH.COLLECTION_LIST + "/" + encodeURIComponent(id);
+export const getProductCollectionEditPath = (id: string): string => getProductCollectionDetailPath(id) + "/edit";

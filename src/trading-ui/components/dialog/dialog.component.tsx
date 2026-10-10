@@ -1,35 +1,15 @@
 import { Dialog, DialogActions, DialogContent, type DialogProps, DialogTitle, IconButton, Stack, Typography, type SxProps, type Theme } from '@mui/material';
 import React from 'react';
-import { ButtonElement, type ButtonElementProps, STYLE } from '@/trading-ui/adapters/library';
+import { STYLE } from '@/trading-ui/adapters/library';
+import { ButtonElement, type ButtonElementProps } from "../../adapters/button.element";
 import { TYPOGRAPHY_STYLES } from '../../common/constant/typography.constant';
 import type { PageButtonPermissionProps } from '../../permissions/page-button-permission.utils';
 import { CustomButton } from '../button/custom-button';
 import { StackRowAlignCenter, StackRowAlignCenterJustBetween } from '../styled';
 import { XClose } from '@untitledui/icons';
 
-const DIALOG_BUTTON_INK = '#101828';
 
-const dialogOutlinedButtonSx: SxProps<Theme> = {
-  textTransform: 'none',
-  borderColor: DIALOG_BUTTON_INK,
-  color: DIALOG_BUTTON_INK,
-  '&:hover': {
-    borderColor: DIALOG_BUTTON_INK,
-    bgcolor: 'rgba(16, 24, 40, 0.04)',
-  },
-};
-
-const dialogContainedButtonSx: SxProps<Theme> = {
-  textTransform: 'none',
-  bgcolor: DIALOG_BUTTON_INK,
-  color: '#fff',
-  boxShadow: 'none',
-  '&:hover': {
-    bgcolor: DIALOG_BUTTON_INK,
-    opacity: 0.92,
-    boxShadow: 'none',
-  },
-};
+import { dialogContainedButtonSx, dialogOutlinedButtonSx } from "./dialog-button.styles";
 
 const mergeDialogButtonSx = (variant: ButtonElementProps['variant'], extra?: SxProps<Theme>): SxProps<Theme> => {
   const base = variant === 'contained' ? dialogContainedButtonSx : dialogOutlinedButtonSx;

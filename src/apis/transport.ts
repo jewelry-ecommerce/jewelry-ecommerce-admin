@@ -1,4 +1,5 @@
 import axios, { type AxiosRequestConfig } from "axios";
+import { store } from "@/redux/store.redux";
 
 import { getApiBaseUrl, getDataSourceMode } from "@/common/config/app.config";
 
@@ -40,7 +41,7 @@ export class ApiError extends Error {
   }
 }
 
-const httpClient = axios.create({ timeout: 15000, withCredentials: true });
+const httpClient = axios.create({ timeout: 15000, withCredentials: false });
 
 const dropEmptyQueryValues = (query: Record<string, unknown> | undefined): Record<string, unknown> | undefined => {
   if (!query) return undefined;
@@ -86,7 +87,7 @@ export const apiRequest = async <TResult>(descriptor: ApiDescriptor<TResult>): P
       url: descriptor.path,
       params: dropEmptyQueryValues(descriptor.query),
       data: descriptor.body,
-      headers: { Accept: "application/json" },
+      headers: { Accept: "application/json", ...(store.getState().auth.accessToken ? { Authorization: "Bearer " + store.getState().auth.accessToken } : {}) },
     };
 
     const response = await httpClient.request<TResult>(config);

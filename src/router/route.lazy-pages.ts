@@ -17,3 +17,11 @@ export const ModuleListPage = lazy(() => import("@/pages/modules/module-list.pag
 export const CmsDemoPage = lazy(() => import("@/pages/cms/cms-demo.page"));
 
 export const CmsBannerPage = lazy(() => import("@/pages/cms/cms-banner.page"));
+export const AttributeCreatePage = lazy(() => import("@/trading-ui/pages/product/product-attribute/product-attribute-create/product-attribute-create.page"));
+export const AttributeListPage = lazy(() => import("@/trading-ui/pages/product/product-attribute/product-attribute-list/product-attribute-list.page"));
+export const AttributeDetailPage = lazy(() => import("@/trading-ui/pages/product/product-attribute/product-attribute-detail/product-attribute-detail.page"));
+export const AttributeEditPage = lazy(() => import("@/trading-ui/pages/product/product-attribute/product-attribute-update/product-attribute-update.page"));
+export const CategoryPage = lazy(() => import("@/trading-ui/pages/product/product-category/category/category.page"));
+export const CollectionListPage = lazy(() => import("@/trading-ui/pages/product/product-category/collection/collection-list/collection-list.page"));
+export const CollectionFormPage = lazy(() => import("@/trading-ui/pages/product/product-category/collection/collection-form/collection-form.page"));
+export const CollectionDetailPage = lazy(() => import("@/trading-ui/pages/product/product-category/collection/collection-detail/collection-detail.page"));

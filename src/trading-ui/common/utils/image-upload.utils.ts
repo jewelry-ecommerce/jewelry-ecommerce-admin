@@ -1,12 +1,16 @@
 import { CMS_DEMO_CLIENT_URL } from '@/apis/cms-demo/cms-demo.api';
 import { getDataSourceMode } from '@/common/config/app.config';
+import { backendRequest } from '@/apis/backend-request';
 import type { MediaVisibility } from '../../apis/file/file.enum';
 export interface DemoMediaUploadRequest { file: File; visibility?: MediaVisibility; pathPrefix?: string | null }
 export interface DemoMediaUploadResponse { asset: { publicUrl: string } }
+export function uploadMultipleImages(data: DemoMediaUploadRequest[]): Promise<DemoMediaUploadResponse[]> {
+  return Promise.all(data.map(uploadSingleImage));
+}
 export async function uploadSingleImage(data: DemoMediaUploadRequest): Promise<DemoMediaUploadResponse> {
-  if (getDataSourceMode() !== 'MOCK') throw new Error('Upload CMS demo chỉ dùng ở chế độ MOCK.');
   const form = new FormData();
   form.append('file', data.file);
+  if (getDataSourceMode() === 'HTTP') return backendRequest<DemoMediaUploadResponse>('media/upload', 'POST', form);
   const response = await fetch('/api/demo-cms/media', { method: 'POST', body: form });
   if (!response.ok) {
     const error: { message?: string } = await response.json();

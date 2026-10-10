@@ -1,6 +1,12 @@
 import { PRODUCTS, CATEGORIES, COLLECTIONS } from '@/mocks/data/catalog.data';
 import { getCmsDemoPages } from '@/apis/cms-demo/cms-demo.api';
-export enum CollectionStatus { ACTIVE = 'ACTIVE', INACTIVE = 'INACTIVE' }
+import { getDataSourceMode } from '@/common/config/app.config';
+import { productApi as backendProductApi } from './product/product.api';
+import { categoryApi as backendCategoryApi } from './category/category.api';
+import { collectionApi as backendCollectionApi } from './collection/collection.api';
+import { CategoryStatus } from './category/category.enum';
+import { CollectionStatus } from './collection/collection.enum';
+export { CollectionStatus };
 export * from './banner/banner.enum';
 export * from './banner/banner.entities';
 export * from './banner/banner.interface';
@@ -16,6 +22,16 @@ interface ProductQuery {
 }
 export const productApi = {
   async getAdminProductList(query: ProductQuery): Promise<{ list: Product[] }> {
+    if (getDataSourceMode() === "HTTP") {
+      const result = await backendProductApi.getAdminProductList({
+        page: query.page, take: query.take, search: query.search, isPagination: query.isPagination,
+        productIds: Array.isArray(query.productIds) ? query.productIds.join(',') : query.productIds,
+      });
+      return { list: result.list.map(product => ({
+        id: product.id, spuCode: product.spuCode, name: product.name, image: product.image ?? "", imageHover: product.imageHover ?? "",
+        variations: (product.variations ?? []).map(variation => ({ id: variation.id })), defaultVariationId: product.defaultVariationId ?? undefined,
+      })) };
+    }
     const search = query.search?.trim().toLowerCase() || '';
     const productIds = typeof query.productIds === 'string' ? query.productIds.split(',') : query.productIds;
     const list = PRODUCTS.filter(product =>
@@ -32,11 +48,21 @@ export const productApi = {
 };
 export const categoryApi = {
   async getCategoryTree(_query: { compact?: boolean; status?: string }) {
+    if (getDataSourceMode() === "HTTP") return backendCategoryApi.getCategoryTree({
+      status: Object.values(CategoryStatus).find(status => status === _query.status),
+    });
     return CATEGORIES.map(({ id, name, slug }) => ({ id, name, slug, children: [] }));
   },
 };
 export const collectionApi = {
   async getCollectionList(_query: { page?: number; take?: number; isPagination?: boolean; status?: string }) {
+    if (getDataSourceMode() === "HTTP") {
+      const result = await backendCollectionApi.getCollectionList({
+        page: _query.page, take: _query.take, isPagination: _query.isPagination,
+        status: Object.values(CollectionStatus).find(status => status === _query.status),
+      });
+      return { list: result.list.map(collection => ({ id: collection.id, name: collection.name, slug: collection.slug })) };
+    }
     return { list: COLLECTIONS.map(({ id, name, slug }) => ({ id, name, slug })) };
   },
 };

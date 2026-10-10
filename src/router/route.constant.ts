@@ -1,5 +1,13 @@
 import { DashboardLayout } from "@/layouts/dashboard.layout";
-import { CmsDemoPage, CmsBannerPage, DashboardPage, LoginPage, ModuleListPage, NoAccessPage, NotFoundPage } from "@/router/route.lazy-pages";
+import { lazy } from "react";
+const ProductSpuCreatePage = lazy(()=>import("@/trading-ui/pages/product/product-spu/product-spu-create/product-spu-create.page"));
+const ProductSpuListPage = lazy(()=>import("@/trading-ui/pages/product/product-spu/product-spu-list/product-spu-list.page"));
+const ProductSpuEditPage = lazy(()=>import("@/trading-ui/pages/product/product-spu/product-spu-update/product-spu-update.page"));
+const LabelContentListPage=lazy(()=>import('@/trading-ui/pages/content-display/label/label-content/label-content-list/label-content-list.page'));
+const LabelContentCreatePage=lazy(()=>import('@/trading-ui/pages/content-display/label/label-content/label-content-create/label-content-create.page'));
+const LabelContentDetailPage=lazy(()=>import('@/trading-ui/pages/content-display/label/label-content/label-content-detail/label-content-detail.page'));
+const LabelContentUpdatePage=lazy(()=>import('@/trading-ui/pages/content-display/label/label-content/label-content-update/label-content-update.page'));
+import { CollectionListPage, CollectionFormPage, CollectionDetailPage, CategoryPage, AttributeListPage, AttributeDetailPage, AttributeEditPage, AttributeCreatePage, CmsDemoPage, CmsBannerPage, DashboardPage, LoginPage, ModuleListPage, NoAccessPage, NotFoundPage } from "@/router/route.lazy-pages";
 import { RouteType } from "@/router/route.enum";
 import type { AppRoute } from "@/router/route.interface";
 import { ROUTE_PATH, type RoutePathKey } from "@/router/route.path";
@@ -21,13 +29,19 @@ export const ROUTE: Record<RoutePathKey, AppRoute> = {
   DASHBOARD: dashboardRoute(ROUTE_PATH.DASHBOARD, DashboardPage),
 
   // Catalog
-  PRODUCT_LIST: placeholderRoute(ROUTE_PATH.PRODUCT_LIST),
-  PRODUCT_CREATE: placeholderRoute(ROUTE_PATH.PRODUCT_CREATE),
-  PRODUCT_DETAIL: placeholderRoute(ROUTE_PATH.PRODUCT_DETAIL),
-  PRODUCT_EDIT: placeholderRoute(ROUTE_PATH.PRODUCT_EDIT),
-  CATEGORY_LIST: placeholderRoute(ROUTE_PATH.CATEGORY_LIST),
-  COLLECTION_LIST: placeholderRoute(ROUTE_PATH.COLLECTION_LIST),
-  ATTRIBUTE_LIST: placeholderRoute(ROUTE_PATH.ATTRIBUTE_LIST),
+  PRODUCT_LIST: dashboardRoute(ROUTE_PATH.PRODUCT_LIST,ProductSpuListPage),
+  PRODUCT_CREATE: dashboardRoute(ROUTE_PATH.PRODUCT_CREATE,ProductSpuCreatePage),
+  PRODUCT_DETAIL: dashboardRoute(ROUTE_PATH.PRODUCT_DETAIL,ProductSpuEditPage),
+  PRODUCT_EDIT: dashboardRoute(ROUTE_PATH.PRODUCT_EDIT,ProductSpuEditPage),
+  CATEGORY_LIST: dashboardRoute(ROUTE_PATH.CATEGORY_LIST, CategoryPage),
+  COLLECTION_LIST: dashboardRoute(ROUTE_PATH.COLLECTION_LIST, CollectionListPage),
+  COLLECTION_CREATE: dashboardRoute(ROUTE_PATH.COLLECTION_CREATE, CollectionFormPage),
+  COLLECTION_EDIT: dashboardRoute(ROUTE_PATH.COLLECTION_EDIT, CollectionFormPage),
+  COLLECTION_DETAIL: dashboardRoute(ROUTE_PATH.COLLECTION_DETAIL, CollectionDetailPage),
+  ATTRIBUTE_LIST: dashboardRoute(ROUTE_PATH.ATTRIBUTE_LIST, AttributeListPage),
+  ATTRIBUTE_CREATE: dashboardRoute(ROUTE_PATH.ATTRIBUTE_CREATE, AttributeCreatePage),
+  ATTRIBUTE_DETAIL: dashboardRoute(ROUTE_PATH.ATTRIBUTE_DETAIL, AttributeDetailPage),
+  ATTRIBUTE_EDIT: dashboardRoute(ROUTE_PATH.ATTRIBUTE_EDIT, AttributeEditPage),
   MATERIAL_LIST: placeholderRoute(ROUTE_PATH.MATERIAL_LIST),
   GEMSTONE_LIST: placeholderRoute(ROUTE_PATH.GEMSTONE_LIST),
   PRODUCT_IMPORT: placeholderRoute(ROUTE_PATH.PRODUCT_IMPORT),
@@ -39,6 +53,10 @@ export const ROUTE: Record<RoutePathKey, AppRoute> = {
   SET_DETAIL: placeholderRoute(ROUTE_PATH.SET_DETAIL),
 
   // CMS
+  LABEL_CONTENT_LIST: dashboardRoute(ROUTE_PATH.LABEL_CONTENT_LIST,LabelContentListPage),
+  LABEL_CONTENT_CREATE: dashboardRoute(ROUTE_PATH.LABEL_CONTENT_CREATE,LabelContentCreatePage),
+  LABEL_CONTENT_DETAIL: dashboardRoute(ROUTE_PATH.LABEL_CONTENT_DETAIL,LabelContentDetailPage),
+  LABEL_CONTENT_EDIT: dashboardRoute(ROUTE_PATH.LABEL_CONTENT_EDIT,LabelContentUpdatePage),
   CMS_PAGE_LIST: dashboardRoute(ROUTE_PATH.CMS_PAGE_LIST, CmsDemoPage),
   CMS_PAGE_CREATE: dashboardRoute(ROUTE_PATH.CMS_PAGE_CREATE, CmsDemoPage),
   CMS_PAGE_DETAIL: dashboardRoute(ROUTE_PATH.CMS_PAGE_DETAIL, CmsDemoPage),
