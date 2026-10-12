@@ -17,7 +17,7 @@ import { setSession } from "@/redux/auth/auth.slice";
 import { useAppDispatch } from "@/redux/store.redux";
 import { ROUTE_PATH } from "@/router/route.path";
 import { COLOR, STYLE } from "@/theme/design-tokens";
-import { DEFAULT_LOGIN_FORM_VALUES, loginFormSchema, type LoginFormValues } from "@/pages/auth/login.constant";
+import { DEFAULT_LOGIN_FORM_VALUES, loginFormSchema, isPhoneLogin, type LoginFormValues } from "@/pages/auth/login.constant";
 
 const CARD_WIDTH = 420;
 
@@ -112,10 +112,10 @@ const LoginPage = () => {
               <TextInput
                 requiredMark
                 id="login-email"
-                label="Email"
-                type="email"
+                label={isPhoneLogin() ? "Số điện thoại" : "Email"}
+                type={isPhoneLogin() ? "tel" : "email"}
                 autoComplete="username"
-                placeholder="you@aurelia.test"
+                placeholder={isPhoneLogin() ? "Nhập số điện thoại tài khoản ADMIN" : "you@aurelia.test"}
                 value={field.value}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
@@ -154,7 +154,7 @@ const LoginPage = () => {
 
         <Stack spacing={1}>
           <Typography sx={{ ...TYPOGRAPHY_STYLES.sm.semiBold, color: COLOR.NEUTRAL[700] }}>Demo accounts</Typography>
-          {MOCK_ADMIN_CREDENTIAL_HINTS.map((hint) => (
+          {(isPhoneLogin() ? [] : MOCK_ADMIN_CREDENTIAL_HINTS).map((hint) => (
             <Stack key={hint.email} direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
               <Stack sx={{ minWidth: 0 }}>
                 <Typography sx={{ ...TYPOGRAPHY_STYLES.sm.medium, color: COLOR.NEUTRAL[900] }}>{hint.email}</Typography>

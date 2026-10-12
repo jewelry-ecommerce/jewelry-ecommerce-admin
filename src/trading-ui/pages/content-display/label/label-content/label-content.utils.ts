@@ -1,14 +1,8 @@
-import type { SxProps, Theme } from "@mui/material";
-import type {
-  BadgeCampaign,
-  BadgeFlowPositionCounts,
-  CreateBadgeTemplateDto,
-  UpdateBadgeTemplateDto,
-  BadgeTemplate,
-} from "@/trading-ui/apis/badge";
-import { BadgePosition, BadgeStatus, BadgeTemplateBadgeType, BadgeType } from "@/trading-ui/apis/badge";
-import { LABEL_CONTENT_HEATMAP_FOOT_LAYOUT, LABEL_CONTENT_HEATMAP_SLOT_LAYOUTS } from "./label-content.constants";
-import { LABEL_CONTENT_DEFAULT_BACKGROUND_COLOR, LABEL_CONTENT_DEFAULT_TEXT_COLOR } from "./label-content.constants";
+import type { SxProps, Theme } from '@mui/material';
+import type { BadgeCampaign, BadgeFlowPositionCounts, CreateBadgeTemplateDto, UpdateBadgeTemplateDto, BadgeTemplate } from '../../../../apis';
+import { BadgePosition, BadgeStatus, BadgeTemplateBadgeType, BadgeType } from '../../../../apis';
+import { LABEL_CONTENT_HEATMAP_FOOT_LAYOUT, LABEL_CONTENT_HEATMAP_SLOT_LAYOUTS } from './label-content.constants';
+import { LABEL_CONTENT_DEFAULT_BACKGROUND_COLOR, LABEL_CONTENT_DEFAULT_TEXT_COLOR } from './label-content.constants';
 import type {
   LabelContentAdvancedFilters,
   LabelContentDesignRow,
@@ -16,7 +10,7 @@ import type {
   LabelContentHeatmapSlotId,
   LabelContentPositionDialogRow,
   LabelContentTemplateFormValues,
-} from "./label-content.interface";
+} from './label-content.interface';
 
 export const countActiveLabelContentAdvancedFilters = (filters: LabelContentAdvancedFilters): number =>
   [Boolean(filters.status), Boolean(filters.type), Boolean(filters.badgeType), Boolean(filters.defaultPosition)].filter(Boolean).length;
@@ -62,7 +56,7 @@ export const badgeFlowsToPositionDialogRows = (flows: BadgeCampaign[], position:
   return rows.sort((a, b) => b.priority - a.priority);
 };
 
-export const resolveLabelTextColors = (v: Pick<LabelContentTemplateFormValues, "backgroundColor" | "textColor">) => ({
+export const resolveLabelTextColors = (v: Pick<LabelContentTemplateFormValues, 'backgroundColor' | 'textColor'>) => ({
   backgroundColor: v.backgroundColor?.trim() || LABEL_CONTENT_DEFAULT_BACKGROUND_COLOR,
   textColor: v.textColor?.trim() || LABEL_CONTENT_DEFAULT_TEXT_COLOR,
 });
@@ -84,30 +78,28 @@ export const heatmapSlotIdToBadgePosition = (id: LabelContentHeatmapSlotId): Bad
 export const badgePositionLabelVi = (p: BadgePosition): string => {
   switch (p) {
     case BadgePosition.TOP_LEFT:
-      return "1. Trên - Trái";
+      return '1. Trên - Trái';
     case BadgePosition.TOP_RIGHT:
-      return "2. Trên - Phải";
+      return '2. Trên - Phải';
     case BadgePosition.CENTER_LEFT:
-      return "3. Giữa - Trái";
+      return '3. Giữa - Trái';
     case BadgePosition.CENTER_RIGHT:
-      return "4. Giữa - Phải";
+      return '4. Giữa - Phải';
     case BadgePosition.BOTTOM_LEFT:
-      return "5. Dưới - Trái";
+      return '5. Dưới - Trái';
     case BadgePosition.BOTTOM_RIGHT:
-      return "6. Dưới - Phải";
+      return '6. Dưới - Phải';
     case BadgePosition.BOTTOM_CENTER:
-      return "7. Dưới cùng - Ngang";
+      return '7. Dưới cùng - Ngang';
     case BadgePosition.PRICE_LINE:
-      return "8. Dòng giá";
+      return '8. Dòng giá';
     default:
       return String(p);
   }
 };
 
 /** Có đủ dữ liệu để hiện panel xem trước (create: sau khi user chỉnh khu vực thiết kế). */
-export const hasLabelDesignPreview = (
-  v: Pick<LabelContentTemplateFormValues, "type" | "displayText" | "image" | "backgroundColor" | "textColor">,
-): boolean => {
+export const hasLabelDesignPreview = (v: Pick<LabelContentTemplateFormValues, 'type' | 'displayText' | 'image' | 'backgroundColor' | 'textColor'>): boolean => {
   if (v.backgroundColor?.trim() || v.textColor?.trim()) return true;
   if (v.type === BadgeType.IMAGE && v.image?.trim()) return true;
   if (v.type === BadgeType.TEXT && v.displayText?.trim()) return true;
@@ -117,16 +109,16 @@ export const hasLabelDesignPreview = (
 const PREVIEW_OFFSET = 2;
 
 /** Vị trí badge trên ảnh sản phẩm trong panel xem trước. */
-export const badgePositionToImagePreviewSx = (position: BadgePosition | ""): SxProps<Theme> => {
+export const badgePositionToImagePreviewSx = (position: BadgePosition | ''): SxProps<Theme> => {
   switch (position) {
     case BadgePosition.TOP_LEFT:
       return { top: PREVIEW_OFFSET, left: PREVIEW_OFFSET };
     case BadgePosition.TOP_RIGHT:
       return { top: PREVIEW_OFFSET, right: PREVIEW_OFFSET };
     case BadgePosition.CENTER_LEFT:
-      return { top: "50%", left: PREVIEW_OFFSET, transform: "translateY(-50%)" };
+      return { top: '50%', left: PREVIEW_OFFSET, transform: 'translateY(-50%)' };
     case BadgePosition.CENTER_RIGHT:
-      return { top: "50%", right: PREVIEW_OFFSET, transform: "translateY(-50%)" };
+      return { top: '50%', right: PREVIEW_OFFSET, transform: 'translateY(-50%)' };
     case BadgePosition.BOTTOM_LEFT:
       return { bottom: PREVIEW_OFFSET, left: PREVIEW_OFFSET };
     case BadgePosition.BOTTOM_CENTER:
@@ -143,30 +135,26 @@ export const badgePositionToImagePreviewSx = (position: BadgePosition | ""): SxP
 export const badgeTemplateBadgeTypeLabelVi = (t: BadgeTemplateBadgeType): string => {
   switch (t) {
     case BadgeTemplateBadgeType.CAMPAIGN:
-      return "Campaign";
+      return 'Campaign';
     case BadgeTemplateBadgeType.BEST_SELLER:
-      return "Bán chạy";
+      return 'Bán chạy';
     case BadgeTemplateBadgeType.PRICE_DIFF:
-      return "Chênh lệch giá";
+      return 'Chênh lệch giá';
     case BadgeTemplateBadgeType.OUT_OF_STOCK:
-      return "Hết hàng";
+      return 'Hết hàng';
     case BadgeTemplateBadgeType.NEW_ARRIVAL:
-      return "Mới";
+      return 'Mới';
     case BadgeTemplateBadgeType.LOW_STOCK:
-      return "Sắp hết";
+      return 'Sắp hết';
     case BadgeTemplateBadgeType.PRE_ORDER:
-      return "Đặt trước";
+      return 'Đặt trước';
     default:
       return String(t);
   }
 };
 
 /** Loại Label cho Danh sách Labels (Label Library) — không dùng cho badge-flow thủ công. */
-export const LABEL_LIBRARY_BADGE_TYPE_VALUES = [
-  BadgeTemplateBadgeType.CAMPAIGN,
-  BadgeTemplateBadgeType.OUT_OF_STOCK,
-  BadgeTemplateBadgeType.PRE_ORDER,
-] as const;
+export const LABEL_LIBRARY_BADGE_TYPE_VALUES = [BadgeTemplateBadgeType.CAMPAIGN, BadgeTemplateBadgeType.OUT_OF_STOCK, BadgeTemplateBadgeType.PRE_ORDER] as const;
 
 export const LABEL_LIBRARY_BADGE_TYPE_OPTIONS = LABEL_LIBRARY_BADGE_TYPE_VALUES.map((value) => ({
   value,
@@ -174,18 +162,17 @@ export const LABEL_LIBRARY_BADGE_TYPE_OPTIONS = LABEL_LIBRARY_BADGE_TYPE_VALUES.
 }));
 
 /** Label hiển thị khi form có thể trả `''` (create chưa chọn loại). */
-export const resolveBadgeTemplateBadgeTypeLabelVi = (badgeType: BadgeTemplateBadgeType | ""): string =>
-  badgeType ? badgeTemplateBadgeTypeLabelVi(badgeType) : "—";
+export const resolveBadgeTemplateBadgeTypeLabelVi = (badgeType: BadgeTemplateBadgeType | ''): string => (badgeType ? badgeTemplateBadgeTypeLabelVi(badgeType) : '—');
 
 export const badgeTemplateToTableRow = (t: BadgeTemplate): LabelContentDesignRow => {
   return {
     id: t.id,
     name: t.name,
     badgeType: t.badgeType,
-    slotLabel: t.defaultPosition ? badgePositionLabelVi(t.defaultPosition) : "—",
+    slotLabel: t.defaultPosition ? badgePositionLabelVi(t.defaultPosition) : '—',
     priority: t.defaultPriorityWeight ?? 0,
     status: t.status,
-    updatedAt: typeof t.updatedAt === "string" ? t.updatedAt : new Date(t.updatedAt).toISOString(),
+    updatedAt: t.updatedAt ? (typeof t.updatedAt === 'string' ? t.updatedAt : new Date(t.updatedAt).toISOString()) : '',
     badgeTemplate: t,
   };
 };
@@ -194,13 +181,13 @@ const slugCodeFromName = (name: string): string => {
   const normalized = name
     .trim()
     .toUpperCase()
-    .replace(/[^A-Z0-9]+/g, "_")
-    .replace(/^_+|_+$/g, "")
+    .replace(/[^A-Z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
     .slice(0, 40);
 
   const base = /^[A-Z]/.test(normalized) ? normalized : `LABEL_${normalized}`;
   const suffix = Math.random().toString(36).slice(2, 8).toUpperCase();
-  return `${base || "LABEL"}_${suffix}`;
+  return `${base || 'LABEL'}_${suffix}`;
 };
 
 export const buildCreateBadgeTemplatePayload = (v: LabelContentTemplateFormValues): CreateBadgeTemplateDto => {
@@ -250,11 +237,10 @@ export const mapBadgeTemplateToFormValues = (t: BadgeTemplate): LabelContentTemp
     name: t.name,
     status: t.status,
     type,
-    displayText: t.displayText ?? "",
-    image: t.image ?? "",
-    backgroundColor:
-      typeof sc.backgroundColor === "string" && sc.backgroundColor.trim() ? sc.backgroundColor : LABEL_CONTENT_DEFAULT_BACKGROUND_COLOR,
-    textColor: typeof sc.textColor === "string" && sc.textColor.trim() ? sc.textColor : LABEL_CONTENT_DEFAULT_TEXT_COLOR,
+    displayText: t.displayText ?? '',
+    image: t.image ?? '',
+    backgroundColor: typeof sc.backgroundColor === 'string' && sc.backgroundColor.trim() ? sc.backgroundColor : LABEL_CONTENT_DEFAULT_BACKGROUND_COLOR,
+    textColor: typeof sc.textColor === 'string' && sc.textColor.trim() ? sc.textColor : LABEL_CONTENT_DEFAULT_TEXT_COLOR,
     defaultPosition: t.defaultPosition ?? BadgePosition.TOP_LEFT,
   };
 };

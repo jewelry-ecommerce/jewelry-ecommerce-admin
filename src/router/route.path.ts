@@ -10,8 +10,8 @@ export const ROUTE_PATH = {
   // Catalog
   PRODUCT_LIST: "/products",
   PRODUCT_CREATE: "/products/create",
-  PRODUCT_DETAIL: "/products/:id",
-  PRODUCT_EDIT: "/products/:id/edit",
+  PRODUCT_DETAIL: "/products/:spuId",
+  PRODUCT_EDIT: "/products/:spuId/edit",
   CATEGORY_LIST: "/categories",
   COLLECTION_LIST: "/collections",
   COLLECTION_CREATE: "/collections/create",
@@ -29,7 +29,7 @@ export const ROUTE_PATH = {
   // Curated sets
   SET_LIST: "/sets",
   SET_CREATE: "/sets/create",
-  SET_DETAIL: "/sets/:id",
+  SET_DETAIL: "/sets/:setId",
 
   // CMS
   LABEL_CONTENT_LIST: "/cms/labels",
@@ -38,14 +38,18 @@ export const ROUTE_PATH = {
   LABEL_CONTENT_EDIT: "/cms/labels/:labelId/edit",
   CMS_PAGE_LIST: "/cms/pages",
   CMS_PAGE_CREATE: "/cms/pages/create",
-  CMS_PAGE_DETAIL: "/cms/pages/:id",
-  CMS_PAGE_EDIT: "/cms/pages/:id/edit",
+  CMS_PAGE_DETAIL: "/cms/pages/:pageId",
+  CMS_PAGE_EDIT: "/cms/pages/:pageId/edit",
   CMS_BANNER_LIST: "/cms/banners",
+  LABEL_DISPLAY_CREATE: "/cms/badge-flow/create",
+  LABEL_DISPLAY_DETAIL: "/cms/badge-flow/:displayId",
+  LABEL_DISPLAY_UPDATE: "/cms/badge-flow/:displayId/edit",
+  LABEL_FLOW_LIST: "/cms/badge-flow",
   CMS_NAVIGATION: "/cms/navigation",
 
   // Orders
   ORDER_LIST: "/orders",
-  ORDER_DETAIL: "/orders/:code",
+  ORDER_DETAIL: "/orders/:orderId",
 
   // Inventory
   INVENTORY_OVERVIEW: "/inventory",
@@ -58,7 +62,7 @@ export const ROUTE_PATH = {
   // Promotions
   PROMOTION_LIST: "/promotions",
   PROMOTION_CREATE: "/promotions/create",
-  PROMOTION_DETAIL: "/promotions/:id",
+  PROMOTION_DETAIL: "/promotions/:promotionId",
   VOUCHER_LIST: "/vouchers",
   VOUCHER_CREATE: "/vouchers/create",
   VOUCHER_DETAIL: "/vouchers/:id",
@@ -90,7 +94,37 @@ export const ROUTE_PATH = {
   SETTING_ANALYTICS: "/settings/analytics",
   SETTING_LIVE_CHAT: "/settings/live-chat",
 
+  SHIPPING: "/shipping",
+  EXCHANGE: "/exchange",
+  REFUND_PROPOSAL: "/order/refund-proposals",
+  PRE_ORDER_CAMPAIGN: "/order/pre-order-campaigns",
+  PRE_ORDER_CAMPAIGN_CREATE: "/order/pre-order-campaigns/create",
+  PRE_ORDER_CAMPAIGN_DETAIL: "/order/pre-order-campaigns/:campaignId",
+  PRE_ORDER_CAMPAIGN_UPDATE: "/order/pre-order-campaigns/:campaignId/update",
+  PRE_ORDER_CAMPAIGN_STATISTICS: "/order/pre-order-campaigns/statistics",
+  PRE_ORDER_CAMPAIGN_STATISTICS_DETAIL: "/order/pre-order-campaigns/statistics/:campaignId",
+  PRE_ORDER_ORDER: "/order/pre-order-orders",
+  PRE_ORDER_ORDER_DETAIL: "/order/pre-order-orders/:preOrderId",
+  PRE_ORDER_ORDER_UPDATE: "/order/pre-order-orders/:preOrderId/edit",
+  INVOICE: "/invoice",
+  INVOICE_DETAIL: "/invoice/:invoiceId",
+  REFUND_PROPOSAL_DETAIL: "/order/refund-proposals/:refundProposalId",
+  PRODUCT_REVIEW_LIST: "/product/review",
+  PROMOTION_SANDBOX: "/promotion/sandbox",
+  PROMOTION_DASHBOARD: "/promotion/dashboard",
+  CUSTOMER_REQUEST_ORDER_SUPPORT: "/customer-requests/order-support",
+  CUSTOMER_REQUEST_NEWSLETTER: "/customer-requests/newsletter",
+  DISCOUNT_LABEL_SETTINGS: "/content/discount-label",
+  SITE_TOP_BANNER: "/content/site-top-banner",
+  SITE_LOGO: "/content/site-logo",
+  SITE_NAVIGATION: "/content/site-navigation",
+  SITE_FOOTER: "/content/site-footer",
+  SEARCH_PINNED_PRODUCTS: "/content/search-pinned-products",
   NO_ACCESS: "/no-access",
+  ORDER_CREATE: "/order/create",
+  ORDER_EDIT: "/order/:orderId/edit",
+  ORDER_CLONE: "/order/:orderId/clone",
+  PROMOTION_UPDATE: "/promotions/:promotionId/edit",
   NOT_FOUND: "*",
 } as const;
 

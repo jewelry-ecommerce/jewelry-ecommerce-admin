@@ -1,19 +1,41 @@
 import { backendRequest } from '@/apis/backend-request';
-import { getDataSourceMode } from '@/common/config/app.config';
-import type { AttributeRequestDto, QueryAttributeDto } from './attribute.interface';
+import { getDataSourceMode, isJavaBackend } from '@/common/config/app.config';
+import type { Attribute } from './attribute.entities';
+import type { AttributeRequestDto, QueryAttributeDto,CreateAttributeValueDto,UpdateAttributeValueDto } from './attribute.interface';
 import { mapAttribute, type WireAttribute } from './attribute-backend.mapper';
 import { PIM_QUERY_POLICY } from '../pim.config';
 import { categoryApi } from '../category/category.api';
 import { AttributeStatus } from './attribute.enum';
 export * from './attribute.enum';
 export type * from './attribute.interface';
+import { javaAttributes, javaAttributeDetail, javaAttributeTree, javaSaveAttribute, unsupportedJavaAction } from '@/apis/java/java-taxonomy.api';
 const ATTRIBUTE_PATH = 'admin/catalog/attributes';
 function assertHttp():void {
   if(getDataSourceMode() !== 'HTTP') throw new Error('Quản lý thuộc tính cần backend riêng ở chế độ HTTP.');
 }
+function attributeWrite(current:Attribute):AttributeRequestDto{
+  return {name:current.name,code:current.code,displayType:current.displayType,status:current.status,isVariantAxis:current.isVariantAxis,values:(current.values??[]).map(value=>({code:value.code,value:value.value,image:value.image??undefined}))};
+}
 export const attributeApi = {
+  async patchAttribute(id:string,input:Partial<AttributeRequestDto>){
+    const current=attributeWrite(await attributeApi.getAttributeDetail(id));
+    return attributeApi.putAttribute(id,{...current,...input});
+  },
+  async deleteAttributeValue(attributeId:string,valueId:string){
+    const current=await attributeApi.getAttributeDetail(attributeId);
+    return attributeApi.putAttribute(attributeId,{...attributeWrite(current),values:(current.values??[]).filter(value=>value.id!==valueId).map(value=>({...value,image:value.image??undefined}))});
+  },
+  async patchAttributeValue(attributeId:string,valueId:string,input:UpdateAttributeValueDto){
+    const current=await attributeApi.getAttributeDetail(attributeId);
+    return attributeApi.putAttribute(attributeId,{...attributeWrite(current),values:(current.values??[]).map(value=>({...value,image:value.image??undefined,...(value.id===valueId?input:{})}))});
+  },
+  async postAttributeValue(attributeId:string,input:CreateAttributeValueDto){
+    const current=attributeWrite(await attributeApi.getAttributeDetail(attributeId));
+    return attributeApi.putAttribute(attributeId,{...current,values:[...current.values,input]});
+  },
   async getAttributeTree(query:{categoryId:string;isPagination?:boolean}) {
     assertHttp();
+    if (isJavaBackend()) return javaAttributeTree();
     const [category,global]=await Promise.all([categoryApi.getCategoryDetail(query.categoryId),allAttributes({status:AttributeStatus.ACTIVE,isPagination:false})]);
     const selected=new Map([...global.list.filter(attribute=>attribute.isGlobal),...(category.effectiveAttributes??[])].map(attribute=>[attribute.id,attribute]));
     const list=[...selected.values()].filter(attribute=>attribute.status===AttributeStatus.ACTIVE && attribute.isVariantAxis)
@@ -21,21 +43,22 @@ export const attributeApi = {
     return {list,total:list.length};
   },
   async postAttribute(input:AttributeRequestDto) {
-    assertHttp(); return mapAttribute(await backendRequest<WireAttribute>(ATTRIBUTE_PATH,'POST',input));
+    assertHttp(); if (isJavaBackend()) return javaSaveAttribute(input);return mapAttribute(await backendRequest<WireAttribute>(ATTRIBUTE_PATH,'POST',input));
   },
   async putAttribute(id:string,input:AttributeRequestDto) {
-    assertHttp(); return mapAttribute(await backendRequest<WireAttribute>(ATTRIBUTE_PATH+'/'+id,'PUT',input));
+    assertHttp(); if (isJavaBackend()) return javaSaveAttribute(input,id);return mapAttribute(await backendRequest<WireAttribute>(ATTRIBUTE_PATH+'/'+id,'PUT',input));
   },
   async getAttributeDetail(id:string) {
-    assertHttp(); return mapAttribute(await backendRequest<WireAttribute>(ATTRIBUTE_PATH+'/'+id));
+    assertHttp(); if (isJavaBackend()) return javaAttributeDetail(id);return mapAttribute(await backendRequest<WireAttribute>(ATTRIBUTE_PATH+'/'+id));
   },
   async getAttributeList(query:Partial<QueryAttributeDto>) {
     assertHttp();
+    if (isJavaBackend()) {const result=await javaAttributes(query);return {...result,pagination:{total:result.total}};}
     if(query.isPagination === false) return allAttributes(query);
     return attributePage(query, Math.max(query.page??PIM_QUERY_POLICY.firstPage,PIM_QUERY_POLICY.firstPage));
   },
   async deleteAttribute(id:string) {
-    assertHttp(); return backendRequest<{success:boolean}>(ATTRIBUTE_PATH+'/'+id,'DELETE');
+    assertHttp(); if (isJavaBackend()) return unsupportedJavaAction();return backendRequest<{success:boolean}>(ATTRIBUTE_PATH+'/'+id,'DELETE');
   },
 };
 async function attributePage(query:Partial<QueryAttributeDto>,page:number) {
@@ -44,7 +67,7 @@ async function attributePage(query:Partial<QueryAttributeDto>,page:number) {
   if(query.search?.trim()) params.set('search',query.search.trim());
   if(query.status) params.set('status',query.status);
   const result=await backendRequest<{list:WireAttribute[];total:number}>(ATTRIBUTE_PATH+'?'+params);
-  return {...result,list:result.list.map(mapAttribute)};
+  return {...result,pagination:{total:result.total},list:result.list.map(mapAttribute)};
 }
 async function allAttributes(query:Partial<QueryAttributeDto>) {
   const result=await attributePage(query,PIM_QUERY_POLICY.firstPage);

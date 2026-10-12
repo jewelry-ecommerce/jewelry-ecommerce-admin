@@ -13,7 +13,7 @@ import {
   type ProductListBannerConditionType,
 } from "./banner.enum";
 
-export interface Banner extends BaseEntity {
+export interface Banner extends Omit<BaseEntity, "createdAt" | "updatedAt"> {
   internalName: string;
   mediaUrl?: string;
   mediaMobileUrl?: string;
@@ -33,7 +33,7 @@ export interface Banner extends BaseEntity {
   placementLayoutItems: PlacementLayoutItem[];
 }
 
-export interface Placement extends BaseEntity {
+export interface Placement extends Omit<BaseEntity, "createdAt" | "updatedAt"> {
   code: string;
   name: string;
   platform: PlacementPlatform;
@@ -43,7 +43,7 @@ export interface Placement extends BaseEntity {
   placementLayouts: PlacementLayout[];
 }
 
-export interface PlacementLayout extends BaseEntity {
+export interface PlacementLayout extends Omit<BaseEntity, "createdAt" | "updatedAt"> {
   placementId: string;
   name: string;
   revision: number;
@@ -55,7 +55,7 @@ export interface PlacementLayout extends BaseEntity {
   items: PlacementLayoutItem[];
 }
 
-export interface PlacementLayoutItem extends BaseEntity {
+export interface PlacementLayoutItem extends Omit<BaseEntity, "createdAt" | "updatedAt"> {
   placementLayoutId: string;
   slotKey: string;
   bannerId?: string;

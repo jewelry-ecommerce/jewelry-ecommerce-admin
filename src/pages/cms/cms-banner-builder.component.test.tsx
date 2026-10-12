@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import type * as AppConfigModule from "@/common/config/app.config";
 import { act, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { SWRConfig } from "swr";
@@ -7,6 +8,10 @@ import { SnackbarProvider } from "@/hooks/snackbar-provider.component";
 import { CmsBlockFields } from "./cms-block-fields.component";
 import { newCmsBlock } from "./cms-demo.constants";
 import { CmsDemoBlockType } from "@/apis/cms-demo/cms-demo.interface";
+vi.mock("@/common/config/app.config", async (importOriginal) => ({
+  ...await importOriginal<typeof AppConfigModule>(),
+  getDataSourceMode: () => "MOCK", isJavaBackend: () => false,
+}));
 vi.mock("@/trading-ui/components/editor/rich-text-editor.component", () => ({ RichTextEditor: () => null }));
 const placement = { id: "placement-test", code: "TEST_HERO", name: "Banner test", displayType: "SLIDER", status: "ACTIVE" };
 const initialBanner = {

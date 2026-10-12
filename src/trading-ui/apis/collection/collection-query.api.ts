@@ -23,5 +23,5 @@ export async function readCollectionList(query: Partial<QueryCollectionDto>) {
       result.list.push(...next.list); result.pagination = next.pagination;
     }
   }
-  return { ...result, list: result.list.map(mapCollection) };
+  return { ...result, pagination:{...result.pagination,total:result.total}, list: result.list.map(mapCollection) };
 }

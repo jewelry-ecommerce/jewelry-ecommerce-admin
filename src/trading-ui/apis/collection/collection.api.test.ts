@@ -4,7 +4,7 @@ import { CollectionStatus,UpdateCollectionAction } from './collection.enum';
 import type { WireCollection } from './collection-backend.mapper';
 const request=vi.hoisted(()=>vi.fn());
 vi.mock('@/apis/backend-request',()=>({backendRequest:request}));
-vi.mock('@/common/config/app.config',()=>({getDataSourceMode:()=> 'HTTP'}));
+vi.mock('@/common/config/app.config',()=>({getDataSourceMode:()=> 'HTTP', isJavaBackend:()=>false}));
 import { collectionApi } from './collection.api';
 const current:WireCollection={id:5,name:'Collection',slug:'collection',description:'Description',status:CollectionStatus.ACTIVE,
   createdAt:'2026-10-10T00:00:00Z',updatedAt:'2026-10-10T00:00:00Z',productIds:[11],productCollections:[]};

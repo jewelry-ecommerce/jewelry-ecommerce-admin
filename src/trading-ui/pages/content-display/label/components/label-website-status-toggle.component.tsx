@@ -1,4 +1,4 @@
-import { HighlightStatusToggle } from "@/trading-ui/components/switch/highlight-status-toggle.component";
+import { HighlightStatusToggle } from '../../../../components/switch/highlight-status-toggle.component';
 
 type LabelWebsiteStatusToggleProps = {
   readonly active: boolean;
@@ -9,21 +9,6 @@ type LabelWebsiteStatusToggleProps = {
   readonly statusLabel?: string;
 };
 
-export const LabelWebsiteStatusToggle = ({
-  active,
-  onActiveChange,
-  disabled,
-  name = "status",
-  readOnly = false,
-  statusLabel,
-}: LabelWebsiteStatusToggleProps) => (
-  <HighlightStatusToggle
-    label="Hiển thị lên website"
-    checked={active}
-    onCheckedChange={onActiveChange}
-    disabled={disabled}
-    name={name}
-    readOnly={readOnly}
-    statusLabel={statusLabel}
-  />
+export const LabelWebsiteStatusToggle = ({ active, onActiveChange, disabled, name = 'status', readOnly = false, statusLabel }: LabelWebsiteStatusToggleProps) => (
+  <HighlightStatusToggle label="Hiển thị lên website" checked={active} onCheckedChange={onActiveChange} disabled={disabled} name={name} readOnly={readOnly} statusLabel={statusLabel} />
 );

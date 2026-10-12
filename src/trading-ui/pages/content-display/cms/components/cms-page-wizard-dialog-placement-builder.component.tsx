@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { isJavaBackend } from "@/common/config/app.config";
 import { Box, Stack, Typography } from "@mui/material";
 import { arrayMove } from "@dnd-kit/sortable";
 import { Controller, useForm } from "react-hook-form";
@@ -86,7 +87,7 @@ const PLACEMENT_GRID_ROWS = 2;
 const DEFAULT_VALUES: PlacementFormValues = {
   code: "",
   name: "",
-  displayType: PlacementDisplayType.GRID,
+  displayType: isJavaBackend() ? PlacementDisplayType.SLIDER : PlacementDisplayType.GRID,
   columns: PLACEMENT_GRID_COLUMNS,
   rows: PLACEMENT_GRID_ROWS,
 };
@@ -202,8 +203,13 @@ const buildLayoutItemPatchPayload = (
   return payload;
 };
 
+function normalizePlacementSlots(displayType: PlacementDisplayType, columns: number, rows: number, slots: GridSlotItem[]): GridSlotItem[] {
+  if (displayType !== PlacementDisplayType.GRID) return slots;
+  return normalizeSlots(columns, rows, slots);
+}
 const mapLayoutToSlots = (layout: PlacementLayout, columns: number, rows: number) =>
-  normalizeSlots(
+  normalizePlacementSlots(
+    layout.placement.displayType,
     columns,
     rows,
     (layout.items ?? []).map((item, index) => {
@@ -872,7 +878,7 @@ export const CmsPageWizardDialogPlacementBuilder: React.FC<CmsPageWizardDialogPl
                 label="Kiểu hiển thị"
                 requiredMark
                 value={field.value}
-                options={DISPLAY_TYPE_OPTIONS}
+                options={isJavaBackend() ? DISPLAY_TYPE_OPTIONS.filter(option => option.value === PlacementDisplayType.SLIDER) : DISPLAY_TYPE_OPTIONS}
                 onChange={field.onChange}
                 error={Boolean(form.formState.errors.displayType)}
                 errorMessage={form.formState.errors.displayType?.message}

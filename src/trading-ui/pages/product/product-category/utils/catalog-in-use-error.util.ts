@@ -1,4 +1,4 @@
-export type CatalogDependencyModuleCode = 'PROMOTION' | 'BADGE' | 'CMS' | 'PIM';
+export type CatalogDependencyModuleCode = 'PROMOTION' | 'BADGE' | 'CMS';
 
 export type CatalogDependencyItem = {
   sourceType?: 'COLLECTION' | 'CATEGORY';
@@ -18,7 +18,6 @@ export type CatalogInUseErrorPayload = {
 };
 
 const MODULE_LABEL: Record<CatalogDependencyModuleCode, string> = {
-  PIM: 'Quản lý sản phẩm',
   PROMOTION: 'Promotion',
   BADGE: 'Cấu hình Label',
   CMS: 'CMS',

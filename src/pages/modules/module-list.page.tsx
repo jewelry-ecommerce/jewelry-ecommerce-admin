@@ -7,7 +7,8 @@ import {
   FilterListOutlined,
   VisibilityOutlined,
 } from "@mui/icons-material";
-import { Stack, Typography } from "@mui/material";
+import { Alert, Stack, Typography } from "@mui/material";
+import { getDataSourceMode } from "@/common/config/app.config";
 import { useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -335,7 +336,8 @@ const ModuleListPage = () => {
   const definition = useMemo(() => moduleFromPath(pathname), [pathname]);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("ALL");
-  const rows = definition.rows.filter((row) => {
+  const sourceRows = getDataSourceMode() === "HTTP" ? [] : definition.rows;
+  const rows = sourceRows.filter((row) => {
     const matchedStatus = status === "ALL" || row.status === status;
     return (
       matchedStatus &&
@@ -348,12 +350,12 @@ const ModuleListPage = () => {
   });
   const statuses = [
     "ALL",
-    ...Array.from(new Set(definition.rows.map((row) => row.status).filter((value): value is string => Boolean(value)))),
+    ...Array.from(new Set(sourceRows.map((row) => row.status).filter((value): value is string => Boolean(value)))),
   ];
   const tabs = statuses.map((value) => ({
     value,
     label: value === "ALL" ? "Tất cả" : value,
-    count: value === "ALL" ? definition.rows.length : definition.rows.filter((row) => row.status === value).length,
+    count: value === "ALL" ? sourceRows.length : sourceRows.filter((row) => row.status === value).length,
   }));
 
   const actions = [
@@ -377,13 +379,14 @@ const ModuleListPage = () => {
     <Stack sx={{ height: `calc(100vh - ${STYLE.HEIGHT_HEADER}px)`, boxSizing: "border-box", minHeight: 0 }}>
       <WrapperComponent label={definition.title} tabs={<DataTableStatusTabs tabs={tabs} activeValue={status} onChange={setStatus} />}>
         <Stack gap={2} sx={{ flex: 1, minHeight: 0, minWidth: 0 }}>
+          {getDataSourceMode() === "HTTP" && <Alert severity="info">Màn hình này chưa được nối API. Không hiển thị dữ liệu mẫu trong chế độ Java.</Alert>}
           <DataTableFilterCard>
             <DataTableToolbar
               embedded
               searchValue={search}
               onSearchChange={setSearch}
               searchPlaceholder="Tìm theo mã, tên, khách hàng..."
-              actions={actions}
+              actions={getDataSourceMode() === "HTTP" ? [] : actions}
             />
           </DataTableFilterCard>
           <DataTableContentCard>

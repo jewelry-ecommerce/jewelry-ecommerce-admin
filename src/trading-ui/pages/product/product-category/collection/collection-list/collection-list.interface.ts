@@ -1,4 +1,4 @@
-import { type CollectionStatus, type Collection } from '@/trading-ui/apis/pim';
+import { type CollectionStatus, type Collection } from '../../../../../apis';
 
 export interface ProductCollectionCreateFormValues {
   name: string;

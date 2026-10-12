@@ -30,4 +30,10 @@ export default defineConfig([
       '@typescript-eslint/no-unused-expressions': 'error',
     },
   },
+  {
+    // Source UI uses effect-based form hydration and mixed UI/helper modules.
+    // Keep the runtime hook rules and strict type safety; surface these compiler/HMR hints as warnings.
+    files: ['src/trading-ui/**/*.{ts,tsx}'],
+    rules: { 'react-hooks/set-state-in-effect': 'warn', 'react-hooks/preserve-manual-memoization': 'warn', 'react-refresh/only-export-components': 'warn' },
+  },
 ]);

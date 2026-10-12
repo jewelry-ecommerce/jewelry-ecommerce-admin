@@ -1,10 +1,10 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
-import { collectionApi, UpdateCollectionAction } from '@/trading-ui/apis/pim';
+import { collectionApi, UpdateCollectionAction } from '../../../../../apis';
 import type { Collection } from '../../../../../apis/collection/collection.entities';
 import type { Product } from '../../../../../apis/product/product.entities';
-import { SnackbarType, useSnackbar } from '../../../../../hooks/use-snackbar.hook';
+import { SnackbarType, useSnackbar } from '@/hooks/use-snackbar.hook';
 import { DEFAULT_COLLECTION_PAGE_SIZE } from '../collection-detail/collection-detail.constant';
 import { buildCollectionDetailRows, matchesCollectionRow } from '../collection-detail/utils/collection-detail.util';
 import type { CollectionDetailRow } from '../collection-detail/collection-detail.interface';
@@ -67,14 +67,13 @@ export function useCollectionFormState({ mode, collectionId }: UseCollectionForm
     return `${collection.id}:${collectProductIds(collection).join(',')}`;
   }, [collection]);
 
-  const [synchronizedKey, setSynchronizedKey] = useState("");
-  if (isEdit && collection && synchronizedKey !== serverSyncKey) {
-    setSynchronizedKey(serverSyncKey);
+  useEffect(() => {
+    if (!isEdit || !collection) return;
     const ids = collectProductIds(collection);
     setDraftProductIds(ids);
     setInitialProductIds(ids);
     setPendingProductsById({});
-  }
+  }, [isEdit, serverSyncKey, collection]);
 
   const brandId = collection?.brandId;
 
@@ -126,9 +125,14 @@ export function useCollectionFormState({ mode, collectionId }: UseCollectionForm
     return filteredRows.slice(start, start + pageSize);
   }, [filteredRows, page, pageSize]);
 
+  useEffect(() => {
+    setSelectedRowIds((prev) => prev.filter((id) => rows.some((r) => r.id === id)));
+  }, [rows]);
 
-  const totalPage = Math.max(1, Math.ceil(filteredRows.length / pageSize));
-  if (page > totalPage) setPage(totalPage);
+  useEffect(() => {
+    const totalPage = Math.max(1, Math.ceil(filteredRows.length / pageSize));
+    if (page > totalPage) setPage(totalPage);
+  }, [filteredRows.length, page, pageSize]);
 
   const setSearchValue = useCallback((next: string) => {
     setSearchValueState(next);
@@ -246,7 +250,7 @@ export function useCollectionFormState({ mode, collectionId }: UseCollectionForm
     setPage,
     pageSize,
     setPageSize,
-    selectedRowIds: selectedRowIds.filter(id => rows.some(row => row.id === id)),
+    selectedRowIds,
     setSelectedRowIds,
     pagedRows,
     filteredRows,

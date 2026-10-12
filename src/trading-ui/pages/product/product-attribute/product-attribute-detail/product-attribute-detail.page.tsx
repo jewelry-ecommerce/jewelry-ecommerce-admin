@@ -6,13 +6,13 @@ import useSWR from 'swr';
 import { ButtonIconContentComponent } from '../../../../components/button';
 import { productAttributesButtonPermission } from '../../product-permission.constants';
 import { TYPOGRAPHY_STYLES } from '../../../../common/constant/typography.constant';
-import { LabelFormPageHeader } from '../../../content-display/label/components/label-form-page-header.component';
+import { LabelFormPageHeader } from '../../../content-display/label/components';
 import { StackRowAlignCenter, StackRowAlignCenterJustBetween } from '../../../../components/styled/stack.style';
-import { getProductAttributeUpdatePath, ROUTE_PATH } from '@/router/route.path';
+import { getProductAttributeUpdatePath, ROUTE_PATH } from '@/trading-ui/router/route.path';
 import { PRODUCT_ATTRIBUTE_DATA_TYPE_OPTIONS } from '../product-attribute.constant';
 import { Edit02 } from '@untitledui/icons';
-import { EmptyComponent } from '@/components/empty/empty.component';
-import { attributeApi } from '../../../../apis/attribute';
+import { EmptyComponent } from '../../../../components/empty/empty.component';
+import { attributeApi } from '../../../../apis';
 import { AttributeStatus } from '../../../../apis/attribute/attribute.enum';
 import { LoadingComponent } from '../../../../components/loading/loading.component';
 import { TagCommonComponent } from '../../../../components/tag';
@@ -81,7 +81,7 @@ const ProductAttributeDetailPage = () => {
         gap: 0,
       }}
     >
-      <LabelFormPageHeader variant="backOnly" onBack={() => navigate(ROUTE_PATH.ATTRIBUTE_LIST)} />
+      <LabelFormPageHeader variant="backOnly" onBack={() => navigate(ROUTE_PATH.PRODUCT_ATTRIBUTE_LIST)} />
 
       <StackRowAlignCenterJustBetween sx={{ px: 3, py: 2, gap: 1.5, backgroundColor: '#FFFFFF' }}>
         <Typography sx={{ ...TYPOGRAPHY_STYLES['2xl'].bold, color: '#101828' }}>{attribute.name}</Typography>

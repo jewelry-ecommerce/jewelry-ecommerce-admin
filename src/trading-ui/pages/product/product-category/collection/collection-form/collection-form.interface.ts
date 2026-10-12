@@ -1,4 +1,4 @@
-import type { CollectionStatus } from '@/trading-ui/apis/pim';
+import type { CollectionStatus } from '../../../../../apis';
 
 export type CollectionFormMode = 'create' | 'edit';
 

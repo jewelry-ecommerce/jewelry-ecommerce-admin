@@ -1,7 +1,8 @@
 import axios, { type AxiosRequestConfig } from "axios";
 import { store } from "@/redux/store.redux";
 
-import { getApiBaseUrl, getDataSourceMode } from "@/common/config/app.config";
+import { getApiBaseUrl, getDataSourceMode, isJavaBackend } from "@/common/config/app.config";
+import { unwrapJava } from "./java/java-envelope";
 
 /**
  * Single transport boundary — mirrors `jewelry-commerce-client/src/utils/api/transport.ts`.
@@ -91,7 +92,7 @@ export const apiRequest = async <TResult>(descriptor: ApiDescriptor<TResult>): P
     };
 
     const response = await httpClient.request<TResult>(config);
-    return response.data;
+    return isJavaBackend() ? unwrapJava<TResult>(response.data) : response.data;
   } catch (error) {
     throw toApiError(error);
   }

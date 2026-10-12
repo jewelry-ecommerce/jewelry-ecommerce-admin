@@ -3,18 +3,18 @@ import { Stack, Typography } from '@mui/material';
 import { Controller, type SubmitHandler, useForm, useWatch } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { StackRowAlignCenter, STYLE } from '@/trading-ui/adapters/library';
-import { ROUTE_PATH } from '@/router/route.path';
-import { LabelFormPageHeader } from '../../../content-display/label/components/label-form-page-header.component';
+import { ROUTE_PATH } from '@/trading-ui/router/route.path';
+import { LabelFormPageHeader } from '../../../content-display/label/components';
 import { productAttributesButtonPermission } from '../../product-permission.constants';
 import { StackRow } from '../../../../components/styled';
 import { TYPOGRAPHY_STYLES } from '../../../../common/constant/typography.constant';
 import { SelectInput, TextInput } from '../../../../components/form';
 import { type ProductAttributeFormValues, PRODUCT_ATTRIBUTE_DATA_TYPE_OPTIONS, createEmptyProductAttributeValueRow, productAttributeCreateFormSchema } from '../product-attribute.constant';
 import { ProductAttributeValuesList } from '../components/product-attribute-values-list.part';
-import { attributeApi, AttributeDisplayType, AttributeStatus } from '../../../../apis/attribute';
+import { attributeApi, AttributeDisplayType, AttributeStatus } from '../../../../apis';
 import { MediaVisibility } from '../../../../apis/file';
 import { uploadSingleImage } from '../../../../common/utils/image-upload.utils';
-import { SnackbarType, useSnackbar } from '../../../../hooks/use-snackbar.hook';
+import { SnackbarType, useSnackbar } from '@/hooks/use-snackbar.hook';
 import { getErrorMessage } from '../../../../common/utils';
 import { type BaseSyntheticEvent, useCallback, useState } from 'react';
 
@@ -62,7 +62,7 @@ const ProductAttributeCreatePage = () => {
       );
       await attributeApi.postAttribute({ ...values, values: valuesForApi });
       showSnackbar({ message: 'Tạo thuộc tính thành công', type: SnackbarType.SUCCESS });
-      navigate(ROUTE_PATH.ATTRIBUTE_LIST);
+      navigate(ROUTE_PATH.PRODUCT_ATTRIBUTE_LIST);
     } catch (error) {
       showSnackbar({ message: getErrorMessage(error), type: SnackbarType.ERROR });
     } finally {
@@ -88,8 +88,8 @@ const ProductAttributeCreatePage = () => {
       <Stack sx={{ flex: 1, minHeight: 0, gap: 0 }}>
         <LabelFormPageHeader
           title="Tạo thuộc tính"
-          onBack={() => navigate(ROUTE_PATH.ATTRIBUTE_LIST)}
-          onCancel={() => navigate(ROUTE_PATH.ATTRIBUTE_LIST)}
+          onBack={() => navigate(ROUTE_PATH.PRODUCT_ATTRIBUTE_LIST)}
+          onCancel={() => navigate(ROUTE_PATH.PRODUCT_ATTRIBUTE_LIST)}
           onSave={() => void handleFormSubmit()}
           loading={loading}
           cancelPermission={productAttributesButtonPermission('create_cancel', 'Hủy tạo thuộc tính sản phẩm', 'api_attribute_create')}

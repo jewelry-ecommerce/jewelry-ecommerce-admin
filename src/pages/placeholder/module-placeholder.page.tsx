@@ -3,13 +3,13 @@ import { useLocation } from "react-router-dom";
 
 import { EmptyComponent } from "@/components/empty/empty.component";
 import { WrapperComponent } from "@/components/wrapper/wrapper.component";
-import { collectLeafMatchPaths, DASHBOARD_SIDEBAR_NAV, isNavActive } from "@/router/dashboard-sidebar.nav";
+import { isNavItemWithChildren, collectLeafMatchPaths, DASHBOARD_SIDEBAR_NAV, isNavActive } from "@/router/dashboard-sidebar.nav";
 import { STYLE } from "@/theme/design-tokens";
 
 /** Longest-prefix nav match, so `/cms/pages/create` reports "Pages" rather than "Content". */
 const resolveModuleName = (pathname: string): { title: string; groupTitle: string } => {
   const matches = DASHBOARD_SIDEBAR_NAV.flatMap((group) =>
-    (group.items ?? []).flatMap((leaf) =>
+    (group.items ?? []).flatMap(item => isNavItemWithChildren(item) ? item.children : [item]).flatMap((leaf) =>
       collectLeafMatchPaths(leaf)
         .filter((path) => isNavActive(pathname, path))
         .map((path) => ({ title: leaf.title, groupTitle: group.title, length: path.length })),

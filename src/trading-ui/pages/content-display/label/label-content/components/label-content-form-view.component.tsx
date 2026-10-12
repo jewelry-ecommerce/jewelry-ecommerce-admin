@@ -1,15 +1,15 @@
-import { Box, Stack, Typography } from "@mui/material";
-import type { Control, UseFormSetValue, UseFormWatch } from "react-hook-form";
-import { Controller } from "react-hook-form";
-import { BadgeStatus, BadgeType } from "@/trading-ui/apis/badge";
-import { TYPOGRAPHY_STYLES } from "@/trading-ui/common/constant/typography.constant";
-import { SelectInput, TextInput } from "@/trading-ui/components/form";
-import { StackRow } from "@/components/styled/stack.style";
-import { LabelWebsiteStatusToggle } from "../../components";
-import type { LabelContentTemplateFormValues } from "../label-content.interface";
-import { LABEL_LIBRARY_BADGE_TYPE_OPTIONS } from "../label-content.utils";
-import { LabelContentDesignFields } from "./label-content-design-fields.component";
-import { LabelContentPreview } from "./label-preview.component";
+import { Box, Stack, Typography } from '@mui/material';
+import type { Control, UseFormSetValue, UseFormWatch } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
+import { BadgeStatus, BadgeType } from '../../../../../apis';
+import { TYPOGRAPHY_STYLES } from '../../../../../common/constant/typography.constant';
+import { SelectInput, TextInput } from '../../../../../components/form';
+import { StackRow } from '../../../../../components/styled/stack.style';
+import { LabelWebsiteStatusToggle } from '../../components';
+import type { LabelContentTemplateFormValues } from '../label-content.interface';
+import { LABEL_LIBRARY_BADGE_TYPE_OPTIONS } from '../label-content.utils';
+import { LabelContentDesignFields } from './label-content-design-fields.component';
+import { LabelContentPreview } from './label-preview.component';
 
 type LabelContentFormViewProps = {
   viewMode?: boolean;
@@ -20,38 +20,31 @@ type LabelContentFormViewProps = {
   setValue: UseFormSetValue<LabelContentTemplateFormValues>;
 };
 
-export const LabelContentFormView = ({
-  viewMode = false,
-  showPreview,
-  inputsDisabled = false,
-  control,
-  watch,
-  setValue,
-}: LabelContentFormViewProps) => {
+export const LabelContentFormView = ({ viewMode = false, showPreview, inputsDisabled = false, control, watch, setValue }: LabelContentFormViewProps) => {
   const previewValues = watch();
   const fieldsDisabled = viewMode || inputsDisabled;
 
   return (
-    <StackRow sx={{ flex: 1, minHeight: 0, alignItems: "stretch", p: 3 }}>
+    <StackRow sx={{ flex: 1, minHeight: 0, alignItems: 'stretch', p: 3 }}>
       <Stack
         sx={{
-          flex: { xs: "1 1 auto", md: "8 1 0%" },
+          flex: { xs: '1 1 auto', md: '8 1 0%' },
           minWidth: 0,
           minHeight: 0,
         }}
       >
-        <StackRow sx={{ flex: 1, height: "auto" }}>
+        <StackRow sx={{ flex: 1, height: 'auto' }}>
           <Stack
             sx={{
-              border: "1px solid #E5E7EB",
-              borderRadius: "10px",
-              bgcolor: "#FFFFFF",
+              border: '1px solid #E5E7EB',
+              borderRadius: '10px',
+              bgcolor: '#FFFFFF',
               p: 2,
               gap: 3,
               flex: 1,
             }}
           >
-            <Typography sx={{ ...TYPOGRAPHY_STYLES.md.semibold, color: "#101828" }}>Thông tin Label</Typography>
+            <Typography sx={{ ...TYPOGRAPHY_STYLES.md.semibold, color: '#101828' }}>Thông tin Label</Typography>
 
             <Stack gap={2}>
               <Controller
@@ -113,21 +106,21 @@ export const LabelContentFormView = ({
 
       <Box
         sx={{
-          flex: { xs: "1 1 auto", md: "2 1 0%" },
+          flex: { xs: '1 1 auto', md: '2 1 0%' },
           minWidth: 0,
-          display: "flex",
-          flexDirection: "column",
+          display: 'flex',
+          flexDirection: 'column',
           minHeight: 0,
         }}
       >
         <LabelContentPreview
           visible={showPreview}
           type={previewValues.type ?? BadgeType.TEXT}
-          displayText={previewValues.displayText ?? ""}
-          image={previewValues.image ?? ""}
-          backgroundColor={previewValues.backgroundColor ?? ""}
-          textColor={previewValues.textColor ?? ""}
-          defaultPosition={previewValues.defaultPosition ?? ""}
+          displayText={previewValues.displayText ?? ''}
+          image={previewValues.image ?? ''}
+          backgroundColor={previewValues.backgroundColor ?? ''}
+          textColor={previewValues.textColor ?? ''}
+          defaultPosition={previewValues.defaultPosition ?? ''}
         />
       </Box>
     </StackRow>

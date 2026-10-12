@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import type * as AppConfigModule from "@/common/config/app.config";
 import { act, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { MemoryRouter } from 'react-router-dom';
@@ -9,6 +10,10 @@ import { CmsBlockFields } from './cms-block-fields.component';
 import { newCmsBlock } from './cms-demo.constants';
 import { CmsDemoBlockType } from '@/apis/cms-demo/cms-demo.interface';
 import type * as CmsSourceApiModule from '@/trading-ui/apis';
+vi.mock("@/common/config/app.config", async (importOriginal) => ({
+  ...await importOriginal<typeof AppConfigModule>(),
+  getDataSourceMode: () => "MOCK", isJavaBackend: () => false,
+}));
 vi.mock('@/trading-ui/components/editor/rich-text-editor.component', () => ({ RichTextEditor: () => null }));
 vi.mock('@/trading-ui/apis', async (importOriginal) => ({
   ...await importOriginal<typeof CmsSourceApiModule>(),

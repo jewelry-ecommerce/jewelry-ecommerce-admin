@@ -1,16 +1,8 @@
-import type {
-  BadgeCampaignDisplayStatus,
-  BadgeTemplate,
-  BadgePosition,
-  BadgeStatus,
-  BadgeTemplateBadgeType,
-  BadgeType,
-} from "@/trading-ui/apis/badge";
+import type { BadgeCampaignDisplayStatus, BadgeTemplate, BadgePosition, BadgeStatus, BadgeTemplateBadgeType, BadgeType } from '../../../../apis';
 
 export type LabelContentDesignRowId = string;
 
-export type LabelContentDesignPreview =
-  { kind: "image"; src: string } | { kind: "pill"; text: string; variant: "new" | "saleOrigin" | "bestSeller" };
+export type LabelContentDesignPreview = { kind: 'image'; src: string } | { kind: 'pill'; text: string; variant: 'new' | 'saleOrigin' | 'bestSeller' };
 
 export interface LabelContentDesignRow {
   id: LabelContentDesignRowId;
@@ -23,7 +15,7 @@ export interface LabelContentDesignRow {
   badgeTemplate: BadgeTemplate;
 }
 
-export type LabelContentHeatmapSlotId = "TL" | "TR" | "ML" | "MR" | "BL" | "BC" | "BR" | "BF";
+export type LabelContentHeatmapSlotId = 'TL' | 'TR' | 'ML' | 'MR' | 'BL' | 'BC' | 'BR' | 'BF';
 
 export interface LabelContentHeatmapSlotLayout {
   id: LabelContentHeatmapSlotId;
@@ -56,20 +48,20 @@ export interface LabelContentPositionDialogRow {
 
 /** Bộ lọc nâng cao — map sang `QueryBadgeTemplateDto` (bỏ qua field rỗng). */
 export interface LabelContentAdvancedFilters {
-  status: "" | BadgeStatus;
-  type: "" | BadgeType;
-  badgeType: "" | BadgeTemplateBadgeType;
-  defaultPosition: "" | BadgePosition;
+  status: '' | BadgeStatus;
+  type: '' | BadgeType;
+  badgeType: '' | BadgeTemplateBadgeType;
+  defaultPosition: '' | BadgePosition;
 }
 
 export interface LabelContentTemplateFormValues {
-  badgeType: BadgeTemplateBadgeType | "";
+  badgeType: BadgeTemplateBadgeType | '';
   name: string;
-  status: BadgeStatus | "";
+  status: BadgeStatus | '';
   type: BadgeType.TEXT | BadgeType.IMAGE;
   displayText: string;
   image: string;
   backgroundColor: string;
   textColor: string;
-  defaultPosition: BadgePosition | "";
+  defaultPosition: BadgePosition | '';
 }

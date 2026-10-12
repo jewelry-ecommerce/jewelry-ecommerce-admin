@@ -1,164 +1,301 @@
-import { ROUTE_PATH } from "@/router/route.path";
-
-/** Keys map to the icon lookup inside `dashboard-sidebar.component.tsx`. */
+import { ROUTE_PATH } from './route.path';
+/** Key khớp map icon trong `dashboard-sidebar.tsx`. */
 export type DashboardSidebarIconKey =
-  "dashboard" | "catalog" | "set" | "cms" | "order" | "inventory" | "promotion" | "customer" | "inquiry" | "report" | "setting";
+  'shopping_cart' | 'inventory' | 'warehouse' | 'storefront' | 'web' | 'receipt' | 'settings' | 'promotion' | 'loyalty' | 'people' | 'account' | 'schedule' | 'support_agent';
 
 export interface DashboardSidebarNavLeaf {
   title: string;
   path: string;
+  /** Mã tab phân quyền — đồng bộ với catalog permission. */
   tabCode: string;
+  /** Ghi đè menuCode của group — dùng khi gộp nhiều menu IAM trong một mục sidebar. */
   menuCode?: string;
+  /** Route con không có mục sidebar riêng nhưng vẫn highlight tab này (vd. trung tâm phân quyền). */
   relatedPaths?: string[];
+  /** Ẩn khỏi sidebar UI — vẫn xuất hiện trong catalog phân quyền. */
+  hiddenFromNav?: boolean;
 }
+
+export type DashboardSidebarNavGroupItem = {
+  title: string;
+  /** Mã tab cha IAM — đồng bộ catalog permission (vd. `product_category`). */
+  tabCode: string;
+  children: DashboardSidebarNavLeaf[];
+};
+
+/** Mục một cấp (path) hoặc nhóm con (children) — giữ đúng shape UI sidebar. */
+export type DashboardSidebarNavItem = { title: string; path: string; tabCode: string; menuCode?: string; relatedPaths?: string[]; hiddenFromNav?: boolean } | DashboardSidebarNavGroupItem;
 
 export interface DashboardSidebarNavGroup {
   title: string;
   icon: DashboardSidebarIconKey;
+  /** Mã menu phân quyền — đồng bộ với catalog permission. */
   menuCode: string;
   path?: string;
-  items?: DashboardSidebarNavLeaf[];
+  items?: DashboardSidebarNavItem[];
 }
 
-/** Navigation is limited to the graduation-project scope. */
-export const DASHBOARD_SIDEBAR_NAV: DashboardSidebarNavGroup[] = [
-  { title: "Tổng quan", icon: "dashboard", menuCode: "dashboard", path: ROUTE_PATH.DASHBOARD },
-  {
-    title: "Sản phẩm",
-    icon: "catalog",
-    menuCode: "product",
-    path: ROUTE_PATH.PRODUCT_LIST,
-    items: [
-      {
-        title: "Danh sách sản phẩm",
-        path: ROUTE_PATH.PRODUCT_LIST,
-        tabCode: "list",
-        relatedPaths: [ROUTE_PATH.PRODUCT_CREATE, ROUTE_PATH.PRODUCT_DETAIL, ROUTE_PATH.PRODUCT_EDIT],
-      },
-      { title: "Danh mục", path: ROUTE_PATH.CATEGORY_LIST, tabCode: "category" },
-      { title: "Bộ sưu tập", path: ROUTE_PATH.COLLECTION_LIST, tabCode: "collection", relatedPaths: [ROUTE_PATH.COLLECTION_CREATE, ROUTE_PATH.COLLECTION_DETAIL, ROUTE_PATH.COLLECTION_EDIT] },
-      {
-        title: "Bộ sản phẩm",
-        path: ROUTE_PATH.SET_LIST,
-        tabCode: "list",
-        menuCode: "set",
-        relatedPaths: [ROUTE_PATH.SET_CREATE, ROUTE_PATH.SET_DETAIL],
-      },
-      { title: "Thuộc tính", path: ROUTE_PATH.ATTRIBUTE_LIST, tabCode: "attribute", relatedPaths: [ROUTE_PATH.ATTRIBUTE_CREATE, ROUTE_PATH.ATTRIBUTE_DETAIL, ROUTE_PATH.ATTRIBUTE_EDIT] },
-      { title: "Chất liệu", path: ROUTE_PATH.MATERIAL_LIST, tabCode: "material" },
-      { title: "Đá quý", path: ROUTE_PATH.GEMSTONE_LIST, tabCode: "gemstone" },
-      { title: "Nhập sản phẩm", path: ROUTE_PATH.PRODUCT_IMPORT, tabCode: "import" },
-      { title: "Xuất sản phẩm", path: ROUTE_PATH.PRODUCT_EXPORT, tabCode: "export" },
-    ],
-  },
-  {
-    title: "Nội dung & hiển thị",
-    icon: "cms",
-    menuCode: "cms",
-    path: ROUTE_PATH.CMS_PAGE_LIST,
-    items: [
-      {
-        title: "Trang nội dung",
-        path: ROUTE_PATH.CMS_PAGE_LIST,
-        tabCode: "page",
-        relatedPaths: [ROUTE_PATH.CMS_PAGE_CREATE, ROUTE_PATH.CMS_PAGE_DETAIL, ROUTE_PATH.CMS_PAGE_EDIT],
-      },
-      { title: "Banner", path: ROUTE_PATH.CMS_BANNER_LIST, tabCode: "banner" },
-      { title: "Nhãn dán", path: ROUTE_PATH.LABEL_CONTENT_LIST, tabCode: "label", relatedPaths: [ROUTE_PATH.LABEL_CONTENT_CREATE, ROUTE_PATH.LABEL_CONTENT_DETAIL, ROUTE_PATH.LABEL_CONTENT_EDIT] },
-      { title: "Điều hướng", path: ROUTE_PATH.CMS_NAVIGATION, tabCode: "navigation" },
-    ],
-  },
-  {
-    title: "Đơn hàng",
-    icon: "order",
-    menuCode: "order",
-    path: ROUTE_PATH.ORDER_LIST,
-    items: [{ title: "Danh sách đơn hàng", path: ROUTE_PATH.ORDER_LIST, tabCode: "list", relatedPaths: [ROUTE_PATH.ORDER_DETAIL] }],
-  },
-  {
-    title: "Kho vận",
-    icon: "inventory",
-    menuCode: "inventory",
-    path: ROUTE_PATH.INVENTORY_OVERVIEW,
-    items: [
-      { title: "Tổng quan kho", path: ROUTE_PATH.INVENTORY_OVERVIEW, tabCode: "overview" },
-      { title: "Danh sách kho", path: ROUTE_PATH.INVENTORY_WAREHOUSE_LIST, tabCode: "warehouse" },
-      { title: "Tồn kho", path: ROUTE_PATH.INVENTORY_STOCK_LIST, tabCode: "stock" },
-    ],
-  },
-  {
-    title: "Khuyến mãi",
-    icon: "promotion",
-    menuCode: "promotion",
-    path: ROUTE_PATH.PROMOTION_LIST,
-    items: [
-      {
-        title: "Chương trình khuyến mãi",
-        path: ROUTE_PATH.PROMOTION_LIST,
-        tabCode: "promotion",
-        relatedPaths: [ROUTE_PATH.PROMOTION_CREATE, ROUTE_PATH.PROMOTION_DETAIL],
-      },
-      {
-        title: "Mã giảm giá",
-        path: ROUTE_PATH.VOUCHER_LIST,
-        tabCode: "voucher",
-        relatedPaths: [ROUTE_PATH.VOUCHER_CREATE, ROUTE_PATH.VOUCHER_DETAIL],
-      },
-    ],
-  },
-  {
-    title: "Khách hàng",
-    icon: "customer",
-    menuCode: "customer",
-    path: ROUTE_PATH.CUSTOMER_LIST,
-    items: [
-      { title: "Danh sách khách hàng", path: ROUTE_PATH.CUSTOMER_LIST, tabCode: "list", relatedPaths: [ROUTE_PATH.CUSTOMER_DETAIL] },
-      { title: "Hạng thành viên", path: ROUTE_PATH.LOYALTY_TIER_LIST, tabCode: "tier", menuCode: "loyalty" },
-    ],
-  },
-  {
-    title: "Báo cáo",
-    icon: "report",
-    menuCode: "report",
-    path: ROUTE_PATH.REPORT_SALES,
-    items: [
-      { title: "Doanh thu", path: ROUTE_PATH.REPORT_SALES, tabCode: "sales" },
-      { title: "Đơn hàng", path: ROUTE_PATH.REPORT_ORDERS, tabCode: "orders" },
-      { title: "Sản phẩm", path: ROUTE_PATH.REPORT_PRODUCTS, tabCode: "products" },
-    ],
-  },
-  {
-    title: "Quản trị hệ thống",
-    icon: "setting",
-    menuCode: "setting",
-    path: ROUTE_PATH.SETTING_GENERAL,
-    items: [
-      { title: "Cài đặt chung", path: ROUTE_PATH.SETTING_GENERAL, tabCode: "general" },
-      { title: "Thông tin cửa hàng", path: ROUTE_PATH.SETTING_STORE, tabCode: "store" },
-      { title: "Thanh toán", path: ROUTE_PATH.SETTING_PAYMENT, tabCode: "payment" },
-      { title: "Vận chuyển", path: ROUTE_PATH.SETTING_SHIPPING, tabCode: "shipping" },
-    ],
-  },
-];
-
-export const isNavActive = (pathname: string, path: string): boolean => pathname === path || pathname.startsWith(`${path}/`);
-
-export const collectLeafMatchPaths = (leaf: DashboardSidebarNavLeaf): string[] =>
-  [leaf.path, ...(leaf.relatedPaths ?? [])].map((path) => path.replace(/\/:[^/]+/g, ""));
-
-export const resolveLeafMenuCode = (group: DashboardSidebarNavGroup, leaf: DashboardSidebarNavLeaf): string =>
-  leaf.menuCode ?? group.menuCode;
-
-export const isGroupActive = (pathname: string, group: DashboardSidebarNavGroup): boolean => {
-  const paths = [...(group.path ? [group.path] : []), ...(group.items ?? []).flatMap(collectLeafMatchPaths)];
-  return paths.some((path) => isNavActive(pathname, path));
+export type DashboardMenuCatalogItem = {
+  menuCode: string;
+  name: string;
 };
 
-export const collectNavLeaves = (): { menuCode: string; tabCode: string; matchPaths: string[] }[] =>
-  DASHBOARD_SIDEBAR_NAV.flatMap((group) =>
-    (group.items ?? []).map((leaf) => ({
-      menuCode: resolveLeafMenuCode(group, leaf),
-      tabCode: leaf.tabCode,
-      matchPaths: collectLeafMatchPaths(leaf),
-    })),
-  );
+export type DashboardTabCatalogItem = {
+  menuCode: string;
+  /** Mã tab IAM — 1 cấp `list`, nhiều cấp `product_category.category`. */
+  tabCode: string;
+  name: string;
+  path: string;
+};
+
+
+/**
+ * Cấu hình menu dashboard (cùng domain với router, path luôn lấy từ ROUTE_PATH).
+ * `menuCode` / `tabCode` dùng chung cho phân quyền FE và catalog IAM.
+ */
+export const DASHBOARD_SIDEBAR_NAV: DashboardSidebarNavGroup[] = [
+  {
+    "title": "Đơn hàng",
+    "icon": "shopping_cart",
+    "menuCode": "order",
+    "path": ROUTE_PATH.ORDER_LIST,
+    "items": [
+      {
+        "title": "Danh sách đơn hàng",
+        "path": ROUTE_PATH.ORDER_LIST,
+        "tabCode": "list"
+      },
+      {
+        "title": "Vận chuyển & Giao nhận",
+        "path": ROUTE_PATH.SHIPPING,
+        "tabCode": "shipping"
+      },
+      {
+        "title": "Quản lý đổi/trả",
+        "path": ROUTE_PATH.EXCHANGE,
+        "tabCode": "returns"
+      },
+      {
+        "title": "Yêu cầu hoàn tiền",
+        "path": ROUTE_PATH.REFUND_PROPOSAL,
+        "tabCode": "refunds"
+      },
+      {
+        "title": "Đơn đặt trước",
+        "tabCode": "pre_order",
+        "children": [
+          {
+            "title": "Cấu hình chương trình",
+            "path": ROUTE_PATH.PRE_ORDER_CAMPAIGN,
+            "tabCode": "pre_order_campaign",
+            "relatedPaths": [
+              ROUTE_PATH.PRE_ORDER_CAMPAIGN_CREATE,
+              ROUTE_PATH.PRE_ORDER_CAMPAIGN_DETAIL,
+              ROUTE_PATH.PRE_ORDER_CAMPAIGN_UPDATE
+            ]
+          },
+          {
+            "title": "Thống kê",
+            "path": ROUTE_PATH.PRE_ORDER_CAMPAIGN_STATISTICS,
+            "tabCode": "pre_order_statistics",
+            "relatedPaths": [
+              ROUTE_PATH.PRE_ORDER_CAMPAIGN_STATISTICS_DETAIL
+            ]
+          },
+          {
+            "title": "Đơn hàng đặt trước",
+            "path": ROUTE_PATH.PRE_ORDER_ORDER,
+            "tabCode": "pre_order_orders",
+            "relatedPaths": [
+              ROUTE_PATH.PRE_ORDER_ORDER_DETAIL,
+              ROUTE_PATH.PRE_ORDER_ORDER_UPDATE
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Hóa đơn & chứng từ",
+        "path": ROUTE_PATH.INVOICE,
+        "tabCode": "invoice"
+      }
+    ]
+  },
+  {
+    "title": "Sản phẩm",
+    "icon": "inventory",
+    "menuCode": "product",
+    "path": ROUTE_PATH.PRODUCT_LIST,
+    "items": [
+      {
+        "title": "Danh mục sản phẩm",
+        "tabCode": "product_category",
+        "children": [
+          {
+            "title": "Danh mục",
+            "path": ROUTE_PATH.CATEGORY_LIST,
+            "tabCode": "category"
+          },
+          {
+            "title": "Bộ sưu tập",
+            "path": ROUTE_PATH.COLLECTION_LIST,
+            "tabCode": "collection"
+          }
+        ]
+      },
+      {
+        "title": "Danh sách sản phẩm",
+        "path": ROUTE_PATH.PRODUCT_LIST,
+        "tabCode": "list"
+      },
+      {
+        "title": "Bộ sản phẩm",
+        "path": ROUTE_PATH.SET_LIST,
+        "tabCode": "set"
+      },
+      {
+        "title": "Thuộc tính & Bộ lọc",
+        "path": ROUTE_PATH.ATTRIBUTE_LIST,
+        "tabCode": "attributes"
+      },
+      {
+        "title": "Đánh giá",
+        "path": ROUTE_PATH.PRODUCT_REVIEW_LIST,
+        "tabCode": "reviews"
+      }
+    ]
+  },
+  {
+    "title": "Khuyến mãi",
+    "icon": "promotion",
+    "menuCode": "promotion",
+    "path": ROUTE_PATH.PROMOTION_LIST,
+    "items": [
+      {
+        "title": "Chương trình khuyến mãi",
+        "path": ROUTE_PATH.PROMOTION_LIST,
+        "tabCode": "list"
+      },
+      {
+        "title": "Giả lập khuyến mãi",
+        "path": ROUTE_PATH.PROMOTION_SANDBOX,
+        "tabCode": "sandbox"
+      },
+      {
+        "title": "Tổng quan khuyến mãi",
+        "path": ROUTE_PATH.PROMOTION_DASHBOARD,
+        "tabCode": "dashboard"
+      }
+    ]
+  },
+  {
+    "title": "Yêu cầu khách hàng",
+    "icon": "support_agent",
+    "menuCode": "customer_request",
+    "path": ROUTE_PATH.INQUIRY_LIST,
+    "items": [
+      {
+        "title": "Liên hệ khi có hàng",
+        "path": ROUTE_PATH.INQUIRY_LIST,
+        "tabCode": "back_in_stock"
+      },
+      {
+        "title": "Hỗ trợ đơn hàng",
+        "path": ROUTE_PATH.CUSTOMER_REQUEST_ORDER_SUPPORT,
+        "tabCode": "order_support"
+      },
+      {
+        "title": "Đăng ký nhận tin",
+        "path": ROUTE_PATH.CUSTOMER_REQUEST_NEWSLETTER,
+        "tabCode": "newsletter"
+      }
+    ]
+  },
+  {
+    "title": "Nội dung & hiển thị",
+    "icon": "web",
+    "menuCode": "content",
+    "path": ROUTE_PATH.CMS_PAGE_LIST,
+    "items": [
+      {
+        "title": "Quản lý label",
+        "tabCode": "label_management",
+        "children": [
+          {
+            "title": "Danh sách Labels",
+            "path": ROUTE_PATH.LABEL_CONTENT_LIST,
+            "tabCode": "label_list"
+          },
+          {
+            "title": "Quản lý hiển thị Labels",
+            "path": ROUTE_PATH.LABEL_FLOW_LIST,
+            "tabCode": "label_display"
+          }
+        ]
+      },
+      {
+        "title": "Quản lý trang",
+        "tabCode": "page_management",
+        "children": [
+          {
+            "title": "Danh sách trang",
+            "path": ROUTE_PATH.CMS_PAGE_LIST,
+            "tabCode": "cms_pages"
+          },
+          {
+            "title": "Thiết lập banner",
+            "path": ROUTE_PATH.CMS_BANNER_LIST,
+            "tabCode": "banner_settings"
+          }
+        ]
+      },
+      {
+        "title": "Cấu hình hiển thị",
+        "tabCode": "display_config",
+        "children": [
+          {
+            "title": "Nhãn giảm giá",
+            "path": ROUTE_PATH.DISCOUNT_LABEL_SETTINGS,
+            "tabCode": "discount_label"
+          }
+        ]
+      },
+      {
+        "title": "Quản lý header & footer",
+        "tabCode": "header_footer_management",
+        "children": [
+          {
+            "title": "Top banner",
+            "path": ROUTE_PATH.SITE_TOP_BANNER,
+            "tabCode": "top_banner"
+          },
+          {
+            "title": "Logo",
+            "path": ROUTE_PATH.SITE_LOGO,
+            "tabCode": "logo"
+          },
+          {
+            "title": "Menu điều hướng",
+            "path": ROUTE_PATH.SITE_NAVIGATION,
+            "tabCode": "navigation"
+          },
+          {
+            "title": "Footer",
+            "path": ROUTE_PATH.SITE_FOOTER,
+            "tabCode": "footer"
+          },
+          {
+            "title": "Sản phẩm ô tìm kiếm",
+            "path": ROUTE_PATH.SEARCH_PINNED_PRODUCTS,
+            "tabCode": "search_pinned"
+          }
+        ]
+      }
+    ]
+  }
+];
+
+export const isNavActive = (pathname: string, path: string): boolean => pathname === path || pathname.startsWith(path + '/');
+export const isNavItemWithChildren = (item: DashboardSidebarNavItem): item is DashboardSidebarNavGroupItem => 'children' in item;
+export const resolveLeafMenuCode = (group: DashboardSidebarNavGroup, leaf: DashboardSidebarNavLeaf): string => leaf.menuCode ?? group.menuCode;
+export const collectLeafMatchPaths = (leaf: DashboardSidebarNavLeaf): string[] => [leaf.path, ...(leaf.relatedPaths ?? [])].map(path => path.replace(/\/:[^/]+/g, ''));
+export const collectNavLeaves = () => DASHBOARD_SIDEBAR_NAV.flatMap(group => (group.items ?? []).flatMap(item => isNavItemWithChildren(item) ? item.children : [item]).map(leaf => ({menuCode:resolveLeafMenuCode(group,leaf),tabCode:leaf.tabCode,matchPaths:collectLeafMatchPaths(leaf)})));

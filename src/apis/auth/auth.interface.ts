@@ -19,5 +19,6 @@ export type AdminLoginPayload = {
 export type AdminSession = {
   user: AdminUser;
   accessToken: string;
+  refreshToken?: string;
   issuedAt: string;
 };

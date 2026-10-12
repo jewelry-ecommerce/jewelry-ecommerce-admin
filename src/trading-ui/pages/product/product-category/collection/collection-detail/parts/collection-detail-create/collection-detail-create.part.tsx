@@ -9,7 +9,7 @@ import { useDebouncedValue } from '../../../../../../../common/utils/order/creat
 import { getAdminProductList } from '../../../../../../../apis/product/product.api';
 import { DialogComponent } from '../../../../../../../components/dialog';
 import { productCollectionButtonPermission } from '../../../../../product-permission.constants';
-import { EmptyComponent } from '@/components/empty/empty.component';
+import { EmptyComponent } from '../../../../../../../components/empty/empty.component';
 import { LoadingComponent } from '../../../../../../../components/loading/loading.component';
 import { StackRowAlignCenter } from '../../../../../../../components/styled';
 import { CollectionDetailCatalogRow } from '../../components/collection-detail-catalog-row.component';
@@ -126,11 +126,9 @@ export const CollectionDetailCreatePart = ({ open, existingProductIds = [], onCl
     setSelectedIds(new Set());
   }, []);
 
-  const [previousOpen, setPreviousOpen] = useState(open);
-  if (previousOpen !== open) {
-    setPreviousOpen(open);
+  useEffect(() => {
     if (!open) resetFlow();
-  }
+  }, [open, resetFlow]);
 
   useEffect(() => {
     if (!open || !hasMore || isLoadingMore) return;

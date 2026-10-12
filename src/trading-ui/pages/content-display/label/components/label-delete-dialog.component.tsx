@@ -1,4 +1,4 @@
-import { DialogConfirmComponent } from '@/trading-ui/components/dialog';
+import { DialogConfirmComponent } from '../../../../components/dialog';
 
 type LabelDeleteDialogProps = {
   open: boolean;
@@ -17,7 +17,7 @@ export const LabelDeleteDialog = ({ open, title, itemName, loading, onClose, onC
     highlight={{
       tone: 'danger',
       title: itemName ? `Xóa ${itemName}?` : 'Xác nhận xóa?',
-      description: 'Nhãn sẽ bị gỡ khỏi danh sách. Nhãn đang được cấu hình sử dụng phải được gỡ liên kết trước.',
+      description: 'Thao tác xóa cứng, không thể hoàn tác.',
     }}
     cancelLabel="Hủy"
     confirmLabel="Xóa"

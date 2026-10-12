@@ -1,12 +1,12 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { useParams } from 'react-router-dom';
 
-import { collectionApi, CollectionStatus, UpdateCollectionAction } from '@/trading-ui/apis/pim';
+import { collectionApi, CollectionStatus, UpdateCollectionAction } from '../../../../../apis';
 import type { Collection } from '../../../../../apis/collection/collection.entities';
 import type { Product } from '../../../../../apis/product/product.entities';
 import { getErrorMessage } from '../../../../../common/utils';
-import { SnackbarType, useSnackbar } from '../../../../../hooks/use-snackbar.hook';
+import { SnackbarType, useSnackbar } from '@/hooks/use-snackbar.hook';
 import { DEFAULT_COLLECTION_PAGE_SIZE } from './collection-detail.constant';
 import { buildCollectionDetailRows, buildCollectionHeader, matchesCollectionRow } from './utils/collection-detail.util';
 import type { CollectionDetailHeaderInfo, CollectionDetailRow } from './collection-detail.interface';
@@ -65,13 +65,12 @@ export function useCollectionDetailState({ initialHeader }: UseCollectionDetailS
     return `${collection.id}:${String(collection.status)}:${collectProductIds(collection).join(',')}`;
   }, [collection]);
 
-  const [synchronizedKey, setSynchronizedKey] = useState("");
-  if (collection && synchronizedKey !== serverSyncKey) {
-    setSynchronizedKey(serverSyncKey);
+  useEffect(() => {
+    if (!collection) return;
     setDraftIsActive(collection.status === CollectionStatus.ACTIVE);
     setDraftProductIds(collectProductIds(collection));
     setPendingProductsById({});
-  }
+  }, [serverSyncKey, collection]);
 
   const header = useMemo(() => buildCollectionHeader(collection, initialHeader), [collection, initialHeader]);
 
@@ -116,9 +115,14 @@ export function useCollectionDetailState({ initialHeader }: UseCollectionDetailS
     return filteredRows.slice(start, start + pageSize);
   }, [filteredRows, page, pageSize]);
 
+  useEffect(() => {
+    setSelectedRowIds((prev) => prev.filter((id) => rows.some((r) => r.id === id)));
+  }, [rows]);
 
-  const totalPage = Math.max(1, Math.ceil(filteredRows.length / pageSize));
-  if (page > totalPage) setPage(totalPage);
+  useEffect(() => {
+    const totalPage = Math.max(1, Math.ceil(filteredRows.length / pageSize));
+    if (page > totalPage) setPage(totalPage);
+  }, [filteredRows.length, page, pageSize]);
 
   const setSearchValue = useCallback((next: string) => {
     setSearchValueState(next);
@@ -282,7 +286,7 @@ export function useCollectionDetailState({ initialHeader }: UseCollectionDetailS
     pageSize,
     setPageSize,
 
-    selectedRowIds: selectedRowIds.filter(id => rows.some(row => row.id === id)),
+    selectedRowIds,
     setSelectedRowIds,
 
     rows,

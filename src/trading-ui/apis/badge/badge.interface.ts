@@ -48,7 +48,7 @@ export interface BadgeFlowDetail {
   channel?: BadgeChannel;
   ruleConfig?: Record<string, unknown>;
   rules: BadgeFlowRuleView[];
-  assignmentCount: number;
+  assignmentCount?: number;
   skuImportJob?: unknown;
   isSystemGenerated?: boolean;
   source?: string | null;

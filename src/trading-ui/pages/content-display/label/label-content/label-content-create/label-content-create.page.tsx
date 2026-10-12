@@ -1,54 +1,49 @@
-import { yupResolver } from "@hookform/resolvers/yup";
-import { Box, Stack, Typography } from "@mui/material";
-import { useState } from "react";
-import { Controller, type SubmitHandler, useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import * as yup from "yup";
-import { STYLE } from "@/trading-ui/adapters/library";
-import { badgeApi, BadgePosition, BadgeStatus, BadgeType } from "@/trading-ui/apis/badge";
-import { TYPOGRAPHY_STYLES } from "@/trading-ui/common/constant/typography.constant";
-import { ROUTE_PATH } from "@/router/route.path";
-import { contentLabelListButtonPermission } from "@/trading-ui/pages/content-display/content-permission.constants";
-import { LabelFormPageHeader } from "../../components";
-import { LabelContentPreview } from "../components/label-preview.component";
-import { SelectInput, TextInput } from "@/trading-ui/components/form";
-import { StackRow } from "@/trading-ui/components/styled";
-import { getErrorMessage } from "@/trading-ui/common/utils";
-import { useSnackbar, SnackbarType } from "@/hooks/use-snackbar.hook";
-import { LABEL_CONTENT_DEFAULT_BACKGROUND_COLOR, LABEL_CONTENT_DEFAULT_TEXT_COLOR } from "../label-content.constants";
-import type { LabelContentTemplateFormValues } from "../label-content.interface";
-import {
-  buildCreateBadgeTemplatePayload,
-  hasLabelDesignPreview,
-  LABEL_LIBRARY_BADGE_TYPE_OPTIONS,
-  LABEL_LIBRARY_BADGE_TYPE_VALUES,
-} from "../label-content.utils";
-import { LabelContentDesignFields } from "../components/label-content-design-fields.component";
-import { LabelWebsiteStatusToggle } from "../../components";
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Box, Stack, Typography } from '@mui/material';
+import { useState } from 'react';
+import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import * as yup from 'yup';
+import { STYLE } from '@/trading-ui/adapters/library';
+import { badgeApi, BadgePosition, BadgeStatus, BadgeType } from '../../../../../apis';
+import { TYPOGRAPHY_STYLES } from '../../../../../common/constant/typography.constant';
+import { ROUTE_PATH } from '@/trading-ui/router/route.path';
+import { contentLabelListButtonPermission } from '../../../content-permission.constants';
+import { LabelFormPageHeader } from '../../components';
+import { LabelContentPreview } from '../components/label-preview.component';
+import { SelectInput, TextInput } from '../../../../../components/form';
+import { StackRow } from '../../../../../components/styled';
+import { getErrorMessage } from '../../../../../common/utils';
+import { useSnackbar, SnackbarType } from '@/hooks/use-snackbar.hook';
+import { LABEL_CONTENT_DEFAULT_BACKGROUND_COLOR, LABEL_CONTENT_DEFAULT_TEXT_COLOR } from '../label-content.constants';
+import type { LabelContentTemplateFormValues } from '../label-content.interface';
+import { buildCreateBadgeTemplatePayload, hasLabelDesignPreview, LABEL_LIBRARY_BADGE_TYPE_OPTIONS, LABEL_LIBRARY_BADGE_TYPE_VALUES } from '../label-content.utils';
+import { LabelContentDesignFields } from '../components/label-content-design-fields.component';
+import { LabelWebsiteStatusToggle } from '../../components';
 
 const labelContentCreateFormSchema = yup
   .object({
     badgeType: yup
       .string()
       .oneOf([...LABEL_LIBRARY_BADGE_TYPE_VALUES])
-      .required("Vui lòng chọn loại Label"),
-    name: yup.string().trim().required("Vui lòng nhập tên Label"),
-    status: yup.mixed<BadgeStatus | "">().oneOf([BadgeStatus.ACTIVE, BadgeStatus.INACTIVE, ""]).required("Vui lòng chọn trạng thái"),
+      .required('Vui lòng chọn loại Label'),
+    name: yup.string().trim().required('Vui lòng nhập tên Label'),
+    status: yup.mixed<BadgeStatus | ''>().oneOf([BadgeStatus.ACTIVE, BadgeStatus.INACTIVE, '']).required('Vui lòng chọn trạng thái'),
     type: yup.mixed<BadgeType.TEXT | BadgeType.IMAGE>().oneOf([BadgeType.TEXT, BadgeType.IMAGE]).required(),
-    displayText: yup.string().when("type", {
+    displayText: yup.string().when('type', {
       is: BadgeType.TEXT,
-      then: (schema) => schema.trim().required("Vui lòng nhập nội dung hiển thị"),
+      then: (schema) => schema.trim().required('Vui lòng nhập nội dung hiển thị'),
       otherwise: (schema) => schema.strip().optional(),
     }),
-    image: yup.string().when("type", {
+    image: yup.string().when('type', {
       is: BadgeType.IMAGE,
-      then: (schema) => schema.trim().required("Vui lòng tải ảnh"),
+      then: (schema) => schema.trim().required('Vui lòng tải ảnh'),
       otherwise: (schema) => schema.optional(),
     }),
     backgroundColor: yup.string().default(LABEL_CONTENT_DEFAULT_BACKGROUND_COLOR),
     textColor: yup.string().default(LABEL_CONTENT_DEFAULT_TEXT_COLOR),
     defaultPosition: yup
-      .mixed<BadgePosition | "">()
+      .mixed<BadgePosition | ''>()
       .oneOf([
         BadgePosition.TOP_LEFT,
         BadgePosition.TOP_RIGHT,
@@ -58,7 +53,7 @@ const labelContentCreateFormSchema = yup
         BadgePosition.BOTTOM_CENTER,
         BadgePosition.BOTTOM_RIGHT,
         BadgePosition.PRICE_LINE,
-        "",
+        '',
       ])
       .required(),
   })
@@ -75,14 +70,14 @@ const LabelContentCreatePage = () => {
 
   const { control, handleSubmit, watch, setValue } = useForm<LabelContentTemplateFormValues>({
     resolver: yupResolver(labelContentCreateFormSchema),
-    mode: "onSubmit",
+    mode: 'onSubmit',
     defaultValues: {
-      badgeType: "",
-      name: "",
+      badgeType: '',
+      name: '',
       status: BadgeStatus.ACTIVE,
       type: BadgeType.TEXT,
-      displayText: "",
-      image: "",
+      displayText: '',
+      image: '',
       backgroundColor: LABEL_CONTENT_DEFAULT_BACKGROUND_COLOR,
       textColor: LABEL_CONTENT_DEFAULT_TEXT_COLOR,
       defaultPosition: BadgePosition.TOP_LEFT,
@@ -96,7 +91,7 @@ const LabelContentCreatePage = () => {
     setSubmitting(true);
     try {
       await badgeApi.postBadgeTemplate(buildCreateBadgeTemplatePayload(data));
-      showSnackbar({ message: "Tạo label thành công.", type: SnackbarType.SUCCESS });
+      showSnackbar({ message: 'Tạo label thành công.', type: SnackbarType.SUCCESS });
       void navigate(ROUTE_PATH.LABEL_CONTENT_LIST);
     } catch (err) {
       showSnackbar({ message: getErrorMessage(err), type: SnackbarType.ERROR });
@@ -109,12 +104,12 @@ const LabelContentCreatePage = () => {
     <Stack
       sx={{
         height: `calc(100vh - ${STYLE.HEIGHT_HEADER}px)`,
-        boxSizing: "border-box",
+        boxSizing: 'border-box',
         minHeight: 0,
       }}
     >
       <Stack sx={{ flex: 1, minHeight: 0 }}>
-        <Stack sx={{ height: "100%", minHeight: 0, flex: 1, gap: 0 }}>
+        <Stack sx={{ height: '100%', minHeight: 0, flex: 1, gap: 0 }}>
           <LabelFormPageHeader
             title="Tạo Label"
             onBack={goList}
@@ -125,29 +120,29 @@ const LabelContentCreatePage = () => {
             buttonPermission={contentLabelListButtonPermission}
           />
 
-          <StackRow sx={{ flex: 1, minHeight: 0, alignItems: "stretch", p: 3 }}>
+          <StackRow sx={{ flex: 1, minHeight: 0, alignItems: 'stretch', p: 3 }}>
             <Stack
               component="form"
               noValidate
               onSubmit={handleSubmit(onSubmit)}
               sx={{
-                flex: { xs: "1 1 auto", md: "8 1 0%" },
+                flex: { xs: '1 1 auto', md: '8 1 0%' },
                 minWidth: 0,
                 minHeight: 0,
               }}
             >
-              <StackRow sx={{ flex: 1, height: "auto" }}>
+              <StackRow sx={{ flex: 1, height: 'auto' }}>
                 <Stack
                   sx={{
-                    border: "1px solid #E5E7EB",
-                    borderRadius: "10px",
-                    bgcolor: "#FFFFFF",
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '10px',
+                    bgcolor: '#FFFFFF',
                     p: 2,
                     gap: 3,
                     flex: 1,
                   }}
                 >
-                  <Typography sx={{ ...TYPOGRAPHY_STYLES.md.semibold, color: "#101828" }}>Thông tin Label</Typography>
+                  <Typography sx={{ ...TYPOGRAPHY_STYLES.md.semibold, color: '#101828' }}>Thông tin Label</Typography>
 
                   <Stack gap={2}>
                     <Controller
@@ -204,21 +199,21 @@ const LabelContentCreatePage = () => {
             </Stack>
             <Box
               sx={{
-                flex: { xs: "1 1 auto", md: "2 1 0%" },
+                flex: { xs: '1 1 auto', md: '2 1 0%' },
                 minWidth: 0,
-                display: "flex",
-                flexDirection: "column",
+                display: 'flex',
+                flexDirection: 'column',
                 minHeight: 0,
               }}
             >
               <LabelContentPreview
                 visible={showPreview}
                 type={previewValues.type ?? BadgeType.TEXT}
-                displayText={previewValues.displayText ?? ""}
-                image={previewValues.image ?? ""}
-                backgroundColor={previewValues.backgroundColor ?? ""}
-                textColor={previewValues.textColor ?? ""}
-                defaultPosition={previewValues.defaultPosition ?? ""}
+                displayText={previewValues.displayText ?? ''}
+                image={previewValues.image ?? ''}
+                backgroundColor={previewValues.backgroundColor ?? ''}
+                textColor={previewValues.textColor ?? ''}
+                defaultPosition={previewValues.defaultPosition ?? ''}
               />
             </Box>
           </StackRow>

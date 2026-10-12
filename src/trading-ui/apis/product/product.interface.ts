@@ -273,7 +273,7 @@ export interface SkuMatrixPreviewResponseDto {
 export interface ProductMutationResponseDto {
   uuid: string;
   status: ProductSpuStatus;
-  approval: ProductApprovalSummary;
+  approval?: ProductApprovalSummary | null;
   hasPendingApproval: boolean;
   approvalRequestUuid?: string;
   message?: string;

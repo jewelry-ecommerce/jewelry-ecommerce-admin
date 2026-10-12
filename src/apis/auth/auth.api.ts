@@ -1,5 +1,8 @@
 import type { AdminLoginPayload, AdminSession, AdminUser } from "@/apis/auth/auth.interface";
 import { apiRequest } from "@/apis/transport";
+import { getDataSourceMode, isJavaBackend } from "@/common/config/app.config";
+import { javaLogin, javaLogout, javaGetMe } from "../java/java-auth.api";
+const isJavaTransport = () => getDataSourceMode() === "HTTP" && isJavaBackend();
 import { findAdminAccountByEmail, MOCK_ADMIN_ACCOUNTS, toAdminUser } from "@/mocks/data/admin-user.data";
 import { MockApiError, withLatency } from "@/mocks/mock-transport";
 
@@ -10,7 +13,7 @@ const buildMockToken = (userId: string): string => `mock-admin-token.${userId}.$
 
 /** POST admin/auth/login */
 export const login = (payload: AdminLoginPayload): Promise<AdminSession> =>
-  apiRequest({
+  isJavaTransport() ? javaLogin(payload.email, payload.password) : apiRequest({
     method: "POST",
     path: "admin/auth/login",
     body: payload,
@@ -32,7 +35,7 @@ export const login = (payload: AdminLoginPayload): Promise<AdminSession> =>
 
 /** POST admin/auth/logout */
 export const logout = (): Promise<{ success: true }> =>
-  apiRequest({
+  isJavaTransport() ? javaLogout() : apiRequest({
     method: "POST",
     path: "admin/auth/logout",
     mock: () =>
@@ -44,7 +47,7 @@ export const logout = (): Promise<{ success: true }> =>
 
 /** GET admin/auth/me */
 export const getMe = (): Promise<AdminUser> =>
-  apiRequest({
+  isJavaTransport() ? javaGetMe() : apiRequest({
     method: "GET",
     path: "admin/auth/me",
     mock: () =>

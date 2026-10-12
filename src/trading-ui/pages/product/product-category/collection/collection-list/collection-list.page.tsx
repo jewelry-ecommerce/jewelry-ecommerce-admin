@@ -3,18 +3,18 @@ import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SnackbarType, STYLE } from '@/trading-ui/adapters/library';
 import useSWR from 'swr';
-import { DataTable, DataTablePagination, type DataTableColumn, DataTableToolbar, type DataTableToolbarAction } from '@/components/data-table';
+import { DataTable, DataTablePagination, type DataTableColumn, DataTableToolbar, type DataTableToolbarAction } from '../../../../../components/data-table';
 import { COLLECTION_STATUS_FILTER_ALL, COLLECTION_STATUS_FILTER_OPTIONS, getProductCollectionStatusLabelVi, PRODUCT_COLLECTION_PAGE_SIZE_OPTIONS } from './collection-list.constant.ts';
 import type { ProductCollectionRow } from './collection-list.interface';
-import { collectionApi, type QueryCollectionDto } from '@/trading-ui/apis/pim';
+import { collectionApi, type QueryCollectionDto } from '../../../../../apis/index.ts';
 import { TYPOGRAPHY_STYLES } from '../../../../../common/constant/typography.constant';
 import { StackRowAlignJustCenter } from '../../../../../components/styled';
 import { TagCommonComponent } from '../../../../../components/tag';
-import { TooltipOnHoverComponent } from '@/components/tooltip/tooltip-on-hover.component';
-import { WrapperComponent } from '@/components/wrapper/wrapper.component';
-import { getProductCollectionCreatePath, getProductCollectionDetailPath, getProductCollectionEditPath } from '@/router/route.path';
+import { TooltipOnHoverComponent } from '../../../../../components/tooltip/tooltip-on-hover.component';
+import { WrapperComponent } from '../../../../../components/wrapper/index.ts';
+import { getProductCollectionCreatePath, getProductCollectionDetailPath, getProductCollectionEditPath } from '@/trading-ui/router/route.path';
 import { Edit02, Eye, Plus, Trash01 } from '@untitledui/icons';
-import { EmptyComponent } from '@/components/empty/empty.component';
+import { EmptyComponent } from '../../../../../components/empty/empty.component.tsx';
 import { CollectionStatus } from '../../../../../apis/collection/collection.enum.ts';
 import { DialogConfirmComponent } from '../../../../../components/dialog/dialog-confirm.component.tsx';
 import { useSnackbar } from '@/hooks/use-snackbar.hook';
@@ -62,7 +62,7 @@ const ProductCollectionListPage = () => {
   );
 
   const rows = data?.list ?? [];
-  const totalItems = data?.total ?? data?.pagination?.itemCount ?? 0;
+  const totalItems = data?.total ?? data?.pagination?.total ?? 0;
 
   const closeDeleteDialog = useCallback(() => {
     if (isDeleting) return;
@@ -97,7 +97,7 @@ const ProductCollectionListPage = () => {
         key: 'add',
         label: 'Tạo bộ sưu tập',
         ...productCollectionButtonPermission('create', 'Tạo bộ sưu tập', 'api_collection_create'),
-        variant: 'primary',
+        variant: 'contained',
         icon: <Plus size={18} />,
         onClick: () => navigate(getProductCollectionCreatePath()),
       },
@@ -216,7 +216,7 @@ const ProductCollectionListPage = () => {
               onSearchChange={(v) => setScreenState((prev) => ({ ...prev, search: v, page: 1 }))}
               searchPlaceholder="Tìm theo Tên bộ sưu tập..."
               actions={toolbarActions}
-              filterSelects={[{
+              filterSelect={{
                 value: statusFilterValue,
                 width: 160,
                 options: COLLECTION_STATUS_FILTER_OPTIONS,
@@ -226,7 +226,7 @@ const ProductCollectionListPage = () => {
                     status: value === COLLECTION_STATUS_FILTER_ALL ? undefined : (value as CollectionStatus),
                     page: 1,
                   })),
-              }]}
+              }}
             />
           </Box>
           {isLoading ? (
@@ -262,6 +262,7 @@ const ProductCollectionListPage = () => {
                 totalItems={totalItems}
                 pageSizeOptions={[...PRODUCT_COLLECTION_PAGE_SIZE_OPTIONS]}
                 itemLabel="bộ sưu tập"
+                summaryMode="total"
                 onPageChange={(p) => setScreenState((prev) => ({ ...prev, page: p }))}
                 onPageSizeChange={(n) => {
                   setScreenState((prev) => ({ ...prev, take: n, page: 1 }));

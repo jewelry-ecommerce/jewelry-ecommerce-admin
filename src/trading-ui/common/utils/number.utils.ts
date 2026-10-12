@@ -20,3 +20,4 @@ export const parseAmount = (value: string | number | null | undefined): number =
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
 };
+export {maskPhone} from './number.utils.source';

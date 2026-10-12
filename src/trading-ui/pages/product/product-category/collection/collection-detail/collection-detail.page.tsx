@@ -6,15 +6,15 @@ import { CustomButton } from '../../../../../components/button';
 import { productCollectionButtonPermission } from '../../../product-permission.constants';
 import { Plus, XCircle } from '@untitledui/icons';
 
-import { DataTable, DataTablePagination, DataTableToolbar, type DataTableToolbarAction } from '@/components/data-table';
+import { DataTable, DataTablePagination, DataTableToolbar, type DataTableToolbarAction } from '../../../../../components/data-table';
 import { StackRowAlignCenter, StackRowAlignCenterJustBetween } from '../../../../../components/styled';
 import { TYPOGRAPHY_STYLES } from '../../../../../common/constant/typography.constant';
-import { ROUTE_PATH } from '@/router/route.path';
+import { ROUTE_PATH } from '@/trading-ui/router/route.path';
 import type { CollectionDetailHeaderInfo, CollectionDetailRow } from './collection-detail.interface';
 import { useCollectionDetailState } from './use-collection-detail-state.hook';
 import { SwitchContentElement } from '../../../../../components/switch/switch-content.element';
-import { LabelFormPageHeader } from '@/trading-ui/pages/content-display/label/components/label-form-page-header.component';
-import { EmptyComponent } from '@/components/empty/empty.component';
+import { LabelFormPageHeader } from '../../../../content-display/label/components';
+import { EmptyComponent } from '../../../../../components/empty/empty.component';
 import { LoadingComponent } from '../../../../../components/loading/loading.component';
 import { DialogConfirmComponent } from '../../../../../components/dialog/dialog-confirm.component';
 import { COLLECTION_DETAIL_PAGE_SIZE_OPTIONS } from './collection-detail.constant';
@@ -67,7 +67,7 @@ const CollectionDetailPage = () => {
   const d = useCollectionDetailState({ initialHeader });
 
   const goToCollectionList = useCallback(() => {
-    navigate(ROUTE_PATH.COLLECTION_LIST);
+    navigate(ROUTE_PATH.PRODUCT_COLLECTION_LIST);
   }, [navigate]);
 
   const handleBackFromDetail = useCallback(() => {
@@ -95,7 +95,7 @@ const CollectionDetailPage = () => {
         key: 'add',
         label: 'Thêm sản phẩm',
         ...productCollectionButtonPermission('edit', 'Thêm sản phẩm vào bộ sưu tập', 'api_collection_update'),
-        variant: 'primary',
+        variant: 'contained',
         icon: <Plus size={18} color="#FFFFFF" />,
         onClick: () => setAddProductOpen(true),
       },
@@ -236,6 +236,7 @@ const CollectionDetailPage = () => {
               totalItems={totalRows}
               pageSizeOptions={[...COLLECTION_DETAIL_PAGE_SIZE_OPTIONS]}
               itemLabel="sản phẩm"
+              summaryMode="total"
               onPageChange={d.setPage}
               onPageSizeChange={d.setPageSize}
             />

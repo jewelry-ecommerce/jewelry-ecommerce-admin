@@ -1,5 +1,5 @@
-import { CollectionStatus } from '@/trading-ui/apis/pim';
-import type { Collection, Product, ProductCollection, ProductVariation } from '@/trading-ui/apis/pim';
+import { CollectionStatus } from '../../../../../../apis';
+import type { Collection, Product, ProductCollection, ProductVariation } from '../../../../../../apis';
 import { formatCurrency, parseAmount } from '../../../../../../common/utils/number.utils';
 import type { CollectionDetailHeaderInfo, CollectionDetailRow } from '../collection-detail.interface';
 

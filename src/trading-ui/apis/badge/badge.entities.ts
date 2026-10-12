@@ -30,7 +30,8 @@ export interface BadgeAssignment extends BaseEntity {
   badgeTemplate: BadgeTemplate;
 }
 
-export interface BadgeCampaign extends BaseEntity {
+export interface BadgeCampaign extends Omit<BaseEntity, "createdAt" | "updatedAt"> {
+  createdAt?: Date; updatedAt?: Date;
   name: string;
   description?: string;
   activeFrom?: Date;
@@ -46,7 +47,8 @@ export interface BadgeCampaign extends BaseEntity {
   referenceId?: string | null;
 }
 
-export interface BadgeRule extends BaseEntity {
+export interface BadgeRule extends Omit<BaseEntity, "createdAt" | "updatedAt"> {
+  createdAt?: Date; updatedAt?: Date;
   campaignId?: string;
   campaign?: BadgeCampaign;
   badgeTemplateId: string;
@@ -64,14 +66,16 @@ export interface BadgeRule extends BaseEntity {
   assignments: BadgeAssignment[];
 }
 
-export interface BadgeTemplate extends BaseEntity {
+export interface BadgeTemplate extends Omit<BaseEntity, "createdAt" | "updatedAt"> {
+  createdAt?: Date;
+  updatedAt?: Date;
   name: string;
   code: string;
   description?: string;
   type: BadgeType;
   badgeType: BadgeTemplateBadgeType;
   displayText?: string;
-  styleConfig: Record<string, unknown>;
+  styleConfig: Record<string, unknown> & {textColor?:string;backgroundColor?:string};
   icon?: string;
   image?: string;
   iconMobile?: string;

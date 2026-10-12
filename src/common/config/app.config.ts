@@ -1,6 +1,7 @@
 import { composeApiBaseUrl } from "./api-base-url.util";
 
 export type DataSourceMode = "MOCK" | "HTTP";
+export const isJavaBackend = (): boolean => (import.meta.env.VITE_BACKEND_PROVIDER ?? "JAVA").toUpperCase() === "JAVA";
 
 const readEnv = (value: string | undefined, fallback: string): string => {
   const normalized = (value ?? "").trim();

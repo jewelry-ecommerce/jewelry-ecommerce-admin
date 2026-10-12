@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Stack } from '@mui/material';
 import { STYLE } from '@/trading-ui/adapters/library';
-import { WrapperComponent } from '@/components/wrapper/wrapper.component';
+import { WrapperComponent } from '../../../../components/wrapper';
 import { StackRowAlignCenter } from '../../../../components/styled/stack.style';
 import { CategoryPageViews } from './category.enum';
 import { CategoryCreatePart } from './parts/category-create/category-create.part';
@@ -9,7 +9,7 @@ import { CategoryListPart } from './parts/category-list/category-list.part';
 import { CategoryUpdatePart } from './parts/category-update/category-update.part';
 import { type CategoryGlobalState } from './category.interface';
 import useSWR from 'swr';
-import { attributeApi } from '@/trading-ui/apis/pim';
+import { attributeApi } from '../../../../apis';
 import { AttributeStatus } from '../../../../apis/attribute/attribute.enum';
 
 const CategoryPage = () => {

@@ -2,8 +2,8 @@ import { AddRounded, KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Stack, Typography } from '@mui/material';
 import React, { useCallback, useState } from 'react';
 import type { Category } from '../../../../../../apis/category/category.entities';
-import { categoryApi, type QueryCategoryTreeDto } from '@/trading-ui/apis/pim';
-import { SnackbarType, useSnackbar } from '../../../../../../hooks/use-snackbar.hook';
+import { categoryApi, type QueryCategoryTreeDto } from '../../../../../../apis';
+import { SnackbarType, useSnackbar } from '@/hooks/use-snackbar.hook';
 import { TYPOGRAPHY_STYLES } from '../../../../../../common/constant/typography.constant';
 import { StackRowAlignCenter, StackRowAlignCenterJustBetween } from '../../../../../../components/styled/stack.style';
 import { CustomButton, PermissionIconButton } from '../../../../../../components/button';
@@ -12,14 +12,14 @@ import { usePermissionGate } from '../../../../../../permissions/use-permission-
 import { useListPageViewAccess } from '../../../../../../permissions/use-list-page-view-access.hook';
 import { DialogConfirmComponent } from '../../../../../../components/dialog';
 import { toggleExpandedId } from '../../category.constant';
-import { EmptyComponent } from '@/components/empty/empty.component';
+import { EmptyComponent } from '../../../../../../components/empty/empty.component';
 import { getErrorMessage } from '../../../../../../common/utils';
 import { LoadingComponent } from '../../../../../../components/loading/loading.component';
 import useSWR from 'swr';
 import { type CategoryGlobalState } from '../../category.interface';
 import { CategoryPageViews } from '../../category.enum';
 import { Plus, Trash03 } from '@untitledui/icons';
-import { OrderType } from '@/trading-ui/adapters/library';
+import { OrderType } from '../../../../../../apis/order';
 import { getCatalogDependencyItems, getCatalogInUseDialogCopy, isCatalogInUseError } from '../../../utils/catalog-in-use-error.util';
 
 interface CategoryListPartProps {

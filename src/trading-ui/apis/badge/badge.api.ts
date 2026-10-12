@@ -1,6 +1,7 @@
 import { backendRequest } from "@/apis/backend-request";
-import { getDataSourceMode } from "@/common/config/app.config";
+import { getDataSourceMode, isJavaBackend } from "@/common/config/app.config";
 export * from './badge-flow.api';
+export { activateBadgeFlow as patchBadgeFlowActivate, deactivateBadgeFlow as patchBadgeFlowDeactivate } from './badge-flow.api';
 import type { BadgeTemplate } from "./badge.entities";
 import type { CreateBadgeTemplateDto, QueryBadgeTemplateDto, UpdateBadgeStatusDto, UpdateBadgeTemplateDto } from "./badge.interface";
 type WireTemplate = Omit<
@@ -8,8 +9,8 @@ type WireTemplate = Omit<
   "id" | "createdAt" | "updatedAt" | "displayText" | "image" | "icon" | "iconMobile" | "imageMobile" | "description"
 > & {
   id: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
   displayText?: string | null;
   image?: string | null;
   icon?: string | null;
@@ -21,8 +22,8 @@ function view(input: WireTemplate): BadgeTemplate {
   return {
     ...input,
     id: String(input.id),
-    createdAt: new Date(input.createdAt),
-    updatedAt: new Date(input.updatedAt),
+    createdAt: input.createdAt ? new Date(input.createdAt) : undefined,
+    updatedAt: input.updatedAt ? new Date(input.updatedAt) : undefined,
     displayText: input.displayText ?? undefined,
     image: input.image ?? undefined,
     icon: input.icon ?? undefined,
@@ -49,7 +50,7 @@ export async function patchBadgeTemplate(id: string, body: UpdateBadgeTemplateDt
 }
 export async function patchBadgeTemplateStatus(id: string, body: UpdateBadgeStatusDto): Promise<BadgeTemplate> {
   assertHttp();
-  return view(await backendRequest<WireTemplate>(PATH + "/" + id + "/status", "PATCH", body));
+  return view(await backendRequest<WireTemplate>(PATH + "/" + id + (isJavaBackend() ? "" : "/status"), "PATCH", body));
 }
 export async function deleteBadgeTemplate(id: string): Promise<{ success: boolean }> {
   assertHttp();
@@ -71,12 +72,20 @@ async function templatePage(query: Partial<QueryBadgeTemplateDto>, page: number)
 export async function getListBadgeTemplate(query: Partial<QueryBadgeTemplateDto>) {
   assertHttp();
   const firstPage = query.isPagination === false ? TEMPLATE_QUERY_POLICY.firstPage : Math.max(query.page ?? 1, 1);
-  const result = await templatePage(query, firstPage);
-  if (query.isPagination === false) {
+  const useLocalSearch = isJavaBackend() && Boolean(query.search?.trim());
+  const result = await templatePage(useLocalSearch ? { ...query, search: undefined, isPagination: false } : query, useLocalSearch ? 1 : firstPage);
+  if (query.isPagination === false || useLocalSearch) {
     while (result.pagination.hasNextPage) {
-      const next = await templatePage(query, result.pagination.page + 1);
+      const next = await templatePage(useLocalSearch ? { ...query, search: undefined, isPagination: false } : query, result.pagination.page + 1);
       result.list.push(...next.list); result.pagination = next.pagination;
     }
+  }
+  if (useLocalSearch) {
+    const keyword = query.search!.trim().toLocaleLowerCase();
+    const filtered = result.list.filter(row => (row.name + " " + row.code).toLocaleLowerCase().includes(keyword));
+    const take = query.take ?? TEMPLATE_QUERY_POLICY.defaultTake, offset = (firstPage - 1) * take;
+    const list = query.isPagination === false ? filtered : filtered.slice(offset, offset + take);
+    return { total: filtered.length, list: list.map(view), pagination: { page: firstPage, take, itemCount: filtered.length, hasNextPage: offset + take < filtered.length } };
   }
   return { ...result, list: result.list.map(view) };
 }

@@ -3,7 +3,7 @@ import type { Product } from '../../../../../../apis/product/product.entities';
 import { TYPOGRAPHY_STYLES } from '../../../../../../common/constant/typography.constant';
 import { CheckboxComponent } from '../../../../../../components/check-box/check-box.element';
 import { StackRowAlignCenter, StackRowAlignJustCenter } from '../../../../../../components/styled';
-import { PRODUCT_SPU_DEFAULT_IMAGE_SRC } from '../../../../product-spu/product-status-labels.util';
+import { PRODUCT_SPU_DEFAULT_IMAGE_SRC } from '../../../../product-spu/product-spu.constant';
 import { COLLECTION_CATALOG_THUMB_PX } from '../collection-detail.constant';
 import { getProductCategoryName, getProductPriceLabel, getProductVariantCount } from '../utils/collection-detail.util';
 

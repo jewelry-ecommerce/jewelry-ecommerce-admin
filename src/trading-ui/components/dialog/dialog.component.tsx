@@ -10,6 +10,8 @@ import { XClose } from '@untitledui/icons';
 
 
 import { dialogContainedButtonSx, dialogOutlinedButtonSx } from "./dialog-button.styles";
+export { dialogContainedButtonSx, dialogOutlinedButtonSx } from "./dialog-button.styles";
+
 
 const mergeDialogButtonSx = (variant: ButtonElementProps['variant'], extra?: SxProps<Theme>): SxProps<Theme> => {
   const base = variant === 'contained' ? dialogContainedButtonSx : dialogOutlinedButtonSx;

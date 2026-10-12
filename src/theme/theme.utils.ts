@@ -51,6 +51,7 @@ export const getTheme = (mode: Mode = Mode.LIGHT): Theme => {
       },
     },
     components: {
+      MuiStack: { styleOverrides: { root: { gap: STYLE.PADDING_GAP_LAYOUT } } },
       MuiButton: {
         // No `fullWidth` default: width is a layout decision of the call site, not of the theme.
         defaultProps: {

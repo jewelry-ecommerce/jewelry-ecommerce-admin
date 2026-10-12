@@ -5,7 +5,7 @@ import type { PermissionContextValue, RolePermissionGrant } from "@/permissions/
 import { buildActionKey, buildTabKey, ROLE_PERMISSIONS } from "@/permissions/role.constant";
 import { ALWAYS_ALLOWED_PATHS, DENY_ALL, PermissionContext } from "@/permissions/use-permission-context.hook";
 import { useAppSelector } from "@/redux/store.redux";
-import { collectNavLeaves, resolveLeafMenuCode, type DashboardSidebarNavGroup } from "@/router/dashboard-sidebar.nav";
+import { collectNavLeaves, resolveLeafMenuCode, isNavItemWithChildren, type DashboardSidebarNavItem, type DashboardSidebarNavGroup } from "@/router/dashboard-sidebar.nav";
 
 type GrantSets = {
   isSuperAdmin: boolean;
@@ -82,7 +82,11 @@ export const PermissionProvider = ({ children }: { children: ReactNode }) => {
         .map((group) => {
           if (!group.items?.length) return canAccessMenu(group.menuCode) ? group : null;
 
-          const items = group.items.filter((leaf) => canAccessMenuTab(resolveLeafMenuCode(group, leaf), leaf.tabCode));
+          const items = group.items.flatMap<DashboardSidebarNavItem>((item) => {
+            if (!isNavItemWithChildren(item)) return canAccessMenuTab(resolveLeafMenuCode(group, item), item.tabCode) ? [item] : [];
+            const children = item.children.filter(leaf => canAccessMenuTab(resolveLeafMenuCode(group, leaf), leaf.tabCode));
+            return children.length ? [{ ...item, children }] : [];
+          });
           if (items.length === 0) return null;
           return { ...group, items };
         })

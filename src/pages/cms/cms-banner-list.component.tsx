@@ -3,6 +3,7 @@ import type { Placement } from "@/trading-ui/apis/banner/banner.entities";
 import { PermissionIconButton } from "@/trading-ui/components/button/permission-icon-button";
 import { DataTable, DataTableContentCard, DataTableFilterCard, DataTableToolbar, type DataTableColumn } from "@/components/data-table";
 import { Stack } from "@mui/material";
+import { isJavaBackend } from "@/common/config/app.config";
 interface Props {
   rows: Placement[];
   search: string;
@@ -27,7 +28,7 @@ function columns(props: Props): DataTableColumn<Placement>[] {
           <PermissionIconButton aria-label="Chỉnh sửa banner" onClick={() => props.edit(row.code)}>
             <Edit02 size={18} />
           </PermissionIconButton>
-          <PermissionIconButton aria-label="Xóa vị trí banner" onClick={() => props.remove(row.id)}>
+          <PermissionIconButton disabled={isJavaBackend()} title={isJavaBackend() ? "Java chưa hỗ trợ xóa vị trí banner" : undefined} aria-label="Xóa vị trí banner" onClick={() => props.remove(row.id)}>
             <Trash01 size={18} />
           </PermissionIconButton>
         </>

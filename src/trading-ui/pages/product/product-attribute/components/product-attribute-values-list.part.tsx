@@ -3,7 +3,7 @@ import DragIndicatorOutlined from '@mui/icons-material/DragIndicatorOutlined';
 import { Box, Stack, Typography } from '@mui/material';
 import { PermissionIconButton } from '../../../../components/button';
 import { productAttributesButtonPermission } from '../../product-permission.constants';
-import { useEffect, useMemo, type Ref } from 'react';
+import { useEffect, useState, type Ref } from 'react';
 import { Controller, useFieldArray, useWatch, type Control, type UseFormGetValues } from 'react-hook-form';
 import { StackRowAlignCenter, StackRowAlignJustCenter } from '@/trading-ui/adapters/library';
 import { TYPOGRAPHY_STYLES } from '../../../../common/constant/typography.constant';
@@ -38,8 +38,17 @@ interface SwatchImageUploadFieldProps {
 }
 
 const SwatchImageUploadField = ({ value, onChange, onBlur, inputRef }: SwatchImageUploadFieldProps) => {
-  const filePreviewUrl = useMemo(() => value instanceof File ? URL.createObjectURL(value) : null, [value]);
-  useEffect(() => () => { if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl); }, [filePreviewUrl]);
+  const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!(value instanceof File)) {
+      setFilePreviewUrl(null);
+      return;
+    }
+    const u = URL.createObjectURL(value);
+    setFilePreviewUrl(u);
+    return () => URL.revokeObjectURL(u);
+  }, [value]);
 
   const previewSrc = value instanceof File ? filePreviewUrl : typeof value === 'string' && value.trim() ? value.trim() : null;
   const hasImage = Boolean(previewSrc);

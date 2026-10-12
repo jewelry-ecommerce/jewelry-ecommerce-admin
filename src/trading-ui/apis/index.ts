@@ -1,73 +1,76 @@
-import { PRODUCTS, CATEGORIES, COLLECTIONS } from '@/mocks/data/catalog.data';
-import { getCmsDemoPages } from '@/apis/cms-demo/cms-demo.api';
-import { getDataSourceMode } from '@/common/config/app.config';
-import { productApi as backendProductApi } from './product/product.api';
-import { categoryApi as backendCategoryApi } from './category/category.api';
-import { collectionApi as backendCollectionApi } from './collection/collection.api';
-import { CategoryStatus } from './category/category.enum';
-import { CollectionStatus } from './collection/collection.enum';
-export { CollectionStatus };
-export * from './banner/banner.enum';
-export * from './banner/banner.entities';
-export * from './banner/banner.interface';
+
+export { categoryApi } from './category/category.api';
+export * from './category/category.entities';
+export * from './category/category.interface';
+export { collectionApi } from './collection/collection.api';
+export * from './collection/collection.entities';
+export * from './collection/collection.enum';
+export * from './collection/collection.interface';
+export { attributeApi } from './attribute';
+export * from './attribute/attribute.entities';
+export * from './attribute/attribute.enum';
+export * from './attribute/attribute.interface';
+export { productSourceApi as productApi } from './product/product-source.api';
+export * from './product/product.entities';
+export * from './product/product.enum';
+export * from './product/product.interface';
+export * as productSkuSearchApi from './product/sku-search.api';
+export * from './product/sku-search.interface';
+export * as importExportApi from './import-export/import-export.api';
+export * from './import-export/import-export.entities';
+export * from './import-export/import-export.enum';
+export * from './import-export/import-export.interface';
+export * as cmsApi from './cms/cms-source.api';
+export * from './cms/cms.entities';
+export { PageDisplayStatus,TargetDevice,VersionStatus,NavigationType } from './cms/cms.enum';
+export * from './cms/cms.interface';
+export * as cmsGlobalConfigApi from './cms/cms-global-config.api';
+export * as cmsHeaderFooterApi from './cms/cms-header-footer.api';
+export * from './cms/cms-header-footer.interface';
+export * as navigationApi from './cms/navigation.api';
+export * from './cms/navigation.interface';
 export { bannerApi } from './banner/banner.api';
-export { MediaVisibility } from './file/file.enum';
-export interface Product {
-  id: string; spuCode: string; name: string; image: string; imageHover: string;
-  variations: { id: string }[]; defaultVariationId?: string;
-}
-interface ProductQuery {
-  orderType?: string; orderBy?: string; isPagination?: boolean; search?: string;
-  productIds?: string | string[]; page?: number; take?: number;
-}
-export const productApi = {
-  async getAdminProductList(query: ProductQuery): Promise<{ list: Product[] }> {
-    if (getDataSourceMode() === "HTTP") {
-      const result = await backendProductApi.getAdminProductList({
-        page: query.page, take: query.take, search: query.search, isPagination: query.isPagination,
-        productIds: Array.isArray(query.productIds) ? query.productIds.join(',') : query.productIds,
-      });
-      return { list: result.list.map(product => ({
-        id: product.id, spuCode: product.spuCode, name: product.name, image: product.image ?? "", imageHover: product.imageHover ?? "",
-        variations: (product.variations ?? []).map(variation => ({ id: variation.id })), defaultVariationId: product.defaultVariationId ?? undefined,
-      })) };
-    }
-    const search = query.search?.trim().toLowerCase() || '';
-    const productIds = typeof query.productIds === 'string' ? query.productIds.split(',') : query.productIds;
-    const list = PRODUCTS.filter(product =>
-      (!productIds?.length || productIds.includes(product.id)) &&
-      (!search || product.name.toLowerCase().includes(search) || product.code.toLowerCase().includes(search))
-    ).map(product => ({
-      id: product.id, spuCode: product.code, name: product.name,
-      image: product.media[0]?.url || '', imageHover: product.media[1]?.url || '',
-      defaultVariationId: product.variants[0]?.id,
-      variations: product.variants.map(variant => ({ id: variant.id })),
-    }));
-    return { list };
-  },
-};
-export const categoryApi = {
-  async getCategoryTree(_query: { compact?: boolean; status?: string }) {
-    if (getDataSourceMode() === "HTTP") return backendCategoryApi.getCategoryTree({
-      status: Object.values(CategoryStatus).find(status => status === _query.status),
-    });
-    return CATEGORIES.map(({ id, name, slug }) => ({ id, name, slug, children: [] }));
-  },
-};
-export const collectionApi = {
-  async getCollectionList(_query: { page?: number; take?: number; isPagination?: boolean; status?: string }) {
-    if (getDataSourceMode() === "HTTP") {
-      const result = await backendCollectionApi.getCollectionList({
-        page: _query.page, take: _query.take, isPagination: _query.isPagination,
-        status: Object.values(CollectionStatus).find(status => status === _query.status),
-      });
-      return { list: result.list.map(collection => ({ id: collection.id, name: collection.name, slug: collection.slug })) };
-    }
-    return { list: COLLECTIONS.map(({ id, name, slug }) => ({ id, name, slug })) };
-  },
-};
-export const cmsApi = {
-  async getPageList(_query: { page?: number; take?: number; isPagination?: boolean; isActive?: boolean }) {
-    return { list: await getCmsDemoPages() };
-  },
-};
+export * from './banner/banner.entities';
+export * from './banner/banner.enum';
+export * from './banner/banner.interface';
+export { sourceBadgeApi as badgeApi } from './badge/badge-source.api';
+export * from './badge/badge.entities';
+export * from './badge/badge.enum';
+export * from './badge/badge.interface';
+export * as promotionApi from './promotion/promotion.api';
+export * from './promotion/promotion.entities';
+export * from './promotion/promotion.enum';
+export * from './promotion/promotion.interface';
+export * from './promotion/promotion-authoring-contract.types';
+export * as fileApi from './file/file.api';
+export * from './file/file.enum';
+export * from './file/file.interface';
+export * as brandApi from './brand/brand.api';
+export * from './brand/brand.entities';
+export * from './brand/brand.enum';
+export * from './brand/brand.interface';
+export * as seasonApi from './season/season.api';
+export * from './season/season.entities';
+export * from './season/season.interface';
+export * as productSetApi from './product-set/product-set.api';
+export * from './product-set/product-set.constants';
+export * from './product-set/product-set.enum';
+export * from './product-set/product-set.interface';
+export * as configEnvApi from './operations/config-env.api';
+export * from './operations/config-env.interface';
+export * as operationsApi from './operations/operations.api';
+export * from './operations/operations.interface';
+export * as searchPinnedApi from './search-pinned/search-pinned.api';
+export * from './search-pinned/search-pinned.interface';
+
+export * as preOrderCampaignApi from './pre-order-campaign/pre-order-campaign.api';
+export * from './pre-order-campaign/pre-order-campaign.entities';
+export * from './pre-order-campaign/pre-order-campaign.enum';
+export * from './pre-order-campaign/pre-order-campaign.interface';
+export * as preOrderOrderApi from './pre-order-order/pre-order-order.api';
+export * from './pre-order-order/pre-order-order.interface';
+export * from './pre-order-order/pre-order-order.enum';
+export * as posApi from './pos/pos.api';
+export * from './pos/pos.entities';
+export * as posShiftApi from './pos/pos-shift.api';
+export * from './pos/pos-shift.interface';

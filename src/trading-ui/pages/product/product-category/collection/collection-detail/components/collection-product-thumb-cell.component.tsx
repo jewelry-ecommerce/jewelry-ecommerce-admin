@@ -2,7 +2,7 @@ import { ImageElement } from '@/trading-ui/adapters/library';
 
 import type { Product } from '../../../../../../apis/product/product.entities';
 import { StackRowAlignJustCenter } from '../../../../../../components/styled';
-import { PRODUCT_SPU_DEFAULT_IMAGE_SRC } from '../../../../product-spu/product-status-labels.util';
+import { PRODUCT_SPU_DEFAULT_IMAGE_SRC } from '../../../../product-spu/product-spu.constant';
 
 const TABLE_PRODUCT_THUMB_PX = 48;
 

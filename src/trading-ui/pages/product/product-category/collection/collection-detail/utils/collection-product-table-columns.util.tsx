@@ -6,9 +6,9 @@ import type { CollectionDetailRow } from '../collection-detail.interface';
 import { getProductCategoryName } from './collection-detail.util';
 import { TYPOGRAPHY_STYLES } from '../../../../../../common/constant/typography.constant';
 import { StackRowAlignJustCenter } from '../../../../../../components/styled';
-import { type DataTableColumn } from '@/components/data-table';
+import { type DataTableColumn } from '../../../../../../components/data-table';
 import { TagCommonComponent } from '../../../../../../components/tag';
-import { getProductApprovalStatusLabelVi, getProductLifecycleStatusLabelVi } from '../../../../product-spu/product-status-labels.util';
+import { getProductApprovalStatusLabelVi, getProductLifecycleStatusLabelVi } from '../../../../product-spu/product-spu.constant';
 
 /** Tổng width cột dữ liệu (+ checkbox 52px trong DataTable). */
 export const COLLECTION_PRODUCT_TABLE_MIN_WIDTH = 1040;

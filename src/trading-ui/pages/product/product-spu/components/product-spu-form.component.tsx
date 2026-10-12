@@ -3,13 +3,50 @@ import { type Control, Controller, type FieldValues, type Path } from 'react-hoo
 import { SelectInput, TextInput } from '../../../../components/form';
 import { SelectAttributeTreeInput, type AttributeTreeSelectOption } from '../../../../components/form/select-attribute-tree-input';
 import { getCategoryTreeValuesFromUuid, getCategoryUuidFromTreeSelection } from '../utils/product-spu-category-tree.utils';
-import type { ProductInfoFormItem } from '../../../../apis/product/product.interface';
+import type { ProductSpu, ProductSpuCreateFormValues } from '../product-spu.interface';
+import type { ProductCreateRequestDto, ProductInfoFormItem } from '../../../../apis/product/product.interface';
 import { StackRow } from '../../../../components/styled';
 import { TYPOGRAPHY_STYLES } from '../../../../common/constant/typography.constant';
 import { ProductKind, ProductUnitOfMeasure, PRODUCT_UNIT_OF_MEASURE_OPTIONS } from '../../../../apis/product/product.enum';
 import { PRODUCT_KIND_OPTIONS } from '../product-spu.constant';
 import { ProductSpuInfosForm } from './product-spu-infos-form.component';
 
+export type ProductSpuGeneralFormValues = Pick<ProductSpuCreateFormValues, 'spuCode' | 'name' | 'productKind' | 'categoryUuid' | 'brandId' | 'taxRateOverride'> & {
+  seasonUuid: string;
+  unitOfMeasure: ProductUnitOfMeasure;
+};
+
+export const emptyProductSpuGeneralForm = (): ProductSpuGeneralFormValues => ({
+  spuCode: '',
+  name: '',
+  productKind: ProductKind.MERCHANDISE,
+  unitOfMeasure: ProductUnitOfMeasure.EACH,
+  categoryUuid: '',
+  seasonUuid: '',
+  brandId: '',
+  taxRateOverride: undefined,
+});
+
+export const emptyProductSpuCreateForm = (): ProductCreateRequestDto => ({
+  ...emptyProductSpuGeneralForm(),
+  metaTitle: '',
+  metaDescription: '',
+  metaKeywords: '',
+  attributes: [],
+  skus: [],
+  productInfos: [],
+});
+
+export const productSpuToGeneralFormValues = (product: ProductSpu): ProductSpuGeneralFormValues => ({
+  spuCode: product.code,
+  name: product.name,
+  productKind: ProductKind.MERCHANDISE,
+  unitOfMeasure: ProductUnitOfMeasure.EACH,
+  categoryUuid: '',
+  seasonUuid: '',
+  brandId: '',
+  taxRateOverride: undefined,
+});
 
 export type ProductSpuFormProps<TFieldValues extends FieldValues = FieldValues> = {
   control: Control<TFieldValues>;
@@ -149,14 +186,13 @@ export const ProductSpuForm = <TFieldValues extends FieldValues = FieldValues>({
             />
             <Controller
               control={control}
-name={'seasonUuid' as Path<TFieldValues>}
+              name={'seasonUuid' as Path<TFieldValues>}
               render={({ field, fieldState }) => (
                 <SelectInput
                   {...field}
                   value={field.value ?? ''}
                   label="Mùa vụ"
-                  placeholder="Vui lòng chọn"
-                  requiredMark
+                  placeholder="Không bắt buộc"
                   options={[...seasonOptions]}
                   error={!!fieldState.error}
                   errorMessage={fieldState.error?.message}

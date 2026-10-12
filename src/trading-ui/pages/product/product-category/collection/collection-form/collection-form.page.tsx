@@ -8,19 +8,20 @@ import { CustomButton } from '../../../../../components/button';
 import { productCollectionButtonPermission } from '../../../product-permission.constants';
 import { Plus, Star01, XCircle } from '@untitledui/icons';
 
-import { collectionApi, CollectionStatus } from '@/trading-ui/apis/pim';
+import { collectionApi, CollectionStatus } from '../../../../../apis';
+import { getTenantCodeHeader } from '../../../../../common/config';
 import { TYPOGRAPHY_STYLES } from '../../../../../common/constant/typography.constant';
 import { getErrorMessage } from '../../../../../common/utils';
-import { DataTable, DataTablePagination, DataTableToolbar, type DataTableToolbarAction } from '@/components/data-table';
+import { DataTable, DataTablePagination, DataTableToolbar, type DataTableToolbarAction } from '../../../../../components/data-table';
 import { DialogConfirmComponent } from '../../../../../components/dialog/dialog-confirm.component';
-import { EmptyComponent } from '@/components/empty/empty.component';
+import { EmptyComponent } from '../../../../../components/empty/empty.component';
 import { TextInput } from '../../../../../components/form';
 import { LoadingComponent } from '../../../../../components/loading/loading.component';
 import { StackRowAlignCenter, StackRowAlignCenterJustBetween } from '../../../../../components/styled';
 import { SwitchContentElement } from '../../../../../components/switch/switch-content.element';
-import { SnackbarType, useSnackbar } from '../../../../../hooks/use-snackbar.hook';
-import { ROUTE_PATH } from '@/router/route.path';
-import { LabelFormPageHeader } from '@/trading-ui/pages/content-display/label/components/label-form-page-header.component';
+import { SnackbarType, useSnackbar } from '@/hooks/use-snackbar.hook';
+import { ROUTE_PATH } from '@/trading-ui/router/route.path';
+import { LabelFormPageHeader } from '../../../../content-display/label/components';
 import { collectionCreateFormSchema } from '../collection-list/collection-list.constant';
 import { COLLECTION_DETAIL_PAGE_SIZE_OPTIONS } from '../collection-detail/collection-detail.constant';
 import type { CollectionDetailRow } from '../collection-detail/collection-detail.interface';
@@ -47,7 +48,7 @@ const COLLECTION_FORM_TABLE_MIN_HEIGHT = 480;
 const CollectionFormPage = () => {
   const navigate = useNavigate();
   const { showSnackbar } = useSnackbar();
-  const editMatch = useMatch(ROUTE_PATH.COLLECTION_EDIT);
+  const editMatch = useMatch(ROUTE_PATH.PRODUCT_COLLECTION_EDIT);
   const mode: CollectionFormMode = editMatch ? 'edit' : 'create';
   const collectionId = editMatch?.params?.collectionId;
 
@@ -58,6 +59,7 @@ const CollectionFormPage = () => {
   const [leaveUnsavedOpen, setLeaveUnsavedOpen] = useState(false);
 
   const formState = useCollectionFormState({ mode, collectionId });
+  const tenantCode = getTenantCodeHeader();
 
   const {
     control,
@@ -88,11 +90,12 @@ const CollectionFormPage = () => {
   }, [resetFormFromCollection]);
 
   const isDirty = isFormDirty || formState.isProductDraftDirty;
+  const canSubmitByTenant = Boolean(tenantCode);
 
   const pageTitle = mode === 'create' ? 'Tạo bộ sưu tập' : 'Chỉnh sửa bộ sưu tập';
 
   const goToList = useCallback(() => {
-    navigate(ROUTE_PATH.COLLECTION_LIST);
+    navigate(ROUTE_PATH.PRODUCT_COLLECTION_LIST);
   }, [navigate]);
 
   const handleBack = useCallback(() => {
@@ -110,6 +113,10 @@ const CollectionFormPage = () => {
 
   const onSubmit = useCallback(
     async (values: CollectionFormValues) => {
+      if (!tenantCode) {
+        showSnackbar({ type: SnackbarType.ERROR, message: 'Chưa xác định tenant đăng nhập' });
+        return;
+      }
 
       setLoading(true);
       formState.setIsMutating(true);
@@ -150,7 +157,7 @@ const CollectionFormPage = () => {
         formState.setIsMutating(false);
       }
     },
-    [collectionId, formState, goToList, isFormDirty, mode, showSnackbar],
+    [collectionId, formState, goToList, isFormDirty, mode, showSnackbar, tenantCode],
   );
 
   const handleSave = useCallback(() => {
@@ -174,7 +181,7 @@ const CollectionFormPage = () => {
         key: 'add',
         label: 'Thêm sản phẩm',
         ...productCollectionButtonPermission(mode === 'edit' ? 'edit' : 'create', 'Thêm sản phẩm vào bộ sưu tập', mode === 'edit' ? 'api_collection_update' : 'api_collection_create'),
-        variant: 'primary',
+        variant: 'contained',
         icon: <Plus size={18} color="#FFFFFF" />,
         onClick: () => setAddProductOpen(true),
       },
@@ -217,7 +224,7 @@ const CollectionFormPage = () => {
         onCancel={handleBack}
         onSave={handleSave}
         loading={isSaving}
-        disabled={!isDirty}
+        disabled={!isDirty || !canSubmitByTenant}
         cancelPermission={productCollectionButtonPermission(
           mode === 'edit' ? 'edit_cancel' : 'create_cancel',
           mode === 'edit' ? 'Hủy chỉnh sửa bộ sưu tập' : 'Hủy tạo bộ sưu tập',
@@ -295,7 +302,7 @@ const CollectionFormPage = () => {
                     content={field.value === CollectionStatus.ACTIVE ? 'Kích hoạt' : 'Vô hiệu hóa'}
                     name={field.name}
                     value={field.value === CollectionStatus.ACTIVE}
-                    disabled={isSaving}
+                    disabled={isSaving || !canSubmitByTenant}
                     onChange={(e) => {
                       const nextChecked = Boolean(e?.target?.value);
                       field.onChange(nextChecked ? CollectionStatus.ACTIVE : CollectionStatus.INACTIVE);
@@ -392,6 +399,7 @@ const CollectionFormPage = () => {
                   totalItems={totalRows}
                   pageSizeOptions={[...COLLECTION_DETAIL_PAGE_SIZE_OPTIONS]}
                   itemLabel="sản phẩm"
+                  summaryMode="total"
                   onPageChange={formState.setPage}
                   onPageSizeChange={formState.setPageSize}
                 />

@@ -4,28 +4,28 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { STYLE } from '@/trading-ui/adapters/library';
 import useSWR from 'swr';
-import { DataTable, type DataTableColumn, DataTablePagination, DataTableToolbar, type DataTableToolbarAction } from '@/components/data-table';
+import { DataTable, type DataTableColumn, DataTablePagination, DataTableToolbar, type DataTableToolbarAction } from '../../../../components/data-table';
 import { TYPOGRAPHY_STYLES } from '../../../../common/constant/typography.constant';
 import { TagCommonComponent } from '../../../../components/tag';
-import { PAGE_SIZE_OPTIONS } from '@/common/constant/page-take.constant';
+import { LABEL_CONTENT_PAGE_SIZE_OPTIONS } from '../../../content-display/label/label-content/label-content.constants';
 import { StackRowAlignJustCenter } from '../../../../components/styled';
-import { TooltipOnHoverComponent } from '@/components/tooltip/tooltip-on-hover.component';
-import { getProductAttributeDetailPath, getProductAttributeUpdatePath, ROUTE_PATH } from '@/router/route.path';
-import { WrapperComponent } from '@/components/wrapper/wrapper.component';
+import { TooltipOnHoverComponent } from '../../../../components/tooltip/tooltip-on-hover.component';
+import { getProductAttributeDetailPath, getProductAttributeUpdatePath, ROUTE_PATH } from '@/trading-ui/router/route.path';
+import { WrapperComponent } from '../../../../components/wrapper';
 import { PRODUCT_ATTRIBUTE_DATA_TYPE_OPTIONS } from '../product-attribute.constant';
-import { SnackbarType, useSnackbar } from '../../../../hooks/use-snackbar.hook';
+import { SnackbarType, useSnackbar } from '@/hooks/use-snackbar.hook';
 import { AttributeStatus } from '../../../../apis/attribute/attribute.enum';
-import { DialogConfirmComponent } from '@/components/dialog';
-import { EmptyComponent } from '@/components/empty/empty.component';
+import { DialogConfirmComponent } from '../../../../components/dialog';
+import { EmptyComponent } from '../../../../components/empty/empty.component';
 import { Edit02, Eye, Trash01 } from '@untitledui/icons';
 import type { Attribute } from '../../../../apis/attribute/attribute.entities';
-import { attributeApi, type QueryAttributeDto } from '../../../../apis/attribute';
-import { PAGE_TAKE_DEFAULT } from '@/common/constant/page-take.constant';
+import { attributeApi, type QueryAttributeDto } from '../../../../apis';
+import { PAGE_TAKE_DEFAULT } from '../../../../common/constant/page-take.constant';
 import { getErrorMessage } from '../../../../common/utils';
 import { LoadingComponent } from '../../../../components/loading/loading.component';
 import { PermissionIconButton } from '../../../../components/button';
 import { productAttributesButtonPermission, PRODUCT_ATTRIBUTES_PAGE_SCOPE } from '../../product-permission.constants';
-import { useListPageViewAccess } from '@/trading-ui/permissions/use-list-page-view-access.hook';
+import { useListPageViewAccess } from '../../../../permissions/use-list-page-view-access.hook';
 
 const getAttributeStatusLabelVi = (status?: AttributeStatus): string => {
   if (status === AttributeStatus.ACTIVE) return 'Kích hoạt';
@@ -63,7 +63,7 @@ const ProductAttributeListPage = () => {
   );
 
   const rows = data?.list ?? [];
-  const totalItems = data?.total ?? 0;
+  const totalItems = data?.total ?? data?.pagination?.total ?? 0;
 
   const toolbarActions = useMemo<DataTableToolbarAction[]>(
     () => [
@@ -71,10 +71,10 @@ const ProductAttributeListPage = () => {
         key: 'add',
         label: 'Tạo thuộc tính',
         ...productAttributesButtonPermission('create', 'Tạo thuộc tính', 'api_attribute_create'),
-        variant: 'primary',
+        variant: 'contained',
         icon: <AddRounded sx={{ fontSize: 18 }} />,
         onClick: () => {
-          navigate(ROUTE_PATH.ATTRIBUTE_CREATE);
+          navigate(ROUTE_PATH.PRODUCT_ATTRIBUTE_CREATE);
         },
       },
     ],
@@ -218,8 +218,9 @@ const ProductAttributeListPage = () => {
                 page={screenState.page}
                 pageSize={screenState.take}
                 totalItems={totalItems}
-                pageSizeOptions={[...PAGE_SIZE_OPTIONS]}
+                pageSizeOptions={[...LABEL_CONTENT_PAGE_SIZE_OPTIONS]}
                 itemLabel="thuộc tính"
+                summaryMode="total"
                 onPageChange={(p) => setScreenState((prev) => ({ ...prev, page: p }))}
                 onPageSizeChange={(n) => {
                   setScreenState((prev) => ({ ...prev, take: n, page: PAGE_TAKE_DEFAULT.page }));
@@ -231,6 +232,7 @@ const ProductAttributeListPage = () => {
       </WrapperComponent>
       <DialogConfirmComponent
         open={isDeleteDialogOpen.toggle}
+        onClose={() => setIsDeleteDialogOpen({ toggle: false })}
         title="Xác nhận xoá thuộc tính"
         highlight={{
           tone: 'danger',

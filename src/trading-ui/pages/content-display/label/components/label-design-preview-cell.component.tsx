@@ -1,7 +1,7 @@
 import { Box, type BoxProps, Typography } from '@mui/material';
-import { type BadgeTemplate, BadgeType } from '@/trading-ui/apis/badge';
-import { StackRowAlignJustCenter } from '@/trading-ui/components/styled/stack.style';
-import { TYPOGRAPHY_STYLES } from '@/common/constant/typography.constant';
+import { type BadgeTemplate, BadgeType } from '../../../../apis';
+import { StackRowAlignJustCenter } from '../../../../components/styled/stack.style';
+import { TYPOGRAPHY_STYLES } from '../../../../common/constant/typography.constant';
 
 export const LabelPreviewFrame = ({ children, sx }: BoxProps) => (
   <StackRowAlignJustCenter
@@ -47,8 +47,8 @@ export const LabelDesignPreviewCell = ({ badgeTemplate }: LabelDesignPreviewCell
           py: '4px',
           borderRadius: 1,
           ...TYPOGRAPHY_STYLES.sm.regular,
-          color: typeof badgeTemplate.styleConfig?.textColor==='string'?badgeTemplate.styleConfig.textColor:undefined,
-          bgcolor: typeof badgeTemplate.styleConfig?.backgroundColor==='string'?badgeTemplate.styleConfig.backgroundColor:undefined,
+          color: badgeTemplate.styleConfig?.textColor,
+          bgcolor: badgeTemplate.styleConfig?.backgroundColor,
         }}
       >
         {badgeTemplate.displayText || badgeTemplate.name}
