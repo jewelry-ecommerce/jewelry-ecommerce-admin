@@ -10,7 +10,7 @@ async function resolveCode(id:string):Promise<string>{
  if(!/^[1-9][0-9]*$/.test(id))return id;
  const cached=orderCodes.get(id);if(cached)return cached;
  for(let page=1;;page++){
-  const response=await backendRequest<{list:WireOrder[];total:number}>(ORDER_BASE+'?page='+page+'&take='+JAVA_OPERATIONS.pageSize);
+  const response=await backendRequest<{list:WireOrder[];total:number}>(ORDER_BASE+'?'+query({page,take:JAVA_OPERATIONS.pageSize}));
   response.list.forEach(order=>orderCodes.set(String(order.id),order.code));
   const found=orderCodes.get(id);if(found)return found;
   if(page*JAVA_OPERATIONS.pageSize>=response.total||!response.list.length)throw new Error('Không tìm thấy đơn hàng Java.');
@@ -50,7 +50,8 @@ function query(request?:IOrderListRequest):URLSearchParams{
   if(request?.dateField==='deliveredAt')selected.push('dateField');
   if(selected.length)unsupportedJavaFields(ORDER_BASE,selected);
   if(request?.orderStatus && !(request.orderStatus.toUpperCase() in JAVA_OPERATIONS.transitions))unsupportedJavaFields(ORDER_BASE,['status:'+request.orderStatus]);
-  const params=new URLSearchParams({page:String(request?.page??1),take:String(request?.take??20)});
+  // Java SQL treats missing (null) filters differently from empty strings.
+  const params=new URLSearchParams({page:String(request?.page??1),take:String(request?.take??20),search:'',status:'',paymentStatus:''});
   if(request?.search?.trim())params.set('search',request.search.trim());
   if(request?.orderStatus)params.set('status',request.orderStatus.toUpperCase());
   if(request?.paymentStatus)params.set('paymentStatus',request.paymentStatus.toUpperCase());

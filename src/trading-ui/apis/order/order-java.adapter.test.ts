@@ -28,7 +28,22 @@ test('list preserves numeric backend IDs, order codes and real counts', async ()
   expect(result.list[0]).toMatchObject({ id: '903', orderCode: 'JEW-903', status: OrderStatus.PENDING,
     items: [expect.objectContaining({ id: '910', variationId: '12', productId: '9' })] });
   expect(result.summary).toMatchObject({ ALL: 2, [OrderStatus.PENDING]: 2 });
-  expect(transport.request.mock.calls[0][0]).toContain('search=JEW&paymentStatus=UNPAID');
+  const query = new URLSearchParams(transport.request.mock.calls[0][0].split('?')[1]);
+  expect(query.get('search')).toBe('JEW');
+  expect(query.get('paymentStatus')).toBe('UNPAID');
+});
+
+test('unselected Java filters are explicit empty strings for list, counts and numeric detail lookup', async () => {
+  transport.request.mockImplementation(async (path: string) => path.includes('?')
+    ? { list: [{ ...order, id: 905, code: 'JEW-905' }], total: 1 } : { ...order, id: 905, code: 'JEW-905' });
+  await getJavaSourceOrderList({ page: 1, take: 20 });
+  await getJavaSourceOrderDetail('905');
+  for (const [path] of transport.request.mock.calls.filter(([path]) => path.includes('?'))) {
+    const query = new URLSearchParams(path.split('?')[1]);
+    expect(query.get('search')).toBe('');
+    expect(query.get('status')).not.toBeNull();
+    expect(query.get('paymentStatus')).toBe('');
+  }
 });
 
 test('direct numeric detail URL resolves the actual order code before GET', async () => {

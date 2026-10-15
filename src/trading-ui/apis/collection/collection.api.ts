@@ -6,7 +6,6 @@ import type { CreateCollectionDto, UpdateCollectionDto, QueryCollectionDto, Upda
 import { UpdateCollectionAction } from './collection.enum';
 import { readCollectionList } from './collection-query.api';
 import { javaSaveCollection, javaCollectionDetail, javaCollectionList, javaUpdateMembership } from '@/apis/java/java-collection.api';
-import { unsupportedJavaAction } from '@/apis/java/java-taxonomy.api';
 const COLLECTION_PATH='admin/catalog/collections';
 function assertHttp():void {
   if(getDataSourceMode() !== 'HTTP') throw new Error('Quản lý bộ sưu tập cần backend riêng ở chế độ HTTP.');
@@ -27,7 +26,7 @@ export const collectionApi={
   },
   updateCollection:update,
   async getCollectionDetail(id:string) {if (isJavaBackend()) return javaCollectionDetail(id);return mapCollection(await rawDetail(id));},
-  async deleteCollection(id:string) {assertHttp();if (isJavaBackend()) return unsupportedJavaAction();return backendRequest<{success:boolean}>(COLLECTION_PATH+'/'+id,'DELETE');},
+  async deleteCollection(id:string) {assertHttp();await backendRequest<void>(COLLECTION_PATH+'/'+id,'DELETE');return {success:true};},
   async getCollectionList(query:Partial<QueryCollectionDto>={}) {
     assertHttp();
     return isJavaBackend() ? javaCollectionList(query) : readCollectionList(query);

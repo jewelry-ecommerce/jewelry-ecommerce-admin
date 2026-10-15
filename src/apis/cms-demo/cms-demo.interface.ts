@@ -35,6 +35,12 @@ export interface CmsDemoBlock {
   config: CmsDemoConfig;
 }
 export interface CmsDemoPage {
+  displayStatus?: 'DRAFT'|'SCHEDULED'|'RUNNING'|'PAUSED'|'ENDED';
+  targetDevice?: 'ALL'|'DESKTOP'|'MOBILE';
+  scheduleStart?: string|null;
+  scheduleEnd?: string|null;
+  hasUnpublishedChanges?: boolean;
+  versionId?: number;
   locale?: string;
   isActive?: boolean;
   id: string;

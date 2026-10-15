@@ -1,6 +1,6 @@
 
 import { getApiBaseUrl, isJavaBackend } from "@/common/config/app.config";
-import { unwrapJava } from "./java/java-envelope";
+import { unwrapJava, javaEnvelopeFailure } from "./java/java-envelope";
 import { store } from "@/redux/store.redux";
 import { refreshJavaAdminSession } from "./java/java-auth-session";
 interface BackendErrorPayload {code?:string;message?:string|string[];dependencies?:Record<string,unknown>[]}
@@ -29,6 +29,8 @@ export async function backendRequest<TResult>(path: string, method = "GET", body
   }
   if (response.status === 204) return undefined as TResult;
   const payload = await response.json();
+  const failure=isJavaBackend()?javaEnvelopeFailure(payload):undefined;
+  if(failure) throw new BackendHttpError(failure.code,failure.message,failure.status);
   return isJavaBackend() ? unwrapJava<TResult>(payload) : payload;
 }
 export function toUiEntityIds(value: unknown): unknown {

@@ -2,7 +2,7 @@ import { backendRequest } from "@/apis/backend-request";
 import { getDetailBadgeTemplate } from "@/trading-ui/apis/badge/badge.api";
 import { badgeFlowBody, mapBadgeFlow, numericBadgeId, type WireBadgeFlow } from "@/trading-ui/apis/badge/badge-flow.mapper";
 import type { CreateBadgeFlowDto, UpdateBadgeFlowDto, BadgeFlowDetail } from "@/trading-ui/apis/badge/badge.interface";
-import type { BadgeCampaignStatus } from "@/trading-ui/apis/badge/badge.enum";
+import type { BadgeCampaignStatus, BadgeCampaignDisplayStatus } from "@/trading-ui/apis/badge/badge.enum";
 interface JavaFlow extends Omit<WireBadgeFlow, "rules" | "assignmentCount"> {
   templates: { badgeTemplateId: string; priorityWeight?: number; isPinned?: boolean }[];
 }
@@ -16,11 +16,19 @@ async function view(flow: JavaFlow): Promise<BadgeFlowDetail> {
   }));
   return mapBadgeFlow({ ...flow, rules, assignmentCount: undefined });
 }
-export async function javaBadgeFlows(query: { page?: number; take?: number; search?: string; status?: BadgeCampaignStatus } = {}) {
+export async function javaBadgeFlows(query: { page?: number; take?: number; search?: string; status?: BadgeCampaignStatus; displayStatus?:BadgeCampaignDisplayStatus; isPagination?:boolean } = {}) {
   const params = new URLSearchParams({ page: String(query.page ?? 1), take: String(query.take ?? POLICY.take) });
   if (query.status) params.set("status", query.status);
-  if (query.search) throw new Error("Java chưa hỗ trợ tìm kiếm cấu hình nhãn. Bỏ từ khóa để tải danh sách.");
+  if (query.search?.trim()) params.set("search",query.search.trim());
+  if (query.displayStatus) params.set("displayStatus",query.displayStatus);
   const result = await backendRequest<JavaFlowPage>(POLICY.path + "?" + params);
+  if(query.isPagination===false) {
+    while(result.pagination.hasNextPage) {
+      params.set("page",String(Number(params.get("page"))+1));
+      const next=await backendRequest<JavaFlowPage>(POLICY.path+"?"+params);
+      result.list.push(...next.list);result.pagination=next.pagination;
+    }
+  }
   return { ...result, list: await Promise.all(result.list.map(view)) };
 }
 async function rawFlow(id: string): Promise<JavaFlow> {

@@ -25,7 +25,9 @@ export function javaProductForm(product: JavaProduct): ProductFormSnapshot {
     const view = javaSkuView(product, sku);
     return { uuid: view.id, skuCode: view.skuCode, status: view.status, medias: view.medias?.map(media => media.url) ?? [],
       sellingPriceAfterTaxMinor: view.sellingPriceAfterTaxMinor ?? undefined, compareAtPriceAfterTaxMinor: view.compareAtPriceAfterTaxMinor,
-      weight: sku.weightGram, attributeValueUuids: (sku.attributeBindings ?? []).map(binding => optionKey(binding.id, binding.value)) };
+      weight: sku.weightGram,costPriceAfterTaxMinor:sku.costPrice,b2bWholesalePriceAfterTax:sku.b2bWholesalePrice,
+      taxRateOverride:sku.taxRateOverride,length:sku.length,width:sku.width,height:sku.height,
+      attributeValueUuids: (sku.attributeBindings ?? []).map(binding => optionKey(binding.id, binding.value)) };
   });
   const attributes = new Map<string, Set<string>>();
   for (const sku of product.skus) for (const binding of sku.attributeBindings ?? []) {
@@ -36,5 +38,10 @@ export function javaProductForm(product: JavaProduct): ProductFormSnapshot {
     selected: [...attributes].flatMap(([id, values]) => [...values].map(value => id + ':' + value)),
     values: { spuCode: product.code, name: product.name, categoryUuid: String(product.categoryId),
       description: product.description, defaultSkuCode: product.skus.find(sku => sku.isDefault)?.skuCode,
+      unitOfMeasure:product.unitOfMeasure,taxRateOverride:product.taxRateOverride,weight:product.weightGram,
+      length:product.length,width:product.width,height:product.height,
+      metaTitle:product.metaTitle??'',metaDescription:product.metaDescription??'',metaKeywords:product.metaKeywords??'',
+      productInfos:product.productInfos?.map(info=>({title:info.title,description:info.description,sortOrder:info.sortOrder})),
+      productMixMatch:product.productMixMatch?.map(product=>String(product.id)),
       attributes: [...attributes].map(([attributeUuid, values]) => ({ attributeUuid, valueUuids: [...values] })), skus } };
 }

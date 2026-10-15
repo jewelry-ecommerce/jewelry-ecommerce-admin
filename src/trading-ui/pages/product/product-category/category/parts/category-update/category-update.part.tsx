@@ -129,10 +129,6 @@ export const CategoryUpdatePart: React.FC<CategoryUpdatePartProps> = ({ screenSt
 
           <StackRowAlignCenter gap={2} sx={{ alignItems: 'flex-start' }}>
             <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Typography sx={{ ...TYPOGRAPHY_STYLES.base.regular, color: '#475467' }}>Thuế VAT</Typography>
-              <Typography sx={{ ...TYPOGRAPHY_STYLES.base.medium, color: '#111827' }}>{category?.taxRate || '0'}%</Typography>
-            </Box>
-            <Box sx={{ flex: 1, minWidth: 0 }}>
               <Typography sx={{ ...TYPOGRAPHY_STYLES.base.regular, color: '#475467' }}>Bộ thuộc tính gán</Typography>
               <ChipComponent tags={(category?.effectiveAttributes ?? []).map((attribute) => attribute.name)} />
             </Box>
@@ -237,25 +233,6 @@ export const CategoryUpdatePart: React.FC<CategoryUpdatePartProps> = ({ screenSt
       </StackRowAlignCenter>
 
       <StackRowAlignCenter sx={{ alignItems: 'flex-start' }}>
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Controller
-            name="taxRate"
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextInput
-                label="Thuế VAT"
-                name={field.name}
-                value={field.value}
-                requiredMark
-                type="number"
-                placeholder="VD: 10"
-                error={Boolean(fieldState.error)}
-                errorMessage={fieldState.error?.message}
-                onChange={field.onChange}
-              />
-            )}
-          />
-        </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Controller
             name="directAttributeIds"

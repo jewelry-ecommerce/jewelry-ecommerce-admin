@@ -1,5 +1,10 @@
 import { expect, test } from "vitest";
-import { unwrapJava, normalizeJavaPage } from "./java-envelope";
+import { unwrapJava, normalizeJavaPage, javaEnvelopeFailure } from "./java-envelope";
+test("business errors inside HTTP success expose code/status/message",()=>{
+  expect(javaEnvelopeFailure({status:404,message:"Không tìm thấy",errors:[{code:"NOT_FOUND"}]}))
+    .toEqual({status:404,message:"Không tìm thấy",code:"NOT_FOUND"});
+  expect(javaEnvelopeFailure({status:200,data:{id:12}})).toBeUndefined();
+});
 test("unwrap success and keep Java business errors intact", () => {
   expect(unwrapJava({ status: 200, data: { id: 12 } })).toEqual({ id: 12 });
   const failure = { status: 422, data: null, code: "OUT_OF_STOCK", message: "Hết hàng" };

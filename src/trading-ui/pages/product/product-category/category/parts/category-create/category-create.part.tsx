@@ -179,25 +179,6 @@ export const CategoryCreatePart: React.FC<CategoryCreatePartProps> = ({ screenSt
       <StackRowAlignCenter gap={2} sx={{ alignItems: 'flex-start' }}>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Controller
-            name="taxRate"
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextInput
-                label="Thuế VAT"
-                name={field.name}
-                value={field.value}
-                requiredMark
-                type="number"
-                placeholder="VD: 10"
-                error={Boolean(fieldState.error)}
-                errorMessage={fieldState.error?.message}
-                onChange={field.onChange}
-              />
-            )}
-          />
-        </Box>
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Controller
             name="directAttributeIds"
             control={control}
             render={({ field, fieldState }) => (

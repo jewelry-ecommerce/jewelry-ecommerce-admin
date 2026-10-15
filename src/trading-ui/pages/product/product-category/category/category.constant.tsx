@@ -14,7 +14,7 @@ export const categoryFormSchema: yup.ObjectSchema<CategoryRequestDto> = yup
     name: yup.string().trim().required('Vui lòng nhập Tên Danh mục'),
     code: yup.string().trim().required('Vui lòng nhập Mã Danh mục'),
     isDisplay: yup.boolean().optional(),
-    taxRate: yup.number().required('Vui lòng nhập Thuế suất'),
+    taxRate: yup.number().optional(),
     logo: yup.string().optional(),
     image: yup.string().optional(),
     parentId: yup.string().optional(),

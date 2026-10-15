@@ -1,6 +1,7 @@
 
 
 import { javaCmsPage, javaCmsPages, javaSaveCmsPage } from '@/apis/java/java-cms.api';
+import { backendRequest } from '@/apis/backend-request';
 import type { CmsDemoPage } from '@/apis/cms-demo/cms-demo.interface';
 import type { Page } from './cms.entities';
 import type { ResList } from '../../common/constant/api.interface';
@@ -11,7 +12,7 @@ export function sourcePage(page:CmsDemoPage):Page{
   return {id:page.id,name:page.name,slug:page.slug,locale:page.locale??'vi-VN',isActive:page.isActive!==false,
     seoTitle:page.seo?.title??undefined,seoDescription:page.seo?.description??undefined,seoKeywords:page.seo?.keywords??undefined,
     canonicalUrl:page.seo?.canonicalUrl??undefined,seoImageUrl:page.seo?.imageUrl??undefined,
-    displayStatus:page.status===CmsDemoStatus.PUBLISHED?(page.isActive===false?PageDisplayStatus.PAUSED:PageDisplayStatus.RUNNING):PageDisplayStatus.DRAFT};
+    displayStatus:Object.values(PageDisplayStatus).find(status=>status===page.displayStatus)??(page.status===CmsDemoStatus.PUBLISHED?(page.isActive===false?PageDisplayStatus.PAUSED:PageDisplayStatus.RUNNING):PageDisplayStatus.DRAFT)};
 }
 export async function getPageList(query:QueryPageDto):Promise<ResList<Page>>{
   const search=query.search?.trim().toLowerCase();
@@ -26,6 +27,10 @@ export async function postPage(body:CreatePageDto):Promise<Page>{
 }
 export async function patchPage(id:string,body:UpdatePageDto):Promise<Page>{
   const current=await javaCmsPage(id);
-  return sourcePage(await javaSaveCmsPage({...current,...body,seo:{...current.seo,...metadata(body)}}));
+  const supplied=Object.fromEntries(Object.entries(metadata(body)).filter(([key])=>{
+    const fields={title:'seoTitle',description:'seoDescription',keywords:'seoKeywords',canonicalUrl:'canonicalUrl',imageUrl:'seoImageUrl'} as const;
+    return Object.hasOwn(body,fields[key as keyof typeof fields]);
+  }));
+  return sourcePage(await javaSaveCmsPage({...current,...body,status:CmsDemoStatus.DRAFT,seo:{...current.seo,...supplied}}));
 }
-export async function deletePage(_id:string):Promise<void>{throw new Error('Backend Java chưa hỗ trợ xóa trang CMS. Có thể tắt kích hoạt trang để ẩn trên client.');}
+export async function deletePage(id:string):Promise<void>{await backendRequest<void>('admin/cms/pages/'+encodeURIComponent(id),'DELETE');}

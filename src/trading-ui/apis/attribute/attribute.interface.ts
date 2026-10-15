@@ -4,6 +4,7 @@ import { type AttributeDisplayType } from './attribute.enum';
 import { type AttributeStatus } from './attribute.enum';
 
 export interface CreateAttributeValueDto {
+  id?: string;
   value: string;
   code: string;
   image?: string;

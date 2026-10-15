@@ -1,5 +1,12 @@
 
 interface JavaEnvelope<T> { status: number; data: T; message?: string }
+export function javaEnvelopeFailure(payload:unknown):{status:number;code:string;message:string}|undefined {
+  if(!payload || typeof payload!=='object' || !('status' in payload) || typeof payload.status!=='number' || payload.status<400 || payload.status>599) return;
+  const message='message' in payload && typeof payload.message==='string'?payload.message:'Yêu cầu không thành công.';
+  const first='errors' in payload && Array.isArray(payload.errors)?payload.errors[0]:undefined;
+  const code:unknown=first && typeof first==='object' && 'code' in first?first.code:undefined;
+  return {status:payload.status,code:typeof code==='string'?code:'JAVA_BUSINESS_ERROR',message};
+}
 export function normalizeJavaPage(payload: unknown): unknown {
   if (!payload || typeof payload !== 'object') return payload;
   if ('items' in payload && Array.isArray(payload.items) && 'page' in payload && 'take' in payload && 'total' in payload) {

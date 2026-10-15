@@ -8,13 +8,13 @@ import { categoryApi } from '../category/category.api';
 import { AttributeStatus } from './attribute.enum';
 export * from './attribute.enum';
 export type * from './attribute.interface';
-import { javaAttributes, javaAttributeDetail, javaAttributeTree, javaSaveAttribute, unsupportedJavaAction } from '@/apis/java/java-taxonomy.api';
+import { javaAttributes, javaAttributeDetail, javaAttributeTree, javaSaveAttribute } from '@/apis/java/java-taxonomy.api';
 const ATTRIBUTE_PATH = 'admin/catalog/attributes';
 function assertHttp():void {
   if(getDataSourceMode() !== 'HTTP') throw new Error('Quản lý thuộc tính cần backend riêng ở chế độ HTTP.');
 }
 function attributeWrite(current:Attribute):AttributeRequestDto{
-  return {name:current.name,code:current.code,displayType:current.displayType,status:current.status,isVariantAxis:current.isVariantAxis,values:(current.values??[]).map(value=>({code:value.code,value:value.value,image:value.image??undefined}))};
+  return {name:current.name,code:current.code,displayType:current.displayType,status:current.status,isVariantAxis:current.isVariantAxis,values:(current.values??[]).map(value=>({id:value.id,code:value.code,value:value.value,image:value.image??undefined}))};
 }
 export const attributeApi = {
   async patchAttribute(id:string,input:Partial<AttributeRequestDto>){
@@ -35,7 +35,7 @@ export const attributeApi = {
   },
   async getAttributeTree(query:{categoryId:string;isPagination?:boolean}) {
     assertHttp();
-    if (isJavaBackend()) return javaAttributeTree();
+    if (isJavaBackend()) return javaAttributeTree(query.categoryId);
     const [category,global]=await Promise.all([categoryApi.getCategoryDetail(query.categoryId),allAttributes({status:AttributeStatus.ACTIVE,isPagination:false})]);
     const selected=new Map([...global.list.filter(attribute=>attribute.isGlobal),...(category.effectiveAttributes??[])].map(attribute=>[attribute.id,attribute]));
     const list=[...selected.values()].filter(attribute=>attribute.status===AttributeStatus.ACTIVE && attribute.isVariantAxis)
@@ -58,7 +58,7 @@ export const attributeApi = {
     return attributePage(query, Math.max(query.page??PIM_QUERY_POLICY.firstPage,PIM_QUERY_POLICY.firstPage));
   },
   async deleteAttribute(id:string) {
-    assertHttp(); if (isJavaBackend()) return unsupportedJavaAction();return backendRequest<{success:boolean}>(ATTRIBUTE_PATH+'/'+id,'DELETE');
+    assertHttp();await backendRequest<void>(ATTRIBUTE_PATH+'/'+id,'DELETE');return {success:true};
   },
 };
 async function attributePage(query:Partial<QueryAttributeDto>,page:number) {

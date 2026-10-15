@@ -4,7 +4,7 @@ import { getDataSourceMode, isJavaBackend } from '@/common/config/app.config';
 import type { Category } from './category.entities';
 import type { QueryCategoryDto, CategoryRequestDto, QueryCategoryTreeDto } from './category.interface';
 import { mapCategory, type WireCategory } from './category-backend.mapper';
-import { javaCategoryTree, javaCategoryDetail, javaSaveCategory, unsupportedJavaAction } from '@/apis/java/java-taxonomy.api';
+import { javaCategoryTree, javaCategoryDetail, javaSaveCategory } from '@/apis/java/java-taxonomy.api';
 const CATEGORY_PATH='admin/catalog/categories';
 function assertHttp():void {
   if(getDataSourceMode() !== 'HTTP') throw new Error('Quản lý danh mục cần backend riêng ở chế độ HTTP.');
@@ -24,7 +24,7 @@ export const categoryApi={
   },
   async getCategoryTree(query:Partial<QueryCategoryTreeDto>={}) {
     assertHttp();
-    if (isJavaBackend()) return javaCategoryTree();
+    if (isJavaBackend()) return javaCategoryTree(query.status);
     const params=new URLSearchParams();
     if(query.status) params.set('status',query.status);
     return (await backendRequest<WireCategory[]>(CATEGORY_PATH+'/tree?'+params)).map(mapCategory);
@@ -44,6 +44,6 @@ export const categoryApi={
     return mapCategory(await backendRequest<WireCategory>(CATEGORY_PATH+"/"+id,"PUT",body));
   },
   async deleteCategory(id:string) {
-    assertHttp();if (isJavaBackend()) return unsupportedJavaAction();return backendRequest<{success:boolean}>(CATEGORY_PATH+'/'+id,'DELETE');
+    assertHttp();await backendRequest<void>(CATEGORY_PATH+'/'+id,'DELETE');return {success:true};
   },
 };

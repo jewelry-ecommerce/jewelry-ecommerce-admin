@@ -6,7 +6,7 @@ export interface CategoryRequestDto {
   name: string;
   code: string;
   isDisplay?: boolean;
-  taxRate: number;
+  taxRate?: number;
   logo?: string;
   image?: string;
   parentId?: string;

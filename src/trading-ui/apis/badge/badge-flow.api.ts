@@ -39,6 +39,6 @@ export async function deactivateBadgeFlow(id:string) {
   return mapBadgeFlow(await backendRequest<WireBadgeFlow>(flowPath(id)+'/deactivate','PATCH'));
 }
 export async function deleteBadgeFlow(id:string):Promise<{success:boolean}> {
-  if (isJavaBackend()) throw new Error('Java chưa có API xóa cấu hình nhãn. Có thể ngừng kích hoạt cấu hình.');
+  if (isJavaBackend()) {await backendRequest<void>(flowPath(id),'DELETE');return {success:true};}
   return backendRequest(flowPath(id),'DELETE');
 }

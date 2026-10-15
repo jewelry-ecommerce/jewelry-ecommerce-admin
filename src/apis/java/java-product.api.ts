@@ -4,18 +4,21 @@ import { javaProductSortedPage } from './java-product-sort';
 import { backendRequest } from '../backend-request';
 import { JAVA_CATALOG_PATH, JAVA_PAGE_POLICY, decodeOption, type JavaProduct, type JavaPage, type JavaMedia } from './java-catalog.types';
 import { javaProductView, javaProductForm } from './java-product.mapper';
+import { javaAttributes } from './java-taxonomy.api';
 import { ProductSpuStatus, ProductSkuStatus } from '@/trading-ui/apis/product/product.enum';
 import type { ProductCreateRequestDto, ProductSkuUpsertRequestDto, ProductQuery, ProductListResponseDto } from '@/trading-ui/apis/product/product.interface';
 const path = JAVA_CATALOG_PATH + '/products';
 export async function javaRawProduct(id: string): Promise<JavaProduct> { return backendRequest(path + '/' + id); }
 async function productQueryParams(query: ProductQuery): Promise<URLSearchParams> {
-  const fields=['seasonUuid','hasPendingApproval','approvalStatus','createdFrom','createdTo','updatedFrom','updatedTo','stockStatus','minPrice','maxPrice','timeFilter','timeFrom','timeTo','brandId','createdById'] as const;
+  const fields=['seasonUuid','stockStatus','brandId','createdById'] as const;
   const selected=fields.filter(key=>query[key]!==undefined && query[key]!==null && query[key]!=='');
   if(selected.length)unsupportedJavaFields(path,selected);
   const params = new URLSearchParams({ page: String(query.isPagination === false ? JAVA_PAGE_POLICY.firstPage : query.page ?? 1),
     take: String(query.isPagination === false ? JAVA_PAGE_POLICY.take : query.take ?? 20) });
   if (query.search?.trim()) params.set('search', query.search.trim());
-  if (query.status && query.status !== 'ALL') params.set('status', query.status === 'UNPUBLISHED' ? 'DRAFT' : query.status);
+  if (query.status && query.status !== 'ALL') params.set('status', query.status);
+  for(const key of ['hasPendingApproval','approvalStatus','createdFrom','createdTo','updatedFrom','updatedTo','minPrice','maxPrice','timeFilter','timeFrom','timeTo'] as const)
+    if(query[key]!==undefined && query[key]!==null && query[key]!=='') params.set(key,String(query[key]));
   for (const [id, segment, key] of [[query.categoryUuid, 'categories', 'categorySlug'], [query.collectionUuid, 'collections', 'collectionSlug']] as const) {
     if (!id) continue;
     const entries = await backendRequest<Array<{ id: string | number; slug: string }>>(JAVA_CATALOG_PATH + '/' + segment);
@@ -48,24 +51,22 @@ export async function javaProductList(query: ProductQuery = {}): Promise<Product
   const result = query.orderBy || query.orderType
     ? javaProductSortedPage(await readProductPage({ ...query, isPagination: false }), query)
     : await readProductPage(query);
-  const statuses = ['DRAFT', 'PUBLISHED', 'ARCHIVED'] as const;
-  const totals = await Promise.all(statuses.map(status => backendRequest<JavaPage<JavaProduct>>(path + '?take=1&status=' + status)));
-  const [draft, published, archived] = totals.map(page => page.total);
+  const countParams=await productQueryParams(query);
+  for(const key of ['status','page','take','hasPendingApproval','approvalStatus']) countParams.delete(key);
+  const counts=await backendRequest<NonNullable<ProductListResponseDto['counts']>>(path+'/counts?'+countParams);
   return { total: result.total, list: result.list.map(javaProductView),
     pagination: { ...result.pagination, total: result.total, nextPage: result.pagination.hasNextPage, previousPage: result.pagination.hasPreviousPage },
-    counts: { all: draft + published + archived, draft, unpublished: 0, published, archived, discontinued: 0,
-      hasPendingApproval: 0, approvalApproved: 0, approvalRejected: 0, approvalCancelled: 0 } };
+    counts };
 }
 function validateProductInput(input: ProductCreateRequestDto): void {
-  if (input.taxRateOverride || input.metaTitle || input.metaDescription || input.metaKeywords || input.productInfos?.length || input.productMixMatch?.length)
-    throw new Error('Java chưa lưu thuế, SEO, thông tin bổ sung và sản phẩm phối kèm. Cần bổ sung contract backend để lưu đầy đủ form này.');
-  if (input.skus.some(sku => sku.costPriceAfterTaxMinor || sku.b2bWholesalePriceAfterTax || sku.taxRateOverride || sku.length || sku.width || sku.height))
-    throw new Error('Java hiện chỉ lưu giá niêm yết, giá bán và trọng lượng SKU; chưa hỗ trợ giá vốn, B2B, thuế hoặc kích thước.');
+  if(input.productInfos?.some(info=>!info.description?.trim())) throw new Error('Điền nội dung thông tin bổ sung trước khi lưu.');
 }
 function skuBody(sku: ProductSkuUpsertRequestDto, input: ProductCreateRequestDto, current?: JavaProduct) {
   const selling = sku.sellingPriceAfterTaxMinor ?? 0, compare = sku.compareAtPriceAfterTaxMinor;
   const previous = current?.skus.find(entry => String(entry.id) === sku.uuid || entry.skuCode === sku.skuCode);
   return { ...previous, skuCode: sku.skuCode, name: input.name, weightGram: sku.weight,
+    costPrice:sku.costPriceAfterTaxMinor??null,b2bWholesalePrice:sku.b2bWholesalePriceAfterTax??null,
+    taxRateOverride:sku.taxRateOverride??null,length:sku.length??null,width:sku.width??null,height:sku.height??null,
     listPrice: compare && compare > selling ? compare : selling,
     salePrice: compare && compare > selling ? selling : null, onHand: 0,
     isDefault: sku.skuCode === (input.defaultSkuCode ?? input.skus[0]?.skuCode),
@@ -73,11 +74,22 @@ function skuBody(sku: ProductSkuUpsertRequestDto, input: ProductCreateRequestDto
 }
 function productBody(input: ProductCreateRequestDto, current?: JavaProduct) {
   return { categoryId: Number(input.categoryUuid), code: input.spuCode, name: input.name, description: input.description,
+    unitOfMeasure:input.unitOfMeasure,taxRateOverride:input.taxRateOverride??null,weightGram:input.weight??null,
+    length:input.length??null,width:input.width??null,height:input.height??null,
+    metaTitle:input.metaTitle??null,metaDescription:input.metaDescription??null,metaKeywords:input.metaKeywords??null,
+    productInfos:input.productInfos,productMixMatch:input.productMixMatch?.map(Number),
     shortDescription: current?.shortDescription, material: current?.material, occasion: current?.occasion,
     thumbnailUrl: input.skus.find(sku => sku.skuCode === input.defaultSkuCode)?.medias[0] ?? input.skus[0]?.medias[0] ?? current?.thumbnailUrl };
 }
 async function saveSkuAttributes(productId: string, skuId: string, sku: ProductSkuUpsertRequestDto): Promise<void> {
-  const values = sku.attributeValueUuids.map(decodeOption);
+  const attributes = await javaAttributes({isPagination:false});
+  const values = sku.attributeValueUuids.map(id => {
+    if(id.includes('~')) return decodeOption(id);
+    const attribute = attributes.list.find(entry=>entry.values?.some(value=>value.id===id));
+    const value = attribute?.values?.find(entry=>entry.id===id);
+    if(!attribute || !value) throw new Error('Không tìm thấy giá trị thuộc tính đã chọn: '+id);
+    return {attributeId:Number(attribute.id),value:value.value};
+  });
   await backendRequest(path + '/' + productId + '/variants/' + skuId + '/attributes', 'PUT', { values });
 }
 async function syncSkuMedia(product: JavaProduct, skuId: string, urls: string[]): Promise<void> {
@@ -117,10 +129,27 @@ export async function javaSaveProduct(input: ProductCreateRequestDto, id?: strin
   return javaProductView(await javaRawProduct(String(saved.id)));
 }
 export async function javaProductStatus(id: string, status: ProductSpuStatus) {
-  const action = status === ProductSpuStatus.PUBLISHED ? 'publish' : status === ProductSpuStatus.ARCHIVED ? 'archive'
-    : status === ProductSpuStatus.DRAFT || status === ProductSpuStatus.UNPUBLISHED ? 'unpublish' : undefined;
+  const current=await javaRawProduct(id);
+  const restoring=[ProductSpuStatus.ARCHIVED,ProductSpuStatus.DISCONTINUED].includes(current.status)
+    && status===ProductSpuStatus.UNPUBLISHED;
+  const action = restoring?'restore':status === ProductSpuStatus.PUBLISHED ? 'publish' : status === ProductSpuStatus.ARCHIVED ? 'archive'
+    : status === ProductSpuStatus.DISCONTINUED?'discontinue':status === ProductSpuStatus.UNPUBLISHED ? 'unpublish' : undefined;
   if (!action) throw new Error('Java chưa hỗ trợ trạng thái này.');
   return javaProductView(await backendRequest<JavaProduct>(path + '/' + id + '/' + action, 'PATCH'));
 }
-export async function javaGetProductForm(id: string) { return javaProductForm(await javaRawProduct(id)); }
+export async function javaGetProductForm(id: string) {
+  const [product,attributes]=await Promise.all([javaRawProduct(id),javaAttributes({isPagination:false})]);
+  const form=javaProductForm(product);
+  const stableId=(key:string)=>{
+    const decoded=decodeOption(key);
+    const attribute=attributes.list.find(entry=>entry.id===String(decoded.attributeId));
+    const value=attribute?.values?.find(entry=>entry.value===decoded.value);
+    if(!value) throw new Error('Giá trị SKU không còn trong thuộc tính: '+decoded.value);
+    return value.id;
+  };
+  const skus=form.skus.map(sku=>({...sku,attributeValueUuids:sku.attributeValueUuids.map(stableId)}));
+  const selectedAttributes=form.values.attributes?.map(attribute=>({...attribute,valueUuids:attribute.valueUuids.map(stableId)}));
+  return {...form,skus,selected:selectedAttributes?.flatMap(attribute=>attribute.valueUuids.map(value=>attribute.attributeUuid+':'+value))??[],
+    values:{...form.values,attributes:selectedAttributes,skus}};
+}
 export async function javaGetProductDetail(id: string) { return javaProductView(await javaRawProduct(id)); }

@@ -16,7 +16,7 @@ export interface JavaStock { skuId: number; productId: number; skuCode: string; 
   onHand: number; reserved: number; available: number; stockStatus: string }
 export interface JavaOperationsPage<T> { list: T[]; total: number }
 export function javaAdminOrders(page: number, search: string, status: string): Promise<JavaOperationsPage<JavaAdminOrder>> {
-  const query = new URLSearchParams({ page: String(page), take: String(JAVA_OPERATIONS.pageSize) });
+  const query = new URLSearchParams({ page: String(page), take: String(JAVA_OPERATIONS.pageSize), search: '', status: '', paymentStatus: '' });
   if (search.trim()) query.set("search", search.trim());
   if (status !== "ALL") query.set("status", status);
   return backendRequest(JAVA_OPERATIONS.orders + "?" + query);

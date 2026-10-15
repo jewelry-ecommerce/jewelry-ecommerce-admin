@@ -39,7 +39,7 @@ export function useJavaCmsActions({draft,handleSubmit,setActiveStep}:Params){
     if(Object.keys(errors).length){setActiveStep(1);showSnackbar({type:SnackbarType.ERROR,message:"Kiểm tra lại cấu hình khối nội dung."});return;}
     setLoading(true);
     try{
-      await persist(values,draft,status??draft.draftRef.current?.status??CmsDemoStatus.DRAFT);
+      await persist(values,draft,status??CmsDemoStatus.DRAFT);
       await mutate(key=>Array.isArray(key)&&key[0]==='cms/admin/pages');
       showSnackbar({type:SnackbarType.SUCCESS,message:status===CmsDemoStatus.PUBLISHED?'Xuất bản trang thành công.':'Lưu trang thành công.'});
       if(nextStep===null)navigate(ROUTE_PATH.CMS_PAGE_LIST);else setActiveStep(nextStep);
