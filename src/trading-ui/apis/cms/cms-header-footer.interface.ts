@@ -4,7 +4,7 @@ export type LogoType = 'HEADER' | 'FOOTER' | 'AUTH' | 'FAVICON';
 
 export type LogoAdmin = {
   id: string;
-  tenantCode: string;
+  tenantCode?: string;
   name: string;
   type: LogoType;
   status: LogoStatus;
@@ -101,7 +101,7 @@ export type FooterMenuColumn = {
 
 export type FooterSetting = {
   id: string;
-  tenantCode: string;
+  tenantCode?: string;
   copyrightText?: string;
   footerLogoUrl?: string;
   certificationImageUrl?: string;
@@ -123,7 +123,7 @@ export type HeaderBannerDisplayStyle = 'TEXT' | 'MEDIA';
 
 export type HeaderAdmin = {
   id: string;
-  tenantCode: string;
+  tenantCode?: string;
   status: HeaderStatus;
   /** Trạng thái hiển thị — BE tính SCHEDULED đã tới startTime thành ACTIVE. */
   displayStatus?: HeaderStatus;

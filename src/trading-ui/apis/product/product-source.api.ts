@@ -5,7 +5,8 @@ import { productApi as javaApi } from './product.api';
 import type { Product } from './product.entities';
 import type { AdminProductDetailDto } from './product.interface';
 import type { ProductMutationResponseDto,ProductCreateRequestDto,ProductPatchRequestDto,ProductPatchStatusRequestDto } from './product.interface';
-import { ProductSpuStatus,ProductSkuStatus } from './product.enum';
+import { ProductSkuStatus } from './product.enum';
+import { javaSubmitProduct } from '@/apis/java/java-product-approval.api';
 function mutation(product:Product):ProductMutationResponseDto{
   return {uuid:product.id,status:product.status,approval:product.approval??undefined,hasPendingApproval:product.hasPendingApproval??false};
 }
@@ -17,7 +18,7 @@ async function patchAdminProduct(id:string,body:ProductPatchRequestDto){
   const skus=current.skus.map(sku=>({...sku,...updates.get(sku.uuid??sku.skuCode),
     status:body.skus?.disable?.includes(sku.uuid??'')?ProductSkuStatus.INACTIVE:body.skus?.enable?.includes(sku.uuid??'')?ProductSkuStatus.ACTIVE:sku.status}));
   for(const sku of updates.values())if(!skus.some(current=>sku.uuid?current.uuid===sku.uuid:current.skuCode===sku.skuCode))skus.push(sku);
-  const input:ProductCreateRequestDto={...current.values,...body,seasonUuid:body.seasonUuid??current.values.seasonUuid,skus};
+  const input:ProductCreateRequestDto={...current.values,...body,seasonUuid:body.seasonUuid===undefined?current.values.seasonUuid:body.seasonUuid??undefined,skus};
   return mutation(await javaApi.putAdminProduct(id,input));
 }
 async function getAdminProductDetail(id:string):Promise<AdminProductDetailDto>{
@@ -33,4 +34,4 @@ async function deleteAdminProduct(id:string):Promise<void>{await backendRequest(
 export const productSourceApi={...referenceApi,deleteAdminProduct,getAdminProductList:javaApi.getAdminProductList,getAdminProductDetail,
   getAdminVariationListByProduct:async(id:string)=>{const variations=(await javaApi.getProductDetail(id)).variations??[];return {list:variations,total:variations.length};},
   postAdminProduct,patchAdminProduct,patchAdminProductStatus,postSkuMatrixPreview:javaApi.postSkuMatrixPreview,
-  postAdminProductSubmit:async(id:string)=>mutation(await javaApi.patchAdminProductStatus(id,ProductSpuStatus.PUBLISHED))};
+  postAdminProductSubmit:javaSubmitProduct};

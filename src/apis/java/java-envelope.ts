@@ -5,7 +5,8 @@ export function javaEnvelopeFailure(payload:unknown):{status:number;code:string;
   const message='message' in payload && typeof payload.message==='string'?payload.message:'Yêu cầu không thành công.';
   const first='errors' in payload && Array.isArray(payload.errors)?payload.errors[0]:undefined;
   const code:unknown=first && typeof first==='object' && 'code' in first?first.code:undefined;
-  return {status:payload.status,code:typeof code==='string'?code:'JAVA_BUSINESS_ERROR',message};
+  const detail:unknown=first && typeof first==='object' && 'message' in first?first.message:undefined;
+  return {status:payload.status,code:typeof code==='string'?code:'JAVA_BUSINESS_ERROR',message:typeof detail==='string'&&detail.trim()?detail:message};
 }
 export function normalizeJavaPage(payload: unknown): unknown {
   if (!payload || typeof payload !== 'object') return payload;

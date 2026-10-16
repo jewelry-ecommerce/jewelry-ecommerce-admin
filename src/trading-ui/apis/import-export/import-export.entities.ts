@@ -2,10 +2,10 @@ import { type BaseEntity } from '../../common/constant/api.interface';
 import { type ImportStrategy, type JobProcessStatus, type JobProcessType, type TopicAction, type WorkerQueueProfileStatus } from './import-export.enum';
 
 export interface JobProcess extends BaseEntity {
-  userId: string;
-  topicConfig: TopicConfig;
-  workspaceId: string;
-  tenantCode: string;
+  userId?: string;
+  topicConfig?: TopicConfig;
+  workspaceId?: string;
+  tenantCode?: string;
   type: JobProcessType;
   status: JobProcessStatus;
   referenceType?: string | null;

@@ -6,6 +6,7 @@ import { expect, test, vi } from 'vitest';
 import { CmsDemoStatus, type CmsDemoPage } from '@/apis/cms-demo/cms-demo.interface';
 import type { CmsPageFormValues, CmsPageWizardBlock } from '../cms-page.interface';
 import { useJavaCmsActions } from './java-cms-actions';
+import { TargetDevice } from '@/trading-ui/apis/cms/cms.enum';
 const effects = vi.hoisted(() => ({ save: vi.fn(), navigate: vi.fn(), mutate: vi.fn(), snackbar: vi.fn() }));
 vi.mock('@/apis/java/java-cms.api', () => ({ javaSaveCmsPage: effects.save }));
 vi.mock('react-router-dom', () => ({ useNavigate: () => effects.navigate }));
@@ -24,7 +25,8 @@ test('publish persists PUBLISHED and navigates to the CMS list only after succes
     const draftRef = useRef<CmsDemoPage | null>(null);
     const [blocks, setBlocks] = useState<CmsPageWizardBlock[]>([]);
     const [pageId, setPageId] = useState<string | null>(null);
-    actions = useJavaCmsActions({ draft: { draftRef, blocks, setBlocks, pageId, setPageId, error: undefined },
+    actions = useJavaCmsActions({ draft: { draftRef, blocks, setBlocks, pageId, setPageId, error: undefined,
+      displaySettings:{targetDevice:TargetDevice.ALL,scheduleStart:null,scheduleEnd:null},setDisplaySettings:vi.fn() },
       handleSubmit: form.handleSubmit, setActiveStep: vi.fn() });
     return null;
   }

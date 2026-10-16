@@ -1,4 +1,5 @@
 import type { Dayjs } from 'dayjs';
+import { isJavaBackend } from '@/common/config/app.config';
 import { type IOrderItem, type IOrderListItem, type IOrderListRequest, type OrderStatus as ApiOrderStatus, OrderTimeFilter, OrderReturnReason } from '../../apis/order';
 import { mapOrderStatusFilterToApiOrderStatus, ORDER_API_SORT_DIRECTION_MAP, ORDER_API_SORT_FIELD_MAP, ORDER_SUPPORTED_STATUS_FILTERS } from '../../common/constant/order/order.constants';
 import { type CustomerInfo, type Order, type OrderAdvancedFilters, type OrderShippingAddress, type OrderSortField, type OrderStatusFilter, type OrderTimeOptionValue, type SortDirection } from './order.types';
@@ -97,7 +98,7 @@ export const mapApiOrderListItemToOrder = (item: IOrderListItem): Order => {
     isDataValid: item.isDataValid,
     errorLog: item.errorLog,
     shippingMethod: item.shippingMethod,
-    shippingCarrier: item.shippingCarrier || SHIPPING_CARRIER_OPTIONS[0].label,
+    shippingCarrier: item.shippingCarrier || (isJavaBackend() ? '—' : SHIPPING_CARRIER_OPTIONS[0].label),
     customer: mapShippingAddressToCustomerInfo(shippingAddress, item.contactEmail),
     shippingAddress,
     subtotal: item.subtotal ?? null,

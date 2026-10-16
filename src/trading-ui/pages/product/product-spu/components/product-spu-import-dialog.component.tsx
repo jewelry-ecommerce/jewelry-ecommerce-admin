@@ -1,4 +1,5 @@
 import { Box, LinearProgress, Stack, Typography } from '@mui/material';
+import { isJavaBackend } from '@/common/config/app.config';
 import { useEffect, useState } from 'react';
 import { File05, AlignBottom01, Upload01, InfoCircle } from '@untitledui/icons';
 import { ButtonIconContentComponent } from '../../../../components/button';
@@ -38,7 +39,7 @@ const ProductSpuImportStatsCard = ({
           <Typography sx={{ ...TYPOGRAPHY_STYLES.base.regular, color: '#1447E6' }}>{description}</Typography>
           {button && (
             <ButtonIconContentComponent
-              content="Tải file mẫu (.xlsx)"
+              content={isJavaBackend() ? 'Tải file mẫu (.csv)' : 'Tải file mẫu (.xlsx)'}
               icon={<AlignBottom01 size={20} color="#fff" />}
               onClick={onDownloadTemplate}
               sx={{
@@ -93,7 +94,7 @@ export const ProductSpuImportDialog = ({ open, onClose, submitting = false, onDo
     <DialogComponent
       maxWidth="md"
       fullWidth
-      title="Import sản phẩm từ Excel"
+      title={isJavaBackend() ? 'Import sản phẩm từ CSV' : 'Import sản phẩm từ Excel'}
       icon={<Upload01 size={20} color="#fff" />}
       open={open}
       onClose={submitting ? undefined : onClose}
@@ -127,7 +128,7 @@ export const ProductSpuImportDialog = ({ open, onClose, submitting = false, onDo
         {submitting && <LinearProgress sx={{ borderRadius: 1 }} />}
         <ProductSpuImportStatsCard
           label="File mẫu và hướng dẫn"
-          description="Import file theo mẫu, định dạng .xlsx / .csv."
+          description={isJavaBackend() ? 'Import file CSV theo mẫu Java.' : 'Import file theo mẫu, định dạng .xlsx / .csv.'}
           onDownloadTemplate={onDownloadTemplate}
           icon={<File05 size={20} color="#155DFC" />}
           button
@@ -144,7 +145,7 @@ export const ProductSpuImportDialog = ({ open, onClose, submitting = false, onDo
             setSelectedFile(file);
             setFileValue(file.name);
           }}
-          accept={IMPORT_ACCEPT_EXCEL_CSV}
+          accept={isJavaBackend() ? 'text/csv,.csv' : IMPORT_ACCEPT_EXCEL_CSV}
           error={!!uploadError}
           errorMessage={uploadError}
           onFileReject={(reason) => {
@@ -154,7 +155,7 @@ export const ProductSpuImportDialog = ({ open, onClose, submitting = false, onDo
           }}
           previewMode="file"
           disabled={submitting}
-          hintText="xlsx, csv (tối đa 50MB)"
+          hintText={isJavaBackend() ? 'csv (theo giới hạn upload của backend)' : 'xlsx, csv (tối đa 50MB)'}
         />
 
         <Box

@@ -5,7 +5,7 @@ import { getJavaSourceOrderList, getJavaSourceOrderDetail, cancelJavaSourceOrder
 import { OrderStatus, PaymentStatus } from './order.enum';
 
 test('order date query matches Java LocalDate yyyy-MM-dd rather than ISO timestamp', async () => {
-  transport.request.mockImplementation(async (path: string) => path.includes('take=1&') || new URLSearchParams(path.split('?')[1]).get('take') === '1' ? { total: 0 } : { list: [], total: 0 });
+  transport.request.mockImplementation(async (path: string) => path.includes('/counts?') ? { total: 0, byStatus: {} } : { list: [], total: 0 });
   await getJavaSourceOrderList({ page: 1, take: 20, startDate: '2026-10-01T00:00:00+07:00', endDate: '2026-10-11T23:59:59+07:00' });
   const query = new URLSearchParams(transport.request.mock.calls[0][0].split('?')[1]);
   expect(query.get('fromDate')).toMatch(/^2026-10-0[12]$/);
@@ -20,8 +20,7 @@ beforeEach(() => { transport.request.mockReset(); });
 
 test('list preserves numeric backend IDs, order codes and real counts', async () => {
   transport.request.mockImplementation(async (path: string) => {
-    const query = new URLSearchParams(path.split('?')[1]);
-    if (query.get('take') === '1') return { total: query.get('status') === 'PENDING' ? 2 : 0 };
+    if (path.includes('/counts?')) return { total: 2, byStatus: { PENDING: 2 } };
     return { list: [order], total: 2 };
   });
   const result = await getJavaSourceOrderList({ page: 1, take: 20, search: ' JEW ', paymentStatus: PaymentStatus.UNPAID });
@@ -33,25 +32,26 @@ test('list preserves numeric backend IDs, order codes and real counts', async ()
   expect(query.get('paymentStatus')).toBe('UNPAID');
 });
 
-test('unselected Java filters are explicit empty strings for list, counts and numeric detail lookup', async () => {
-  transport.request.mockImplementation(async (path: string) => path.includes('?')
-    ? { list: [{ ...order, id: 905, code: 'JEW-905' }], total: 1 } : { ...order, id: 905, code: 'JEW-905' });
-  await getJavaSourceOrderList({ page: 1, take: 20 });
+test('v6 sends supported filters and uses one counts endpoint without status or pagination', async () => {
+  transport.request.mockImplementation(async (path: string) => path.includes('/counts?') ? { total: 1, byStatus: { PENDING: 1 } }
+    : path.includes('?') ? { list: [order], total: 1 } : { ...order, id: 905 });
+  await getJavaSourceOrderList({ page: 1, take: 20, orderStatus: OrderStatus.PENDING,
+    dateField: 'deliveredAt', skuCode: 'RING', provinceName: 'HCM' });
   await getJavaSourceOrderDetail('905');
-  for (const [path] of transport.request.mock.calls.filter(([path]) => path.includes('?'))) {
-    const query = new URLSearchParams(path.split('?')[1]);
-    expect(query.get('search')).toBe('');
-    expect(query.get('status')).not.toBeNull();
-    expect(query.get('paymentStatus')).toBe('');
-  }
+  const counts = transport.request.mock.calls.find(([path]) => path.includes('/counts?'));
+  const query = new URLSearchParams(counts![0].split('?')[1]);
+  expect(query.get('status')).toBeNull(); expect(query.get('page')).toBeNull();
+  expect(query.get('skuCode')).toBe('RING'); expect(query.get('dateField')).toBe('deliveredAt');
+  expect(transport.request).toHaveBeenCalledTimes(3);
 });
 
-test('direct numeric detail URL resolves the actual order code before GET', async () => {
+test('v6 numeric detail URL does not scan all orders to resolve the code', async () => {
   transport.request.mockImplementation(async (path: string) => path.includes('?')
     ? { list: [{ ...order, id: 904, code: 'JEW-904' }], total: 1 } : { ...order, id: 904, code: 'JEW-904' });
   const result = await getJavaSourceOrderDetail('904');
   expect(result.id).toBe('904');
-  expect(transport.request).toHaveBeenLastCalledWith('admin/orders/JEW-904');
+  expect(transport.request).toHaveBeenLastCalledWith('admin/orders/904');
+  expect(transport.request).toHaveBeenCalledTimes(1);
 });
 
 test('cancel uses Java code endpoint and POST body rather than numeric ID endpoint', async () => {

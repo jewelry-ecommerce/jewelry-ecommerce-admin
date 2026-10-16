@@ -6,7 +6,7 @@ export interface JavaCmsPage { id: number|string; name: string; slug: string; st
   hasUnpublishedChanges?:boolean; versionId?:number;
   seo: CmsDemoPage['seo']; blocks: { id: number|string; type: CmsDemoBlockType; sortOrder: number; isVisible: boolean; config: CmsDemoConfig }[] }
 function view(page: JavaCmsPage): CmsDemoPage {
-  return { ...page, id:String(page.id), revision: page.versionId??0, blocks: page.blocks.map(block => ({ ...block, id:String(block.id), blockTypeCode: block.type })) };
+  return { ...page, seo:page.seo??{title:'',description:''},id:String(page.id), revision: page.versionId??0, blocks: page.blocks.map(block => ({ ...block, id:String(block.id), blockTypeCode: block.type })) };
 }
 export async function javaCmsPage(id:string):Promise<CmsDemoPage> { return view(await backendRequest<JavaCmsPage>('admin/cms/pages/'+encodeURIComponent(id))); }
 export async function javaCmsPages(): Promise<CmsDemoPage[]> {

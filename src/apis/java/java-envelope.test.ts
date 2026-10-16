@@ -22,3 +22,7 @@ test("flat array responses remain arrays, not fabricated pages", () => {
   const input = [{ id: 4 }];
   expect(normalizeJavaPage(input)).toBe(input);
 });
+test('validation returns the specific Java error rather than generic Invalid data',()=>{
+  expect(javaEnvelopeFailure({status:400,message:'Invalid data',errors:[{code:'DISCOUNT_INVALID',message:'Giá trị không vượt 100%'}]}))
+    .toMatchObject({code:'DISCOUNT_INVALID',message:'Giá trị không vượt 100%'});
+});

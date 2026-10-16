@@ -24,7 +24,10 @@ function validateBlocks(draft:Draft):CmsPageBlockValidationState{
   }]).filter(([,errors])=>Object.keys(errors).length>0));
 }
 async function persist(values:CmsPageFormValues,draft:Draft,status:CmsDemoStatus){
+  const {scheduleStart,scheduleEnd}=draft.displaySettings;
+  if(scheduleEnd && (!scheduleStart || Date.parse(scheduleEnd)<=Date.parse(scheduleStart)))throw new Error('Lịch kết thúc phải sau lịch bắt đầu.');
   const saved=await javaSaveCmsPage({id:draft.draftRef.current?.id??'new',revision:0,status,name:values.name.trim(),slug:values.slug.trim(),locale:values.locale,isActive:values.isActive,
+    ...draft.displaySettings,
     seo:{title:values.seoTitle??"",description:values.seoDescription??"",keywords:values.seoKeywords,canonicalUrl:values.canonicalUrl,imageUrl:values.seoImageUrl},
     blocks:draft.blocks.map((block,index)=>({id:block.serverId??block.clientId,blockTypeCode:blockType(block.blockTypeCode),sortOrder:index+1,isVisible:block.isActive,
       config:block.blockTypeCode===CmsDemoBlockType.PRODUCT_CAROUSEL?sanitizeProductCarouselBlockConfig(block.config):block.config}))});

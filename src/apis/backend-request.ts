@@ -24,6 +24,8 @@ export async function backendRequest<TResult>(path: string, method = "GET", body
   }
   if (!response.ok) {
     const error: BackendErrorPayload = await response.json();
+    const failure=isJavaBackend()?javaEnvelopeFailure(error):undefined;
+    if(failure)throw new BackendHttpError(failure.code,failure.message,response.status,error.dependencies);
     const message=Array.isArray(error.message)?error.message.join(", "):error.message||"Không thể kết nối backend.";
     throw new BackendHttpError(error.code??"REQUEST_FAILED",message,response.status,error.dependencies);
   }

@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { isJavaBackend } from "@/common/config/app.config";
 import { Box, Stack, Typography } from "@mui/material";
 import { arrayMove } from "@dnd-kit/sortable";
 import { Controller, useForm } from "react-hook-form";
@@ -87,7 +86,7 @@ const PLACEMENT_GRID_ROWS = 2;
 const DEFAULT_VALUES: PlacementFormValues = {
   code: "",
   name: "",
-  displayType: isJavaBackend() ? PlacementDisplayType.SLIDER : PlacementDisplayType.GRID,
+  displayType: PlacementDisplayType.GRID,
   columns: PLACEMENT_GRID_COLUMNS,
   rows: PLACEMENT_GRID_ROWS,
 };
@@ -497,7 +496,7 @@ export const CmsPageWizardDialogPlacementBuilder: React.FC<CmsPageWizardDialogPl
         })),
       });
 
-      const nextIds = new Map((createdLayout.items ?? []).map((item) => [item.slotKey, item.id]));
+      const nextIds = new Map((createdLayout.items ?? []).map((item) => [item.bannerId + ':' + item.displayMetadata?.order, item.id]));
       setPlacementInfo((prev) =>
         prev
           ? {
@@ -507,7 +506,7 @@ export const CmsPageWizardDialogPlacementBuilder: React.FC<CmsPageWizardDialogPl
             }
           : prev,
       );
-      setSlots((prev) => prev.map((slot) => ({ ...slot, id: nextIds.get(slot.slotKey) ?? slot.id })));
+      setSlots((prev) => prev.map((slot, index) => ({ ...slot, id: nextIds.get(slot.bannerId + ':' + (index + 1)) ?? slot.id })));
     },
     [placementInfo, syncExistingLayoutItem],
   );
@@ -878,7 +877,7 @@ export const CmsPageWizardDialogPlacementBuilder: React.FC<CmsPageWizardDialogPl
                 label="Kiểu hiển thị"
                 requiredMark
                 value={field.value}
-                options={isJavaBackend() ? DISPLAY_TYPE_OPTIONS.filter(option => option.value === PlacementDisplayType.SLIDER) : DISPLAY_TYPE_OPTIONS}
+                options={DISPLAY_TYPE_OPTIONS}
                 onChange={field.onChange}
                 error={Boolean(form.formState.errors.displayType)}
                 errorMessage={form.formState.errors.displayType?.message}

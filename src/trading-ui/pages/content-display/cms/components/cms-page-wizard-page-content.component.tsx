@@ -1,4 +1,6 @@
 import React from 'react';
+import dayjs from 'dayjs';
+import { CmsPageWizardStepLayout } from './cms-page-wizard-step-layout.component';
 import { Box, Stack, Typography } from '@mui/material';
 import type { Page } from '../../../../apis';
 
@@ -141,6 +143,15 @@ export const CmsPageWizardPageContent: React.FC<CmsPageWizardPageContentProps> =
         ) : null}
 
         {wizard.activeStep === 2 ? (
+          <Stack gap={2}>
+          <CmsPageWizardStepLayout layoutName="" onLayoutNameChange={()=>undefined} showLayoutName={false} showActions={false}
+            targetDevice={wizard.targetDevice} onTargetDeviceChange={targetDevice=>wizard.setDisplaySettings(current=>({...current,targetDevice}))}
+            scheduleStart={wizard.displaySettings.scheduleStart?dayjs(wizard.displaySettings.scheduleStart):null}
+            scheduleEnd={wizard.displaySettings.scheduleEnd?dayjs(wizard.displaySettings.scheduleEnd):null}
+            onScheduleStartChange={value=>wizard.setDisplaySettings(current=>({...current,scheduleStart:value?.isValid()?value.toISOString():null}))}
+            onScheduleEndChange={value=>wizard.setDisplaySettings(current=>({...current,scheduleEnd:value?.isValid()?value.toISOString():null}))}
+            onBack={()=>wizard.setActiveStep(1)} onSave={wizard.onSaveDraft} onContinue={wizard.onPublish}
+            loadingSave={wizard.loadingSave} loadingContinue={wizard.loadingPublish} viewMode={viewMode}/>
           <CmsPageWizardStepPublish
             name={nameWatch}
             slug={slugWatch}
@@ -154,6 +165,7 @@ export const CmsPageWizardPageContent: React.FC<CmsPageWizardPageContentProps> =
             loadingPublish={wizard.loadingPublish}
             viewMode={viewMode}
           />
+          </Stack>
         ) : null}
       </Box>
 

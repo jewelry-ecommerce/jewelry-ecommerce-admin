@@ -1,4 +1,5 @@
 import type { PageOptionsDto } from '../../common/constant/api.interface';
+import type { QueryAdminProductDto } from '../product/product.interface';
 import type { OrderSource, OrderStatus, OrderTimeFilter, PaymentStatus, ShippingMethod } from '../order/order.enum';
 import { type OrderType } from '../order/order.enum';
 import { type AdminProductTimeFilter, type ProductSpuStatus } from '../product/product.enum';
@@ -67,7 +68,7 @@ export interface PostImportTopicConfigsResponse {
   referenceId?: string | null;
 }
 
-export interface ProductExportFiltersDto {
+export interface ProductExportFiltersDto extends Pick<QueryAdminProductDto, 'brandId' | 'seasonUuid' | 'stockStatus'> {
   orderType?: OrderType;
   orderBy?: string;
   categoryUuid?: string;

@@ -1,4 +1,7 @@
 import { axiosRequest } from '../../common/config';
+import { isJavaBackend } from '@/common/config/app.config';
+import { JAVA_PRODUCT_IE, javaImportProducts, javaExportProducts, javaProductJobs, javaProductJob } from '@/apis/java/java-product-ie.api';
+import type { ProductExportFiltersDto } from './import-export.interface';
 import { type ResList } from '../../common/constant/api.interface';
 import { delayMs } from '../../common/utils/delay-ms.util';
 import { type JobProcess, type TopicConfig, type WorkerQueueProfile } from './import-export.entities';
@@ -33,6 +36,10 @@ export const patchImportExportTopicConfig = async (topicConfigId: string, payloa
   await axiosRequest.patch(`${IMPORT_EXPORT_BASE_PATH}/topic-configs/${topicConfigId}`, payload);
 
 export const postImportTopicConfigs = async (topicConfigId: string, file: File, options?: PostImportTopicConfigsOptions): Promise<PostImportTopicConfigsResponse> => {
+  if (isJavaBackend()) {
+    if (topicConfigId !== JAVA_PRODUCT_IE.importTopic) throw new Error('Java chưa hỗ trợ loại import này.');
+    return javaImportProducts(file, options);
+  }
   const formData = new FormData();
   formData.append('file', file);
   const referenceType = options?.referenceType?.trim();
@@ -43,15 +50,19 @@ export const postImportTopicConfigs = async (topicConfigId: string, file: File, 
 };
 
 export const postExportTopicConfigs = async (topicConfigId: string, payload: ExportTopicConfigsRequestDto): Promise<{ jobId: string; status: JobProcessStatus }> => {
+  if (isJavaBackend()) {
+    if (topicConfigId !== JAVA_PRODUCT_IE.exportTopic) throw new Error('Java chưa hỗ trợ loại export này (bao gồm Fast FBO).');
+    return javaExportProducts(payload.filters as ProductExportFiltersDto | undefined);
+  }
   return await axiosRequest.post(`${IMPORT_EXPORT_BASE_PATH}/export/topic-config/${topicConfigId}`, payload);
 };
 
-export const getImportExportListJobs = async (params: Partial<QueryJobDto>): Promise<ResList<JobProcess>> => await axiosRequest.get(`${IMPORT_EXPORT_BASE_PATH}/jobs`, { params });
+export const getImportExportListJobs = async (params: Partial<QueryJobDto>): Promise<ResList<JobProcess>> => isJavaBackend() ? javaProductJobs(params) : await axiosRequest.get(`${IMPORT_EXPORT_BASE_PATH}/jobs`, { params });
 
 export const transferImportJobsReference = async (payload: TransferImportJobsReferenceDto): Promise<TransferImportJobsReferenceResponse> =>
   await axiosRequest.patch(`${IMPORT_EXPORT_BASE_PATH}/jobs/reference/transfer`, payload);
 
-export const getImportExportJobStatus = async (jobId: string): Promise<JobStatusResponseDto> => await axiosRequest.get(`${IMPORT_EXPORT_BASE_PATH}/job/status/${jobId}`);
+export const getImportExportJobStatus = async (jobId: string): Promise<JobStatusResponseDto> => isJavaBackend() ? javaProductJob(jobId) : await axiosRequest.get(`${IMPORT_EXPORT_BASE_PATH}/job/status/${jobId}`);
 
 export const getImportJobResultRows = async <TResolvedData = Record<string, unknown>>(jobId: string, query?: QueryImportJobResultRowsDto): Promise<ResList<ImportJobResultRow<TResolvedData>>> =>
   await axiosRequest.get(`${IMPORT_EXPORT_BASE_PATH}/jobs/${jobId}/result-rows`, { params: query });

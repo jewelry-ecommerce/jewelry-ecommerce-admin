@@ -1,4 +1,5 @@
 import { Card, CardContent, Chip, Grid, Link, Typography } from '@mui/material';
+import { isJavaBackend } from '@/common/config/app.config';
 import { Cube01, File06, Truck01 } from '@untitledui/icons';
 import { StackRowAlignCenter } from '@/trading-ui/adapters/library';
 import type { IOrder } from '../../../../apis/order';
@@ -28,7 +29,7 @@ export function OrderDetailShippingCard({ order, shipStatusLabel }: OrderDetailS
               <Typography sx={{ ...TYPOGRAPHY_STYLES.sm.regular, color: '#6B7280' }}>Đơn vị vận chuyển</Typography>
             </StackRowAlignCenter>
             <Typography sx={{ ...TYPOGRAPHY_STYLES.sm.bold, color: '#111827' }}>
-              {/* {getShippingMethodLabel(order.shippingMethod)} */} {SHIPPING_CARRIER_OPTIONS[0]?.label}
+              {isJavaBackend() ? 'Chưa tích hợp đơn vị vận chuyển' : SHIPPING_CARRIER_OPTIONS[0]?.label}
             </Typography>
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>

@@ -1,7 +1,10 @@
 
 import type { ProductSpuStatus } from '@/trading-ui/apis/product/product.enum';
 import type { ProductCreateRequestDto } from '@/trading-ui/apis/product/product.interface';
+import type { Product } from '@/trading-ui/apis/product/product.entities';
 export interface JavaProductExtras extends Pick<ProductCreateRequestDto,'unitOfMeasure'|'taxRateOverride'|'length'|'width'|'height'|'metaTitle'|'metaDescription'|'metaKeywords'> {
+  brandId?:number|null;brandName?:string;brandCode?:string;brandImage?:string;seasonId?:number|null;seasonName?:string;
+  approval?:Product['approval'];hasPendingApproval?:boolean;
   weightGram?:number;productInfos?:{id:number|string;title:string;description:string;sortOrder:number}[];
   productMixMatch?:{id:number|string;name:string;code?:string}[];
 }

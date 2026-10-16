@@ -94,6 +94,10 @@ export const buildProductExportFiltersFromListQuery = (
   const filters: ProductExportFiltersDto = {
     orderBy: listQuery.orderBy,
     orderType: listQuery.orderType,
+    brandId: listQuery.brandId,
+    seasonUuid: listQuery.seasonUuid,
+    stockStatus: listQuery.stockStatus,
+    hasPendingApproval: listQuery.hasPendingApproval,
   };
 
   if (listQuery.categoryUuid) filters.categoryUuid = listQuery.categoryUuid;

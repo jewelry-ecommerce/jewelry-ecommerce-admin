@@ -115,7 +115,7 @@ export const CmsPageWizardStepPublish: React.FC<CmsPageWizardStepPublishProps> =
               >
                 {isPublishedVersion ? 'Lưu' : 'Lưu nháp'}
               </CustomButton>
-              {!isPublishedVersion ? (
+              {
                 <CustomButton
                   type="button"
                   variant="primary"
@@ -127,7 +127,7 @@ export const CmsPageWizardStepPublish: React.FC<CmsPageWizardStepPublishProps> =
                 >
                   Xuất bản ngay
                 </CustomButton>
-              ) : null}
+              }
             </React.Fragment>
           )
         }

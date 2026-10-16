@@ -13,7 +13,8 @@ function javaSkuView(product: JavaProduct, sku: JavaSku): ProductVariation {
 }
 export function javaProductView(product: JavaProduct): Product {
   return { id: String(product.id), spuCode: product.code, name: product.name, slug: product.slug, status: product.status,
-    categoryId: String(product.categoryId), brandId: null, image: product.thumbnailUrl, description: product.description,
+    approval:product.approval,hasPendingApproval:product.hasPendingApproval,
+    categoryId: String(product.categoryId), brandId: product.brandId==null?null:String(product.brandId), image: product.thumbnailUrl, description: product.description,
     createdAt: new Date(product.createdAt), updatedAt: new Date(product.updatedAt),
     defaultVariationId: String(product.skus.find(sku => sku.isDefault)?.id ?? product.skus[0]?.id ?? ''),
     skuCount: product.skus.length, variations: product.skus.map(sku => javaSkuView(product, sku)),
@@ -37,6 +38,7 @@ export function javaProductForm(product: JavaProduct): ProductFormSnapshot {
   return { id: String(product.id), status: product.status, skus,
     selected: [...attributes].flatMap(([id, values]) => [...values].map(value => id + ':' + value)),
     values: { spuCode: product.code, name: product.name, categoryUuid: String(product.categoryId),
+      brandId:product.brandId==null?null:String(product.brandId),seasonUuid:product.seasonId==null?undefined:String(product.seasonId),
       description: product.description, defaultSkuCode: product.skus.find(sku => sku.isDefault)?.skuCode,
       unitOfMeasure:product.unitOfMeasure,taxRateOverride:product.taxRateOverride,weight:product.weightGram,
       length:product.length,width:product.width,height:product.height,

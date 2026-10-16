@@ -4,6 +4,8 @@ import { Archive, CheckCircleBroken, Edit02, Eye, FlipBackward, Globe01, Refresh
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { STYLE } from '@/trading-ui/adapters/library';
+import { isJavaBackend } from '@/common/config/app.config';
+import { JAVA_PRODUCT_IE, javaDownloadProductTemplate } from '@/apis/java/java-product-ie.api';
 import useSWR from 'swr';
 import {
   categoryApi,
@@ -200,12 +202,12 @@ const ProductSpuListPage = () => {
       revalidateOnFocus: false,
     },
   );
-  const ieTopicConfigsEnabled = importOpen || taskManagerOpen;
+  const ieTopicConfigsEnabled = !isJavaBackend() && (importOpen || taskManagerOpen);
   const { data: ieTopicConfigs } = useSWR(ieTopicConfigsEnabled ? (['ie', 'topic-configs'] as const) : null, () => importExportApi.getImportExportTopicConfigs(), { revalidateOnFocus: false });
-  const productImportTopicConfigId = useMemo(() => ieTopicConfigs?.find((c) => c.routingKey === 'import.product')?.id ?? ieTopicConfigs?.[0]?.id ?? null, [ieTopicConfigs]);
+  const productImportTopicConfigId = useMemo(() => isJavaBackend() ? JAVA_PRODUCT_IE.importTopic : ieTopicConfigs?.find((c) => c.routingKey === 'import.product')?.id ?? ieTopicConfigs?.[0]?.id ?? null, [ieTopicConfigs]);
   const productExportTopicConfigId = useMemo(
     () =>
-      ieTopicConfigs?.find((c) => c.routingKey === 'export.product' && c.workerQueueProfile?.action === TopicAction.EXPORT)?.id ??
+      isJavaBackend() ? JAVA_PRODUCT_IE.exportTopic : ieTopicConfigs?.find((c) => c.routingKey === 'export.product' && c.workerQueueProfile?.action === TopicAction.EXPORT)?.id ??
       ieTopicConfigs?.find((c) => c.workerQueueProfile?.action === TopicAction.EXPORT)?.id ??
       null,
     [ieTopicConfigs],
@@ -387,13 +389,14 @@ const ProductSpuListPage = () => {
           message: 'Đã gửi file import. Theo dõi tiến trình trong Trình quản lý tác vụ.',
         });
         await mutateIeJobs();
+        if (isJavaBackend()) await productsSwr.mutate();
       } catch (err) {
         showSnackbar({ message: getErrorMessage(err), type: SnackbarType.ERROR });
       } finally {
         setImportSubmitting(false);
       }
     },
-    [mutateIeJobs, openTaskManager, resolveProductImportTopicConfigId, showSnackbar],
+    [mutateIeJobs, openTaskManager, resolveProductImportTopicConfigId, showSnackbar, productsSwr],
   );
 
   const handleProductExport = useCallback(
@@ -1344,6 +1347,10 @@ const ProductSpuListPage = () => {
         onClose={() => setImportOpen(false)}
         submitting={importSubmitting}
         onDownloadTemplate={() => {
+            if (isJavaBackend()) {
+              void javaDownloadProductTemplate().catch(error => showSnackbar({ type: SnackbarType.ERROR, message: getErrorMessage(error) }));
+              return;
+            }
           const link = document.createElement('a');
           link.href = '/pim/Import_Product_Template.xlsx';
           link.download = 'Import_Product_Template.xlsx';

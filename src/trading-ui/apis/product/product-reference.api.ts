@@ -1,4 +1,6 @@
 import { axiosRequest } from '../../common/config';
+import { isJavaBackend } from '@/common/config/app.config';
+import { javaProductApprovals, javaReviewProducts, javaCancelApproval, javaSubmitProduct } from '@/apis/java/java-product-approval.api';
 import { type ResList } from '../../common/constant/api.interface';
 import { type ProductVariation } from './product.entities';
 import {
@@ -36,13 +38,13 @@ export const patchAdminProductPackagingRelations = async (id: string, body: Prod
 export const postSkuMatrixPreview = async (body: SkuMatrixPreviewRequestDto): Promise<SkuMatrixPreviewResponseDto> => await axiosRequest.post(`product/admin/products/sku-matrix/preview`, body);
 
 export const getAdminProductApprovalList = async (params: Partial<QueryAdminProductApprovalDto>): Promise<ResList<ProductApprovalRequestDto>> =>
-  await axiosRequest.get(`product/admin/product-approvals`, { params });
+  isJavaBackend() ? javaProductApprovals(params) : await axiosRequest.get(`product/admin/product-approvals`, { params });
 
-export const postAdminProductApprovalReview = async (body: ProductApprovalReviewRequestDto): Promise<void> => await axiosRequest.post(`product/admin/product-approvals/review`, body);
+export const postAdminProductApprovalReview = async (body: ProductApprovalReviewRequestDto): Promise<void> => isJavaBackend() ? javaReviewProducts(body) : await axiosRequest.post(`product/admin/product-approvals/review`, body);
 
-export const postAdminProductApprovalCancel = async (id: string): Promise<ProductApprovalCancelResponseDto> => await axiosRequest.post(`product/admin/product-approvals/${id}/cancel`);
+export const postAdminProductApprovalCancel = async (id: string): Promise<ProductApprovalCancelResponseDto> => isJavaBackend() ? javaCancelApproval(id) : await axiosRequest.post(`product/admin/product-approvals/${id}/cancel`);
 
-export const postAdminProductSubmit = async (id: string): Promise<ProductMutationResponseDto> => await axiosRequest.post(`product/admin/products/${id}/submit`);
+export const postAdminProductSubmit = async (id: string): Promise<ProductMutationResponseDto> => isJavaBackend() ? javaSubmitProduct(id) : await axiosRequest.post(`product/admin/products/${id}/submit`);
 
 export const patchAdminProductStatus = async (id: string, body: ProductPatchStatusRequestDto): Promise<ProductMutationResponseDto> =>
   await axiosRequest.patch(`product/admin/products/${id}/status`, body);

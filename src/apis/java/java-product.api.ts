@@ -10,13 +10,15 @@ import type { ProductCreateRequestDto, ProductSkuUpsertRequestDto, ProductQuery,
 const path = JAVA_CATALOG_PATH + '/products';
 export async function javaRawProduct(id: string): Promise<JavaProduct> { return backendRequest(path + '/' + id); }
 async function productQueryParams(query: ProductQuery): Promise<URLSearchParams> {
-  const fields=['seasonUuid','stockStatus','brandId','createdById'] as const;
+  const fields=['createdById'] as const;
   const selected=fields.filter(key=>query[key]!==undefined && query[key]!==null && query[key]!=='');
   if(selected.length)unsupportedJavaFields(path,selected);
   const params = new URLSearchParams({ page: String(query.isPagination === false ? JAVA_PAGE_POLICY.firstPage : query.page ?? 1),
     take: String(query.isPagination === false ? JAVA_PAGE_POLICY.take : query.take ?? 20) });
   if (query.search?.trim()) params.set('search', query.search.trim());
   if (query.status && query.status !== 'ALL') params.set('status', query.status);
+  for(const key of ['stockStatus','brandId','seasonUuid'] as const)
+    if(query[key])params.set(key==='seasonUuid'?'seasonId':key,String(query[key]));
   for(const key of ['hasPendingApproval','approvalStatus','createdFrom','createdTo','updatedFrom','updatedTo','minPrice','maxPrice','timeFilter','timeFrom','timeTo'] as const)
     if(query[key]!==undefined && query[key]!==null && query[key]!=='') params.set(key,String(query[key]));
   for (const [id, segment, key] of [[query.categoryUuid, 'categories', 'categorySlug'], [query.collectionUuid, 'collections', 'collectionSlug']] as const) {
@@ -74,6 +76,7 @@ function skuBody(sku: ProductSkuUpsertRequestDto, input: ProductCreateRequestDto
 }
 function productBody(input: ProductCreateRequestDto, current?: JavaProduct) {
   return { categoryId: Number(input.categoryUuid), code: input.spuCode, name: input.name, description: input.description,
+    brandId:input.brandId?Number(input.brandId):null,seasonId:input.seasonUuid?Number(input.seasonUuid):null,
     unitOfMeasure:input.unitOfMeasure,taxRateOverride:input.taxRateOverride??null,weightGram:input.weight??null,
     length:input.length??null,width:input.width??null,height:input.height??null,
     metaTitle:input.metaTitle??null,metaDescription:input.metaDescription??null,metaKeywords:input.metaKeywords??null,

@@ -26,6 +26,8 @@ export interface CmsPageWizardStepLayoutProps {
   loadingSave: boolean;
   loadingContinue: boolean;
   viewMode?: boolean;
+  showLayoutName?: boolean;
+  showActions?: boolean;
 }
 
 const deviceOptions = CMS_PAGE_TARGET_DEVICE_OPTIONS.map((o) => ({
@@ -48,6 +50,8 @@ export const CmsPageWizardStepLayout: React.FC<CmsPageWizardStepLayoutProps> = (
   loadingSave,
   loadingContinue,
   viewMode = false,
+  showLayoutName = true,
+  showActions = true,
 }) => {
   const fieldsDisabled = viewMode;
   const [scheduleStartError, setScheduleStartError] = useState<string | null>(null);
@@ -84,14 +88,14 @@ export const CmsPageWizardStepLayout: React.FC<CmsPageWizardStepLayoutProps> = (
             </Box>
           </StackRowAlignCenter>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <TextInput
+            {showLayoutName ? <TextInput
               label="Tên layout"
               name="layoutName"
               value={layoutName}
               placeholder="VD: Layout mặc định (để trống sẽ tự sinh)"
               onChange={(e) => onLayoutNameChange(e.target.value)}
               disabled={fieldsDisabled}
-            />
+            /> : null}
             <Box sx={{ height: 16 }} />
             <SelectInput
               label="Thiết bị mục tiêu"
@@ -140,7 +144,7 @@ export const CmsPageWizardStepLayout: React.FC<CmsPageWizardStepLayoutProps> = (
         </CardContent>
       </Card>
 
-      <CmsPageWizardStepActions
+      {showActions ? <CmsPageWizardStepActions
         leftLabel="Quay lại"
         onLeft={onBack}
         onSave={() => runIfScheduleStartValid(onSave)}
@@ -148,7 +152,7 @@ export const CmsPageWizardStepLayout: React.FC<CmsPageWizardStepLayoutProps> = (
         loadingSave={loadingSave}
         loadingContinue={loadingContinue}
         viewMode={viewMode}
-      />
+      /> : null}
     </React.Fragment>
   );
 };
