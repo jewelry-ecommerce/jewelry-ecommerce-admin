@@ -331,7 +331,7 @@ export const mapOrderToReturnExchangeSummary = (order: IOrder): ReturnExchangeOr
       sku: item.skuCode,
       variantId: item.variationId,
       imageUrl: item.image || '',
-      quantityPurchased: item.quantity,
+      quantityPurchased: Math.max(0, item.quantity - (item.returnedQuantity ?? 0)),
       priceSnapshot: getOrderLineUnitPrice(item),
     })),
   };
@@ -414,6 +414,7 @@ export const calculateReturnPickupCodTotal = ({ returnShippingFee, returnReason 
 //end
 
 export const STATUS_LABELS: Record<string, string> = {
+  [OrderReturnStatus.COMPLETED]: 'Hoàn tất',
   [OrderReturnStatus.PENDING]: 'Chờ xác nhận',
   [OrderReturnStatus.APPROVED]: 'Đã xác nhận',
   [OrderReturnStatus.AWAITING_PICKUP]: 'Chờ thu hồi',

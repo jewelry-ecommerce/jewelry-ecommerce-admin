@@ -1,4 +1,5 @@
 import type { IAdminCreateOrderV2Request, IAdminOrderV2Context } from '../../../apis/order';
+import { isJavaBackend } from '@/common/config/app.config';
 import { OrderKind, type OrderSource, type PaymentMethod } from '../../../apis/order/order.enum';
 import type { CartLine, CreateOrderFormValues } from '../../../pages/order/create-order/create-order.interface';
 import { buildOrderItemsFromCartLines, normalizeVnPhone } from './create-order.utils';
@@ -34,14 +35,15 @@ export const buildAdminOrderV2Context = (input: AdminOrderV2ContextInput): IAdmi
   const wardCode = Number(input.wardCode);
   const addressLine = input.addressLine.trim();
   const items = buildOrderItemsFromCartLines(input.cartLines);
-  if (!receiverPhone || items.length === 0 || wardCode <= 0 || !addressLine) return null;
+  const addressReady = isJavaBackend() ? Boolean(input.provinceName.trim() && input.wardName.trim()) : wardCode > 0;
+  if (!receiverPhone || items.length === 0 || !addressReady || !addressLine) return null;
 
   const provinceCode = Number(input.provinceCode);
   return {
     contextVersion: ADMIN_ORDER_CONTEXT_VERSION,
     receiverPhone,
     items,
-    wardCode,
+    ...(wardCode > 0 ? { wardCode } : {}),
     addressLine,
     couponCodes: normalizeCouponCodes(input.couponCodes),
     ...(input.firstName.trim() ? { firstName: input.firstName.trim() } : {}),
@@ -81,6 +83,7 @@ export const getAdminOrderApiErrorCode = (error: unknown): string => {
 };
 
 export const isAdminOrderResultUncertain = (error: unknown): boolean => {
+  if (getAdminOrderApiErrorCode(error) === 'IDEMPOTENCY_KEY_REUSED') return true;
   const statusCode = isRecord(error) ? (error.statusCode ?? error.status) : null;
   if (typeof statusCode === 'number') return statusCode >= ADMIN_ORDER_SERVER_ERROR_STATUS;
 

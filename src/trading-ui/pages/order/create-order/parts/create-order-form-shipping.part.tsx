@@ -1,4 +1,6 @@
 import { LocalShippingOutlined } from '@mui/icons-material';
+import { isJavaBackend } from '@/common/config/app.config';
+import { JavaOrderAddressFields } from './java-order-address-fields.part';
 import { Box, Paper, Stack, Typography } from '@mui/material';
 import { memo, useMemo, useState } from 'react';
 import { Controller, useWatch, type Control, type FieldErrors } from 'react-hook-form';
@@ -111,7 +113,7 @@ export const CreateOrderFormShippingPart = memo(function CreateOrderFormShipping
             <Typography sx={{ ...TYPOGRAPHY_STYLES.base.semibold }}>Địa chỉ của khách hàng</Typography>
           </StackRowAlignCenter>
           <Stack gap={2}>
-            <StackRow>
+            {isJavaBackend() ? <JavaOrderAddressFields control={control} /> : <StackRow>
               <Controller
                 control={control}
                 name="provinceCode"
@@ -150,7 +152,7 @@ export const CreateOrderFormShippingPart = memo(function CreateOrderFormShipping
                   />
                 )}
               />
-            </StackRow>
+            </StackRow>}
             <Controller
               control={control}
               name="addressLine"

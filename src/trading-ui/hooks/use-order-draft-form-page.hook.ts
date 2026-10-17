@@ -1,6 +1,7 @@
  
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useWatch } from 'react-hook-form';
+import { isJavaBackend } from '@/common/config/app.config';
 import { useNavigate } from 'react-router-dom';
 import { getWardsByProvinceCode, getProvinceList, type IProvince, type IWard } from '../apis/address';
 import {
@@ -12,6 +13,7 @@ import {
   getOrderWarehouses,
   mapOrderCustomerByPhoneItemToLookup,
   OrderCancellationReason,
+  OrderStatus,
   type OrderSource,
   PaymentMethod,
   ShippingMethod,
@@ -163,7 +165,7 @@ export function useOrderDraftFormPage(args: UseOrderDraftFormPageArgs) {
   const orderId = args.mode === 'edit' ? args.orderId : undefined;
   const cloneFromId = args.mode === 'create' ? args.cloneFromId : null;
   const isCloneMode = Boolean(cloneFromId) && !isEditMode;
-  const isCreateOnlyMode = !isEditMode && !isCloneMode;
+  const isCreateOnlyMode = !isEditMode && (!isCloneMode || isJavaBackend());
 
   const { showSnackbar } = useSnackbar();
 
@@ -196,6 +198,7 @@ export function useOrderDraftFormPage(args: UseOrderDraftFormPageArgs) {
   const [warehouseOptions, setWarehouseOptions] = useState<WarehouseOption[]>([]);
 
   useEffect(() => {
+    if (isJavaBackend()) return;
     let cancelled = false;
     void (async () => {
       try {
@@ -241,6 +244,8 @@ export function useOrderDraftFormPage(args: UseOrderDraftFormPageArgs) {
   } = useCreateOrderForm();
 
   const provinceCode = useWatch({ control, name: 'provinceCode' });
+  const javaProvinceName = useWatch({ control, name: 'provinceName' }) ?? '';
+  const javaWardName = useWatch({ control, name: 'wardName' }) ?? '';
   const wardCode = useWatch({ control, name: 'wardCode' });
   const receiverPhone = useWatch({ control, name: 'receiverPhone' });
   const firstName = useWatch({ control, name: 'firstName' });
@@ -411,6 +416,7 @@ export function useOrderDraftFormPage(args: UseOrderDraftFormPageArgs) {
     let cancelled = false;
     void (async () => {
       try {
+        if (isJavaBackend()) return;
         const res = await getProvinceList();
         if (!cancelled) setProvinces(res.list ?? []);
       } catch {
@@ -438,7 +444,7 @@ export function useOrderDraftFormPage(args: UseOrderDraftFormPageArgs) {
         const detail = await getOrderDetail(idToLoad);
         if (cancelled) return;
 
-        if (isEditMode && !ORDER_EDIT_PAGE_ALLOWED_STATUSES.includes(detail.status)) {
+        if (isEditMode && !ORDER_EDIT_PAGE_ALLOWED_STATUSES.includes(detail.status) && !(isJavaBackend() && detail.status === OrderStatus.CONFIRMED)) {
           showSnackbar({
             type: SnackbarType.WARNING,
             message: 'Chỉ chỉnh sửa đơn khi đơn ở trạng thái Chờ xác nhận.',
@@ -448,7 +454,7 @@ export function useOrderDraftFormPage(args: UseOrderDraftFormPageArgs) {
         }
 
         const addr = detail.shippingAddressSnapshot;
-        if (addr?.provinceCode != null) {
+        if (!isJavaBackend() && addr?.provinceCode != null) {
           try {
             const wardsRes = await getWardsByProvinceCode(Number(addr.provinceCode));
             if (!cancelled) setWards(wardsRes.list ?? []);
@@ -458,6 +464,8 @@ export function useOrderDraftFormPage(args: UseOrderDraftFormPageArgs) {
         }
 
         setProvinceName(addr?.provinceName ?? '');
+        setValue('provinceName', addr?.provinceName ?? '');
+        setValue('wardName', addr?.wardName ?? '');
         setWardName(addr?.wardName ?? '');
         setValue('crmSearch', '', { shouldValidate: true });
         setValue('receiverPhone', String(addr?.receiverPhone ?? '').trim(), { shouldValidate: true });
@@ -533,7 +541,7 @@ export function useOrderDraftFormPage(args: UseOrderDraftFormPageArgs) {
   }, [buildPrefillCartLinesFromOrder, cloneFromId, isCloneMode, isEditMode, orderId, setValue, syncCartLinesWithLiveStock]);
 
   useEffect(() => {
-    if (provinceCode === '') {
+    if (isJavaBackend() || provinceCode === '') {
       setWards([]);
       return;
     }
@@ -598,13 +606,13 @@ export function useOrderDraftFormPage(args: UseOrderDraftFormPageArgs) {
       receiverPhone,
       firstName,
       provinceCode,
-      provinceName,
+      provinceName: isJavaBackend() ? javaProvinceName : provinceName,
       wardCode,
-      wardName,
+      wardName: isJavaBackend() ? javaWardName : wardName,
       addressLine: toAddressLine,
       couponCodes: quoteCouponCodes,
     });
-  }, [cartLines, firstName, isCreateOnlyMode, provinceCode, provinceName, quoteCouponCodes, receiverPhone, toAddressLine, wardCode, wardName]);
+  }, [cartLines, firstName, isCreateOnlyMode, provinceCode, provinceName, quoteCouponCodes, receiverPhone, toAddressLine, wardCode, wardName, javaProvinceName, javaWardName]);
 
   const legacyPricingQuote = useOrderPricingQuote({
     enabled: !isCreateOnlyMode,
@@ -865,6 +873,8 @@ export function useOrderDraftFormPage(args: UseOrderDraftFormPageArgs) {
         setValue('firstName', customerName, { shouldValidate: true });
       }
       setValue('contactEmail', res.contactEmail ?? '');
+      setValue('provinceName', res.provinceName ?? '');
+      setValue('wardName', res.wardName ?? '');
       setValue('provinceCode', res.provinceCode ?? '', { shouldValidate: true });
       setProvinceName(res.provinceCode != null ? (res.provinceName ?? '') : '');
       setValue('wardCode', res.wardCode ?? '', { shouldValidate: true });
@@ -975,8 +985,8 @@ export function useOrderDraftFormPage(args: UseOrderDraftFormPageArgs) {
 
   const buildOrderBasePayload = useCallback(
     (v: CreateOrderFormValues, phone: string) => {
-      const selectedProvinceName = provinceName || provinces.find((p) => p.code === v.provinceCode)?.name || '';
-      const selectedWardName = wardName || wards.find((w) => w.code === v.wardCode)?.name || '';
+      const selectedProvinceName = isJavaBackend() ? v.provinceName ?? '' : provinceName || provinces.find((p) => p.code === v.provinceCode)?.name || '';
+      const selectedWardName = isJavaBackend() ? v.wardName ?? '' : wardName || wards.find((w) => w.code === v.wardCode)?.name || '';
       const selectedService = findShippingService(v.shippingService, shippingServiceOptions);
       return {
         items: buildOrderItemsFromCartLines(cartLines),
@@ -988,11 +998,13 @@ export function useOrderDraftFormPage(args: UseOrderDraftFormPageArgs) {
         addressLine: v.addressLine.trim(),
         firstName: v.firstName.trim(),
         shippingMethod: ShippingMethod.STANDARD,
-        shippingCarrier: mapShippingCarrierCode(v.shippingCarrier),
-        carrierServiceId: parseCarrierServiceId(v.shippingService, shippingServiceOptions),
-        estimatedDeliveryAt: selectedService?.estimatedDeliveryAt,
-        shippingFee,
-        pickupAddress: buildPickupAddress(v.warehouseId, warehouseOptions),
+        ...(!isJavaBackend() ? {
+          shippingCarrier: mapShippingCarrierCode(v.shippingCarrier),
+          carrierServiceId: parseCarrierServiceId(v.shippingService, shippingServiceOptions),
+          estimatedDeliveryAt: selectedService?.estimatedDeliveryAt,
+          shippingFee,
+          pickupAddress: buildPickupAddress(v.warehouseId, warehouseOptions),
+        } : {}),
         promotionIds: buildPromotionIds(promoCode, adminOrderVoucher.selectedVoucherCodes),
         notePayment: v.notePayment.trim() || undefined,
         contactEmail: v.contactEmail.trim() || undefined,
@@ -1181,6 +1193,10 @@ export function useOrderDraftFormPage(args: UseOrderDraftFormPageArgs) {
       if (!orderId) return;
       setCloneConfirmSubmitting(true);
       try {
+        if (shouldCancelOriginal && isJavaBackend()) {
+          showSnackbar({ type: SnackbarType.WARNING, message: 'Tạo bản sao thành công trước, sau đó hủy đơn gốc trong chi tiết đơn. Không hủy đơn gốc trước khi bản sao được lưu.' });
+          return;
+        }
         if (shouldCancelOriginal) {
           await cancelOrder(orderId, {
             cancellationReason: OrderCancellationReason.CHANGE_MIND,
@@ -1241,7 +1257,8 @@ export function useOrderDraftFormPage(args: UseOrderDraftFormPageArgs) {
   const lineCountLabel = `${cartLines.reduce((s, l) => s + l.quantity, 0)} món • ${new Set(cartLines.map((l) => l.variation.skuCode)).size} SKU`;
   const selectedProductIds = useMemo(() => Array.from(new Set(cartLines.map((l) => l.productId))), [cartLines]);
 
-  const paymentMethodFieldOptions = isEditMode || isCloneMode ? PAYMENT_METHOD_OPTIONS_EDIT : PAYMENT_METHOD_OPTIONS;
+  const allPaymentOptions = isEditMode || isCloneMode ? PAYMENT_METHOD_OPTIONS_EDIT : PAYMENT_METHOD_OPTIONS;
+  const paymentMethodFieldOptions = isJavaBackend() ? allPaymentOptions.filter(option => option.value === PaymentMethod.COD) : allPaymentOptions;
   const hasCloneStockIssue = useMemo(() => {
     if (!isCloneMode) return false;
     return cartLines.some((line) => {

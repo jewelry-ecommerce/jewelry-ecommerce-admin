@@ -1,12 +1,13 @@
 import { getDataSourceMode, isJavaBackend } from "@/common/config/app.config";
 import { javaPlacements, javaCreatePlacement, javaUpdatePlacement, javaBannerLayouts, javaBannerLayout, javaSaveBannerLayout, javaUpdateBannerItem, javaCreateBanner, javaUpdateBanner } from "@/apis/java/java-banner.api";
 import { backendRequest, toUiEntityIds } from "@/apis/backend-request";
-import type { Banner, Placement, PlacementLayout, PlacementLayoutItem, ProductListBannerConfig } from "./banner.entities";
+import { javaProductListBanners, javaSaveProductListBanner, JAVA_PRODUCT_LIST_BANNER_PATH } from '@/apis/java/java-product-list-banner.api';
+import type { Banner, Placement, PlacementLayout, PlacementLayoutItem } from "./banner.entities";
 import type {
   CreateBannerDto,
   CreatePlacementDto,
   CreatePlacementLayoutDto,
-  QueryPlacementDto, QueryProductListBannerConfigDto, CreateProductListBannerConfigDto, UpdateProductListBannerConfigDto,
+  QueryPlacementDto, CreateProductListBannerConfigDto, UpdateProductListBannerConfigDto,
   UpdateBannerDto,
   UpdatePlacementDto,
   UpdatePlacementLayoutItemDto,
@@ -35,7 +36,7 @@ export const bannerApi = {
   postPlacement: (data: CreatePlacementDto) => isJavaBackend() ? javaCreatePlacement(data) : command<Placement>("postPlacement", { data }),
   patchPlacement: (id: string, data: UpdatePlacementDto) => isJavaBackend() ? javaUpdatePlacement(id, data) : command<Placement>("patchPlacement", { id, data }),
   deletePlacement: async (id: string) => {
-    if (isJavaBackend()) throw new Error("Java chưa có API xóa vị trí banner.");
+    if (isJavaBackend()) return backendRequest<{ success: boolean }>('admin/banner/placements/' + encodeURIComponent(id), 'DELETE');
     return command<{ success: boolean }>("deletePlacement", { id });
   },
   getPlacementLayoutList: async (placementId: string) => isJavaBackend() ? javaBannerLayouts(placementId) : command<PlacementLayout[]>("getPlacementLayoutList", { placementId }),
@@ -47,8 +48,8 @@ export const bannerApi = {
     isJavaBackend() ? javaUpdateBannerItem(placementId, layoutId, itemId, data) : command<PlacementLayoutItem>("patchPlacementLayoutItem", { placementId, layoutId, itemId, data }),
   postBanner: (data: CreateBannerDto) => isJavaBackend() ? javaCreateBanner(data) : command<Banner>("postBanner", { data }),
   patchBanner: (id: string, data: UpdateBannerDto) => isJavaBackend() ? javaUpdateBanner(id, data) : command<Banner>("patchBanner", { id, data }),
-  getProductListBannerConfigs: async (_query?: QueryProductListBannerConfigDto): Promise<ProductListBannerConfig[]> => { throw new Error('Java chưa hỗ trợ cấu hình banner chèn danh sách sản phẩm.'); },
-  postProductListBannerConfig: async (_body: CreateProductListBannerConfigDto): Promise<ProductListBannerConfig> => { throw new Error('Java chưa hỗ trợ cấu hình banner chèn danh sách sản phẩm.'); },
-  patchProductListBannerConfig: async (_id:string,_body: UpdateProductListBannerConfigDto): Promise<ProductListBannerConfig> => { throw new Error('Java chưa hỗ trợ cấu hình banner chèn danh sách sản phẩm.'); },
-  deleteProductListBannerConfig: async (_id:string):Promise<void> => { throw new Error('Java chưa hỗ trợ cấu hình banner chèn danh sách sản phẩm.'); },
+  getProductListBannerConfigs: javaProductListBanners,
+  postProductListBannerConfig: (body: CreateProductListBannerConfigDto) => javaSaveProductListBanner(body),
+  patchProductListBannerConfig: (id: string, body: UpdateProductListBannerConfigDto) => javaSaveProductListBanner(body, id),
+  deleteProductListBannerConfig: async (id: string): Promise<void> => { await backendRequest(JAVA_PRODUCT_LIST_BANNER_PATH + '/' + encodeURIComponent(id), 'DELETE'); },
 };

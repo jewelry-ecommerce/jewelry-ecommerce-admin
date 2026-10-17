@@ -1,5 +1,5 @@
 import { backendRequest, BackendHttpError, toUiEntityIds } from '@/apis/backend-request';
-import type { HeaderAdmin, HeaderUpsertResponse, LogoAdmin, FooterSetting } from '@/trading-ui/apis/cms/cms-header-footer.interface';
+import type { HeaderAdmin, HeaderUpsertResponse, HeaderScheduleConflictItem, LogoAdmin, FooterSetting } from '@/trading-ui/apis/cms/cms-header-footer.interface';
 
 type LayoutQuery = { page?: number; take?: number; search?: string; status?: string; type?: string; isPagination?: boolean; orderBy?: string; orderType?: string };
 type WireHeader = Omit<HeaderAdmin, 'id' | 'tenantCode'> & { id: number };
@@ -40,7 +40,7 @@ export async function javaMutateHeader(suffix: string, method: string, body: unk
     return { success: true, id: data.id, data };
   } catch (error) {
     if (error instanceof BackendHttpError && error.status === 409 && error.code === 'HEADER_SCHEDULE_CONFLICT')
-      return { success: false, flow: 'header_schedule_conflict', message: error.message, conflictingHeaders: [] };
+      return { success: false, flow: 'header_schedule_conflict', message: error.message, conflictingHeaders: toUiEntityIds(error.dependencies ?? []) as HeaderScheduleConflictItem[] };
     throw error;
   }
 }

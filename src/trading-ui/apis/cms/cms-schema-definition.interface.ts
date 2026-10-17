@@ -8,6 +8,7 @@ interface CmsBlockSchemaBase {
 
 export interface CmsBlockObjectSchemaDefinition extends CmsBlockSchemaBase {
   type: 'object';
+  'x-propertyOrder'?: string[];
   properties?: Record<string, CmsBlockSchemaDefinition>;
   required?: string[];
 }

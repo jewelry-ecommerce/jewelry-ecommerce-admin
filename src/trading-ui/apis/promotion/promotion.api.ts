@@ -1,6 +1,4 @@
 import { axiosRequest } from '../../common/config';
-import {isJavaBackend} from '@/common/config/app.config';
-import {getJavaCampaignOverview,deleteJavaCampaign} from './promotion-java-overview.adapter';
 import { type ResList } from '../../common/constant/api.interface';
 import { ComponentKind } from './promotion.enum';
 import type { PromotionApplicabilityConfigV1, UpsertPromotionDraftApplicabilityDto } from './promotion.interface';
@@ -94,7 +92,7 @@ export const createPromotionDraft = async (body: CreatePromotionDraftDto): Promi
 
 export const updatePromotionDraft = async (id: string, body: UpdatePromotionDraftDto): Promise<PromotionDraft> => await axiosRequest.patch(`${PROMOTION_DRAFT_BASE}/${id}`, body);
 
-export const deletePromotionDraft = async (id: string): Promise<void> => isJavaBackend()?deleteJavaCampaign(id):await axiosRequest.delete(`${PROMOTION_DRAFT_BASE}/${id}`);
+export const deletePromotionDraft = async (id: string): Promise<void> => await axiosRequest.delete(`${PROMOTION_DRAFT_BASE}/${id}`);
 
 export const publishPromotionDraft = async (draftId: string): Promise<PublishPromotionDraftResponseDto> => await axiosRequest.post(`${PROMOTION_DRAFT_BASE}/${draftId}/publish`);
 
@@ -134,7 +132,7 @@ export const publishPromotion = async (id: string): Promise<{ promotion: Promoti
 
 export const disablePromotion = async (id: string): Promise<{ promotion: Promotion; warnings: string[] }> => await axiosRequest.post(`${PROMOTION_BASE}/${id}/disable`);
 
-export const deletePromotion = async (id: string): Promise<void> => isJavaBackend()?deleteJavaCampaign(id):await axiosRequest.delete(`${PROMOTION_BASE}/${id}`);
+export const deletePromotion = async (id: string): Promise<void> => await axiosRequest.delete(`${PROMOTION_BASE}/${id}`);
 
 export const previewPromotionSkuTargets = async (id: string, body: PreviewPromotionSkuTargetsDto): Promise<PromotionSkuTargetPreviewResult> =>
   await axiosRequest.post(`${PROMOTION_BASE}/${id}/sku-targets/preview`, body);
@@ -228,7 +226,7 @@ export const deletePromotionDraftVoucherCode = async (draftId: string, schemaId:
 const CAMPAIGN_OVERVIEW_BASE = 'promotion/promotion-campaigns';
 const PUBLISHED_PROMOTION_BASE = 'promotion/promotions';
 
-export const getCampaignOverview = async (params: GetCampaignOverviewQueryDto): Promise<GetCampaignOverviewResponseDto> => isJavaBackend()?getJavaCampaignOverview(params):await axiosRequest.get(CAMPAIGN_OVERVIEW_BASE, { params });
+export const getCampaignOverview = async (params: GetCampaignOverviewQueryDto): Promise<GetCampaignOverviewResponseDto> => await axiosRequest.get(CAMPAIGN_OVERVIEW_BASE, { params });
 
 export const getPublishedPromotionDetail = async (id: string): Promise<PromotionDetailDto> => await axiosRequest.get(`${PUBLISHED_PROMOTION_BASE}/${id}`);
 

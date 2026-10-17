@@ -1,10 +1,10 @@
 export const JAVA_FORM_LIMITATIONS = [
   { route: /^\/products\/(create|[^/]+\/edit)$/,
-    message: 'Đã nối form sản phẩm với Java, gồm SEO, thông tin bổ sung, phối kèm, thương hiệu và mùa. Bao bì chưa thuộc phạm vi; bộ lọc người tạo chưa được Java hỗ trợ.' },
+    message: 'Đã nối form sản phẩm và bộ lọc người tạo với Java. Bao bì chưa thuộc phạm vi.' },
   { route: /^\/promotions\/(create|[^/]+(?:\/edit)?)$/,
-    message: 'Java hiện có khuyến mãi cơ bản, chưa có đầy đủ campaign/draft/schema cho quy trình cấu hình này.' },
+    message: 'Java v7 hỗ trợ Markdown, Đồng giá và Voucher; Online, tất cả khách hàng, không quota/import file. Phạm vi SKU và voucher còn cần BE sửa để đồng nhất với checkout.' },
   { route: /^\/cms\/banners$/,
-    message: 'Đã nối layout Grid, Slider và Double banner với Java. Backend chưa có API xóa placement.' },
+    message: 'Đã nối Grid, Slider, Double banner, phiên bản và xóa placement với Java. Placement đang được sử dụng có thể bị backend từ chối xóa.' },
 ] as const;
 export const JAVA_ORDER_ACTIONS = {
   Pending: { target: 'CONFIRMED', label: 'Xác nhận đơn hàng' },

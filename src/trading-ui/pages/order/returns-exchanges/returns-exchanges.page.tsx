@@ -2,6 +2,7 @@
 // Kiến thức: tắt quote thôi chưa đủ; phí ship, loại phiếu, nút tạo và quyền API phải cùng quay về luồng cũ.
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ArrowBack } from '@mui/icons-material';
+import { isJavaBackend } from '@/common/config/app.config';
 import { Box, Stack, Typography } from '@mui/material';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -98,7 +99,7 @@ const ReturnExchangePage = () => {
   const [bankBranch, setBankBranch] = useState('');
   const [evidenceImageUrls, setEvidenceImageUrls] = useState<string[]>([]);
   const [shipperNote, setShipperNote] = useState('');
-  const [shippingCarrier] = useState('GHN');
+  const [shippingCarrier] = useState(isJavaBackend() ? '' : 'GHN');
   const [shippingMethod, setShippingMethod] = useState<ShippingMethod>(ShippingMethod.STANDARD);
   const [carrierServiceId, setCarrierServiceId] = useState(53321);
   const [pickupAddress, setPickupAddress] = useState(INITIAL_PICKUP_ADDRESS);
@@ -110,7 +111,7 @@ const ReturnExchangePage = () => {
   const canLoadShippingServices =
     Boolean(shippingCarrier) && pickupAddress.wardCode > 0 && Boolean(pickupAddress.addressLine.trim()) && shippingAddress.wardCode > 0 && Boolean(shippingAddress.addressLine.trim());
   const { options: normalizedShippingServiceOptions, isLoading: shippingServiceLoading } = useOrderShippingServiceOptions({
-    enabled: canLoadShippingServices,
+    enabled: !isJavaBackend() && canLoadShippingServices,
     fromWardCode: pickupAddress.wardCode,
     fromAddress: pickupAddress.addressLine,
     toWardCode: shippingAddress.wardCode,
@@ -251,9 +252,9 @@ const ReturnExchangePage = () => {
   const priceDiffLabel = `${priceDiff >= 0 ? '' : '-'}${formatCurrency(Math.abs(priceDiff))}₫`;
   const headerOrderCode = orderSummary?.orderCode?.trim() ?? '';
   const hasExchangeItems = exchangeItems.length > 0;
-  const requestTypeOptions = useMemo(() => getRequestTypeOptions(hasExchangeItems), [hasExchangeItems]);
+  const requestTypeOptions = useMemo(() => getRequestTypeOptions(hasExchangeItems).filter(option => !isJavaBackend() || option.value === OrderReturnType.REFUND || option.value === OrderReturnType.EXCHANGE), [hasExchangeItems]);
   const canCalculateReturnShippingFee =
-    !ADMIN_ORDER_RETURN_EXCHANGE_V2_ENABLED &&
+    !isJavaBackend() && !ADMIN_ORDER_RETURN_EXCHANGE_V2_ENABLED &&
     carrierServiceId > 0 &&
     pickupAddress.wardCode > 0 &&
     Boolean(pickupAddress.addressLine.trim()) &&
@@ -262,11 +263,12 @@ const ReturnExchangePage = () => {
     returnItems.length > 0;
   const quoteRequest = useMemo<IAdminOrderReturnQuoteRequest | null>(() => {
     // Sau khi tắt luồng mới, truyền null để hook vẫn chạy đúng thứ tự React nhưng không gửi request quote.
-    if (!ADMIN_ORDER_RETURN_EXCHANGE_V2_ENABLED) return null;
-    if (step !== 3 || !orderId || !returnReason || !returnItems.length || !exchangeItems.length) return null;
-    if (!pickupAddress.wardCode || !shippingAddress.wardCode || !carrierServiceId) return null;
+    if (!ADMIN_ORDER_RETURN_EXCHANGE_V2_ENABLED && !isJavaBackend()) return null;
+    if (step !== 3 || !orderId || !returnReason || !returnItems.length) return null;
+    if (!isJavaBackend() && (!exchangeItems.length || !pickupAddress.wardCode || !shippingAddress.wardCode || !carrierServiceId)) return null;
     return {
       orderId,
+      type: isJavaBackend() ? requestType || OrderReturnType.REFUND : OrderReturnType.EXCHANGE,
       reason: returnReason,
       returnItems: returnItems.map((line) => ({ orderItemId: line.lineId, quantity: line.quantity })),
       exchangeItems: exchangeItems.map((line) => ({ variationId: line.variantId, quantity: line.quantity })),
@@ -276,7 +278,7 @@ const ReturnExchangePage = () => {
       shippingCarrier,
       carrierServiceId,
     };
-  }, [step, orderId, returnReason, returnItems, exchangeItems, pickupAddress, shippingAddress, shippingMethod, shippingCarrier, carrierServiceId]);
+  }, [step, orderId, returnReason, returnItems, exchangeItems, pickupAddress, shippingAddress, shippingMethod, shippingCarrier, carrierServiceId, requestType]);
   const { quote, isLoading: quoteLoading, hasError: quoteError, refresh: refreshQuote } = useAdminOrderReturnQuote(quoteRequest);
   const shouldShowBankFields = requestType === OrderReturnType.REFUND && orderSummary?.paymentMethod === PaymentMethod.COD && orderSummary?.paymentStatus === PaymentStatus.PAID;
 
@@ -518,7 +520,7 @@ const ReturnExchangePage = () => {
       setStepError(exchangeValidationErrors[0] ?? 'Danh sách sản phẩm đổi chưa hợp lệ.');
       return;
     }
-    if (ADMIN_ORDER_RETURN_EXCHANGE_V2_ENABLED && (!quote?.quoteReference || quoteLoading)) {
+    if ((ADMIN_ORDER_RETURN_EXCHANGE_V2_ENABLED || isJavaBackend()) && (!quote?.quoteReference || quoteLoading)) {
       setStepError('Vui lòng xem báo giá đổi hàng mới trước khi tạo phiếu.');
       return;
     }
@@ -526,10 +528,10 @@ const ReturnExchangePage = () => {
     try {
       setSubmitCreating(true);
       // Sau validation, chỉ gửi một API. Giữ code mới ở đây để release sau khi OMS có đủ quote/commit.
-      if (ADMIN_ORDER_RETURN_EXCHANGE_V2_ENABLED) {
+      if (ADMIN_ORDER_RETURN_EXCHANGE_V2_ENABLED || isJavaBackend()) {
         await commitAdminOrderReturn({
           orderId,
-          type: OrderReturnType.EXCHANGE,
+          type: isJavaBackend() ? requestType : OrderReturnType.EXCHANGE,
           reason: returnReason,
           returnItems: returnItems.map((item) => ({
             orderItemId: item.lineId,
@@ -546,6 +548,7 @@ const ReturnExchangePage = () => {
           carrierServiceId,
           estimatedDeliveryAt: shippingServiceOptions.find((o) => o.value === String(carrierServiceId))?.estimatedDeliveryAt,
           pricingQuote: quote!.quoteReference,
+          ...(isJavaBackend() ? { refundBankAccountHolder: bankAccountHolder.trim(), refundBankAccountNumber: bankAccountNumber.trim(), refundBankName: bankName.trim(), refundBankBranch: bankBranch.trim() } : {}),
           shipperNote: shipperNote.trim() || undefined,
           evidenceImageUrls,
           ...(internalNote.trim() ? { note: internalNote.trim() } : {}),
@@ -599,7 +602,7 @@ const ReturnExchangePage = () => {
       setStepError('');
       showSnackbar({ type: SnackbarType.SUCCESS, message: ADMIN_ORDER_RETURN_EXCHANGE_V2_ENABLED ? 'Đã tạo phiếu đổi hàng. Trạng thái: Chờ thu hồi.' : 'Đã tạo yêu cầu đổi trả.' });
     } catch (error) {
-      if (ADMIN_ORDER_RETURN_EXCHANGE_V2_ENABLED && isReturnQuoteStale(error)) refreshQuote();
+      if ((ADMIN_ORDER_RETURN_EXCHANGE_V2_ENABLED || isJavaBackend()) && isReturnQuoteStale(error)) refreshQuote();
       showSnackbar({
         type: SnackbarType.ERROR,
         message: getReturnSafeError(error),

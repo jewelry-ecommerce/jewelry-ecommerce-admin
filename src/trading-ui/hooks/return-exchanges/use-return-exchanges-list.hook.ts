@@ -1,4 +1,5 @@
 import { type Dayjs } from 'dayjs';
+import { isJavaBackend } from '@/common/config/app.config';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 import { type DataTableSortDirection, type DataTableStatusTab } from '../../components/data-table';
@@ -12,6 +13,7 @@ export type ReturnSortField = 'createdAt' | 'updatedAt' | 'returnCode' | 'priceD
 export type ReturnQuickStatus =
   | 'ALL'
   | OrderReturnStatus.PENDING
+  | OrderReturnStatus.COMPLETED
   | OrderReturnStatus.AWAITING_PICKUP
   | OrderReturnStatus.COLLECTION_FAILED
   | OrderReturnStatus.COLLECTED
@@ -41,6 +43,14 @@ export const RETURN_QUICK_STATUS_TABS: Array<{ value: ReturnQuickStatus; label: 
 const toOrderType = (direction: DataTableSortDirection): OrderType => (direction === 'asc' ? OrderType.ASC : OrderType.DESC);
 
 export const ORDER_RETURN_LIST_SWR_KEY = 'order-return-list' as const;
+
+const JAVA_RETURN_STATUS_TABS: Array<{ value: ReturnQuickStatus; label: string }> = [
+  { value: 'ALL', label: 'Tất cả' },
+  { value: OrderReturnStatus.PENDING, label: 'Chờ xác nhận' },
+  { value: OrderReturnStatus.COMPLETED, label: 'Hoàn tất' },
+  { value: OrderReturnStatus.REJECTED, label: 'Từ chối' },
+  { value: OrderReturnStatus.CANCELLED, label: 'Đã hủy' },
+];
 
 export const useReturnExchangesList = ({ initialAdvancedFilters, pageSize }: { initialAdvancedFilters: ReturnExchangeAdvancedFilters; pageSize: number }) => {
   const { showSnackbar } = useSnackbar();
@@ -172,7 +182,7 @@ export const useReturnExchangesList = ({ initialAdvancedFilters, pageSize }: { i
 
   const statusTabs = useMemo<Array<DataTableStatusTab<ReturnQuickStatus>>>(
     () =>
-      RETURN_QUICK_STATUS_TABS.map((tab) => {
+      (isJavaBackend() ? JAVA_RETURN_STATUS_TABS : RETURN_QUICK_STATUS_TABS).map((tab) => {
         if (tab.value === 'ALL') {
           const allCount = Number(summary.ALL ?? totalItems);
           return {

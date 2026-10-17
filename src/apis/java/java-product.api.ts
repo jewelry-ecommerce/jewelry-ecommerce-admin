@@ -1,6 +1,4 @@
 
-import { unsupportedJavaFields } from './java-unsupported';
-import { javaProductSortedPage } from './java-product-sort';
 import { backendRequest } from '../backend-request';
 import { JAVA_CATALOG_PATH, JAVA_PAGE_POLICY, decodeOption, type JavaProduct, type JavaPage, type JavaMedia } from './java-catalog.types';
 import { javaProductView, javaProductForm } from './java-product.mapper';
@@ -10,14 +8,11 @@ import type { ProductCreateRequestDto, ProductSkuUpsertRequestDto, ProductQuery,
 const path = JAVA_CATALOG_PATH + '/products';
 export async function javaRawProduct(id: string): Promise<JavaProduct> { return backendRequest(path + '/' + id); }
 async function productQueryParams(query: ProductQuery): Promise<URLSearchParams> {
-  const fields=['createdById'] as const;
-  const selected=fields.filter(key=>query[key]!==undefined && query[key]!==null && query[key]!=='');
-  if(selected.length)unsupportedJavaFields(path,selected);
   const params = new URLSearchParams({ page: String(query.isPagination === false ? JAVA_PAGE_POLICY.firstPage : query.page ?? 1),
     take: String(query.isPagination === false ? JAVA_PAGE_POLICY.take : query.take ?? 20) });
   if (query.search?.trim()) params.set('search', query.search.trim());
   if (query.status && query.status !== 'ALL') params.set('status', query.status);
-  for(const key of ['stockStatus','brandId','seasonUuid'] as const)
+  for(const key of ['stockStatus','brandId','seasonUuid','createdById','orderBy','orderType'] as const)
     if(query[key])params.set(key==='seasonUuid'?'seasonId':key,String(query[key]));
   for(const key of ['hasPendingApproval','approvalStatus','createdFrom','createdTo','updatedFrom','updatedTo','minPrice','maxPrice','timeFilter','timeFrom','timeTo'] as const)
     if(query[key]!==undefined && query[key]!==null && query[key]!=='') params.set(key,String(query[key]));
@@ -50,9 +45,7 @@ async function readProductPage(query: ProductQuery): Promise<JavaPage<JavaProduc
   return result;
 }
 export async function javaProductList(query: ProductQuery = {}): Promise<ProductListResponseDto> {
-  const result = query.orderBy || query.orderType
-    ? javaProductSortedPage(await readProductPage({ ...query, isPagination: false }), query)
-    : await readProductPage(query);
+  const result = await readProductPage(query);
   const countParams=await productQueryParams(query);
   for(const key of ['status','page','take','hasPendingApproval','approvalStatus']) countParams.delete(key);
   const counts=await backendRequest<NonNullable<ProductListResponseDto['counts']>>(path+'/counts?'+countParams);

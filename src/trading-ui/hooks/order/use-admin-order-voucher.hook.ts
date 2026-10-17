@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { isJavaBackend } from '@/common/config/app.config';
 import type { PromotionVoucherCardDto, PromotionVoucherCheckoutContext } from '../../apis/promotion/promotion.interface';
 import { buildAdminOrderPromotionVoucherCheckoutContext } from '../../common/utils/order/admin-order-voucher.helpers';
 import type { CartLine } from '../../pages/order/create-order/create-order.interface';
@@ -36,12 +37,12 @@ export function useAdminOrderVoucher({ enabled, cartLines, customerId, segmentId
 
   const handleVoucherToggle = useCallback((card: PromotionVoucherCardDto) => {
     if (card.disabled) return;
-    setSelectedVouchers((prev) => toggleVoucher(prev, card, DEFAULT_MAX_SELECTED_ADMIN_ORDER_VOUCHERS));
+    setSelectedVouchers((prev) => toggleVoucher(prev, card, isJavaBackend() ? 1 : DEFAULT_MAX_SELECTED_ADMIN_ORDER_VOUCHERS));
   }, []);
 
   const handleVoucherApply = useCallback((card: PromotionVoucherCardDto) => {
     if (card.disabled) return;
-    setSelectedVouchers((prev) => addOrReplaceVoucher(prev, card, DEFAULT_MAX_SELECTED_ADMIN_ORDER_VOUCHERS));
+    setSelectedVouchers((prev) => addOrReplaceVoucher(prev, card, isJavaBackend() ? 1 : DEFAULT_MAX_SELECTED_ADMIN_ORDER_VOUCHERS));
   }, []);
 
   const clearSelectedVouchers = useCallback(() => {

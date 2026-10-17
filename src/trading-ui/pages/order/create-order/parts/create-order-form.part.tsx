@@ -1,4 +1,5 @@
 import { Box, Stack } from '@mui/material';
+import { isJavaBackend } from '@/common/config/app.config';
 import * as React from 'react';
 import type { ReactNode } from 'react';
 import { useFormState, type Control } from 'react-hook-form';
@@ -68,7 +69,7 @@ export const CreateOrderFormPart = ({
   shippingServiceFetchFailed = false,
   onSyncShippingServices,
   warehouseOptions = [],
-  omsManagedShipping = false,
+  omsManagedShipping = isJavaBackend(),
   onProvinceChange,
   onWardChange,
   cartLines,

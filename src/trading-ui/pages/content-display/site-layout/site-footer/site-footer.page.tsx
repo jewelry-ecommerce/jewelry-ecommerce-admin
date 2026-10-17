@@ -3,6 +3,7 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { AddRounded } from '@mui/icons-material';
 import { Box, Stack } from '@mui/material';
+import { isJavaBackend } from '@/common/config/app.config';
 import { Eye, Trash03 } from '@untitledui/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { STYLE } from '@/trading-ui/adapters/library';
@@ -59,7 +60,7 @@ const SiteFooterPage = () => {
     'cms/admin/logos-active',
     async () => {
       const res = await cmsHeaderFooterApi.getLogoList({ take: 50, isPagination: false });
-      return (res.list ?? []).find((row) => row.status === 'ACTIVE');
+      return (res.list ?? []).find((row) => row.status === 'ACTIVE' && row.type === 'FOOTER');
     },
     { revalidateOnFocus: false },
   );
@@ -139,7 +140,10 @@ const SiteFooterPage = () => {
     setSaving(true);
     try {
       const payload: SaveFooterDto = {
+        newsletterHeading: form.newsletterHeading,
+        newsletterSubHeading: form.newsletterSubHeading,
         copyrightText: form.copyrightText,
+        footerLogoUrl: form.footerLogoUrl,
         certificationImageUrl: form.certificationImageUrl,
         certificationUrl: form.certificationUrl,
         menuColumns: form.menuColumns.map((col, colIndex) => ({
@@ -310,6 +314,12 @@ const SiteFooterPage = () => {
       >
         <Stack sx={{ flex: 1, minHeight: 0, overflow: 'auto', gap: 2, py: 2, width: '100%' }}>
           <FooterCollapsibleSection title="Bản quyền" expanded={sectionExpanded.copyright} onToggle={() => toggleSection('copyright')}>
+            {isJavaBackend() && <Stack gap={2}>
+              <TextInput label="Tiêu đề đăng ký nhận tin" disabled={viewMode} value={form.newsletterHeading ?? ''}
+                onChange={event => setForm(previous => ({ ...previous, newsletterHeading: event.target.value }))} />
+              <TextInput label="Mô tả đăng ký nhận tin" disabled={viewMode} value={form.newsletterSubHeading ?? ''}
+                onChange={event => setForm(previous => ({ ...previous, newsletterSubHeading: event.target.value }))} />
+            </Stack>}
             <RichTextEditor
               label="Nội dung bản quyền"
               disabled={viewMode}

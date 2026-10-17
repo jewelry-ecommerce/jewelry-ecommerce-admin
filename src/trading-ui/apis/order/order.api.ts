@@ -1,5 +1,6 @@
 import type { AxiosRequestConfig } from 'axios';
 import { isJavaBackend } from '@/common/config/app.config';
+import { javaCreateAdminOrder, javaUpdateAdminOrder, javaDuplicateAdminOrder, javaConfirmAdminPayment, javaOrderCustomersByPhone } from '@/apis/java/java-order-advanced.api';
 import { getJavaSourceOrderList,getJavaSourceOrderDetail,cancelJavaSourceOrder,shipJavaSourceOrder } from './order-java.adapter';
 import { axiosRequest } from '../../common/config/axios.config';
 import { axiosNoAuthRequest } from '../../common/config/axios-no-auth.config';
@@ -112,6 +113,7 @@ export const getOrderProductVariations = async (productId: string): Promise<IOrd
 
 /** GET order/orders/customers/by-phone?phone=0xxxxxxxxx */
 export const getOrderCustomersByPhone = async (phone: string): Promise<IOrderCustomerByPhoneItem[]> => {
+  if (isJavaBackend()) return javaOrderCustomersByPhone(phone);
   const data: unknown = await axiosRequest.get(`${ORDERS_BASE_PATH}/customers/by-phone`, {
     params: { phone },
   });
@@ -186,14 +188,14 @@ export const lookupOrderDetail = async (orderCode: string, request: ILookupOrder
   await axiosRequest.post(`${ORDERS_BASE_PATH}/lookup/${encodeURIComponent(orderCode)}`, request);
 
 // code này được thêm vởi quân phạm
-export const createOrder = async (request: ICreateOrderApiRequest): Promise<ICreateOrderResponse> => await axiosRequest.post(`${ORDERS_BASE_PATH}`, request);
+export const createOrder = async (request: ICreateOrderApiRequest): Promise<ICreateOrderResponse> => isJavaBackend() ? javaCreateAdminOrder(request) : await axiosRequest.post(`${ORDERS_BASE_PATH}`, request);
 // code này được thêm vởi quân phạm
 
 /** Sao chép đơn — POST order/orders/duplicate */
 export const duplicateOrder = async (request: IDuplicateOrderRequest): Promise<IApiResponse<IOrder> | { orderCode?: string; id?: string }> =>
-  await axiosRequest.post(`${ORDERS_BASE_PATH}/duplicate`, request);
+  isJavaBackend() ? javaDuplicateAdminOrder(request) : await axiosRequest.post(`${ORDERS_BASE_PATH}/duplicate`, request);
 
-export const updateOrder = async (orderId: string, request: IUpdateOrderRequest): Promise<IApiResponse<IOrder>> => await axiosRequest.put(`${ORDERS_BASE_PATH}/${orderId}`, request);
+export const updateOrder = async (orderId: string, request: IUpdateOrderRequest): Promise<IApiResponse<IOrder>> => isJavaBackend() ? javaUpdateAdminOrder(orderId, request) : await axiosRequest.put(`${ORDERS_BASE_PATH}/${orderId}`, request);
 
 /** Hủy đơn — POST order/orders/{orderId}/cancel */
 export const cancelOrder = async (orderId: string, request: ICancelOrderRequest): Promise<IApiResponse<IOrder>> => isJavaBackend()?cancelJavaSourceOrder(orderId,request.note??request.cancellationReason):await axiosRequest.post(`${ORDERS_BASE_PATH}/${orderId}/cancel`, request);
@@ -209,7 +211,7 @@ export const confirmRecallOrder = async (orderId: string): Promise<IApiResponse<
 
 /** Xác nhận thanh toán thủ công — PUT order/orders/{orderId}/confirm-payment */
 export const confirmOrderPayment = async (orderId: string, request: IConfirmOrderPaymentRequest): Promise<IApiResponse<IOrder>> =>
-  await axiosRequest.put(`${ORDERS_BASE_PATH}/${orderId}/confirm-payment`, request);
+  isJavaBackend() ? javaConfirmAdminPayment(orderId, request) : await axiosRequest.put(`${ORDERS_BASE_PATH}/${orderId}/confirm-payment`, request);
 
 export const deleteOrder = async (orderId: string): Promise<IApiResponse<void>> => await axiosRequest.delete(`${ORDERS_BASE_PATH}/${orderId}`);
 

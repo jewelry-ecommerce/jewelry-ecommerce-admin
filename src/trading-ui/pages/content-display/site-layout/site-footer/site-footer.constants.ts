@@ -65,6 +65,8 @@ export const FOOTER_SOCIAL_PLATFORMS = ['Facebook', 'Instagram', 'TikTok', 'YouT
 export const FOOTER_SOCIAL_IMAGE_ACCEPT = 'image/*';
 
 export const mapFooterSettingToForm = (setting: FooterSetting): SaveFooterDto => ({
+  newsletterHeading: setting.newsletterHeading ?? '',
+  newsletterSubHeading: setting.newsletterSubHeading ?? '',
   copyrightText: setting.copyrightText ?? '',
   footerLogoUrl: setting.footerLogoUrl ?? '',
   certificationImageUrl: setting.certificationImageUrl ?? '',

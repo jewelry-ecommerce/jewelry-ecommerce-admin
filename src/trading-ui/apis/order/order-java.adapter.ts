@@ -10,16 +10,17 @@ type WireItem=Omit<IOrderItem,'id'|'variationId'|'productId'> & {id:number;skuId
 type WireOrder=Omit<IOrder,'id'|'items'|'status'|'paymentStatus'|'paymentMethod'|'source'|'shippingAddressSnapshot'|'statusHistory'> & {id:number;code:string;placedAt:string;items:WireItem[];status:string;paymentStatus:string;paymentMethod:string;shippingAddressSnapshot?:Partial<IShippingAddress>;timeline?:{status:string;note?:string;occurredAt:string}[]};
 function status(value:string):OrderStatus{const match=Object.values(OrderStatus).find(status=>status.toUpperCase()===value.toUpperCase());if(!match)throw new Error('Trạng thái đơn Java chưa được hỗ trợ: '+value);return match;}
 function payment(value:string):PaymentStatus{const match=Object.values(PaymentStatus).find(status=>status.toUpperCase()===value.toUpperCase());if(!match)throw new Error('Trạng thái thanh toán Java chưa được hỗ trợ: '+value);return match;}
-function view(order:WireOrder):IOrder {
+export function javaOrderView(order:WireOrder):IOrder {
   const method=Object.values(PaymentMethod).find(method=>method===order.paymentMethod);
   const shippingMethod=Object.values(ShippingMethod).find(value=>value.replaceAll('_','').toUpperCase()===order.shippingMethod?.replaceAll('_','').toUpperCase());
-  return {...order,id:String(order.id),orderCode:order.code,source:OrderSource.WEBSITE,status:status(order.status),paymentStatus:payment(order.paymentStatus),paymentMethod:method,
+  return {...order,id:String(order.id),orderCode:order.code,source:'source' in order && String(order.source).toUpperCase()==='ADMIN'?OrderSource.MANUAL:OrderSource.WEBSITE,status:status(order.status),paymentStatus:payment(order.paymentStatus),paymentMethod:method,
     shippingMethod,customerId:order.customerId==null?undefined:String(order.customerId),
     createdAt:order.createdAt??order.placedAt,updatedAt:order.updatedAt??order.createdAt??order.placedAt,
     shippingAddressSnapshot:order.shippingAddressSnapshot?{...order.shippingAddressSnapshot,provinceCode:order.shippingAddressSnapshot.provinceCode??null,wardCode:order.shippingAddressSnapshot.wardCode??null}:null,
     items:order.items.map(line=>({...line,id:String(line.id),variationId:String(line.skuId),productId:line.productId===undefined?undefined:String(line.productId),variationName:line.variationName??line.name,skuCode:line.skuCode??'',image:line.image??line.imageUrl??''})),
     statusHistory:order.timeline?.map((entry,index)=>({fromStatus:index?status(order.timeline![index-1].status):null,toStatus:status(entry.status),note:entry.note,createdAt:entry.occurredAt}))};
 }
+const view = javaOrderView;
 function dateRange(request?:IOrderListRequest):{start?:string;end?:string}{
   if(request?.startDate||request?.endDate)return {start:request.startDate,end:request.endDate};
   const now=dayjs(),end=now.endOf("day");let start=now.startOf("day"),finish=end;
@@ -36,7 +37,7 @@ function dateRange(request?:IOrderListRequest):{start?:string;end?:string}{
   return {start:start.toISOString(),end:finish.toISOString()};
 }
 function query(request?:IOrderListRequest):URLSearchParams{
-  const unsupported=['warehouseId','createdById'] as const;
+  const unsupported=['warehouseId'] as const;
   const selected:string[]=unsupported.filter(key=>request?.[key]);
   if(selected.length)unsupportedJavaFields(ORDER_BASE,selected);
   if(request?.orderStatus && !(request.orderStatus.toUpperCase() in JAVA_OPERATIONS.transitions))unsupportedJavaFields(ORDER_BASE,['status:'+request.orderStatus]);
@@ -44,8 +45,8 @@ function query(request?:IOrderListRequest):URLSearchParams{
   if(request?.search?.trim())params.set('search',request.search.trim());
   if(request?.orderStatus)params.set('status',request.orderStatus.toUpperCase());
   if(request?.paymentStatus)params.set('paymentStatus',request.paymentStatus.toUpperCase());
-  for(const key of ['shippingMethod','provinceName','source','skuCode','orderBy','orderType','dateField'] as const)
-    if(request?.[key])params.set(key,String(request[key]));
+  for(const key of ['shippingMethod','provinceName','source','skuCode','orderBy','orderType','dateField','createdById'] as const)
+    if(request?.[key])params.set(key,key==='source' && request[key]===OrderSource.MANUAL?'ADMIN':String(request[key]));
   const dates=dateRange(request);if(dates.start)params.set('fromDate',dayjs(dates.start).format('YYYY-MM-DD'));if(dates.end)params.set('toDate',dayjs(dates.end).format('YYYY-MM-DD'));
   return params;
 }

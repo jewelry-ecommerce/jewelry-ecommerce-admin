@@ -26,3 +26,6 @@ test('validation returns the specific Java error rather than generic Invalid dat
   expect(javaEnvelopeFailure({status:400,message:'Invalid data',errors:[{code:'DISCOUNT_INVALID',message:'Giá trị không vượt 100%'}]}))
     .toMatchObject({code:'DISCOUNT_INVALID',message:'Giá trị không vượt 100%'});
 });
+test('successful Java envelope with omitted null data becomes empty data, not a fake entity', () => {
+  expect(unwrapJava({ status: 200, message: 'OK' })).toBeNull();
+});

@@ -45,8 +45,8 @@ export async function javaExportProducts(filters: ProductExportFiltersDto = {}) 
 export async function javaProductJobs(query: Partial<QueryJobDto>) {
   if (query.topicConfigId && ![JAVA_PRODUCT_IE.importTopic, JAVA_PRODUCT_IE.exportTopic].some(code => code === query.topicConfigId))
     throw new Error('Java chưa hỗ trợ tác vụ của module này.');
-  if (query.referenceType || query.referenceId) throw new Error('Java chưa hỗ trợ lọc tác vụ theo tham chiếu.');
   const params = new URLSearchParams({ page: String(query.page ?? 1), take: String(query.take ?? 20) });
+  for (const key of ['referenceType', 'referenceId'] as const) if (query[key]) params.set(key, query[key]);
   if (query.status) params.set('status', query.status);
   const result = await backendRequest<{ list: WireJob[]; total: number }>(JAVA_PRODUCT_IE.base + '/jobs?' + params);
   return { list: result.list.map(jobView), total: result.total };

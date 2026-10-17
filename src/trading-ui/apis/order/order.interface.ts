@@ -30,6 +30,7 @@ export interface CustomerDisplayPrice {
 }
 // ==================== Order Item ====================
 export interface IOrderItem {
+  returnedQuantity?: number;
   id: string;
   orderId?: string;
   variationId: string;
@@ -619,7 +620,7 @@ export interface IAdminOrderV2Context {
     variationId: string;
     quantity: number;
   }>;
-  wardCode: number;
+  wardCode?: number;
   addressLine: string;
   couponCodes?: string[];
   firstName?: string;
@@ -975,7 +976,7 @@ export interface IOrderReturnQuoteReference {
 export type IAdminOrderReturnQuoteRequest = Pick<
   ICreateOrderReturnRequest,
   'orderId' | 'reason' | 'returnItems' | 'exchangeItems' | 'pickupAddress' | 'shippingAddress' | 'shippingMethod' | 'shippingCarrier' | 'carrierServiceId'
->;
+> & { type?: OrderReturnType };
 
 export type IAdminOrderReturnCommitRequest = Omit<
   ICreateOrderReturnRequest,

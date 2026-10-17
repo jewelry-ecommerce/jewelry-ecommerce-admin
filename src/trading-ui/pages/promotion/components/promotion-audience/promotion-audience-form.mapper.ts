@@ -1,4 +1,5 @@
 import { AudienceConfigType, type PromotionAudienceConfigV1 } from '../../../../apis';
+import { isJavaBackend } from '@/common/config/app.config';
 import { createDefaultPromotionAudienceFormValues, normalizeAudienceUploadBatchId, type PromotionAudienceFormValues } from '../../promotion.constant';
 import type { PromotionImportedCustomerRow } from '../../utils/promotion-customer-import-result.util';
 
@@ -6,7 +7,7 @@ export const AUDIENCE_TYPE_SELECT_OPTIONS = [
   { value: AudienceConfigType.ALL, label: 'Tất cả khách hàng' },
   { value: AudienceConfigType.MANUAL_CUSTOMER, label: 'Chọn thủ công' },
   { value: AudienceConfigType.UPLOAD_FILE, label: 'Tải lên file' },
-];
+].filter(option => !isJavaBackend() || option.value === AudienceConfigType.ALL);
 
 export const mapAudienceToFormValues = (audience?: PromotionAudienceConfigV1 | null): PromotionAudienceFormValues => {
   const defaults = createDefaultPromotionAudienceFormValues();

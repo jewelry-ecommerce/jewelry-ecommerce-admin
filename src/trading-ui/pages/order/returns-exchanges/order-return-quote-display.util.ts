@@ -16,6 +16,7 @@ export function getOrderReturnQuoteDisplay(quote: IOrderReturnQuoteResponse | nu
     returnAmount: currentQuote ? formatQuoteAmount(product?.returnedMerchandiseSettlementMinor) : pending,
     compensation: currentQuote ? formatQuoteAmount(product?.merchandiseTopUpMinor) : pending,
     otherRevenue: currentQuote ? `${formatQuoteAmount(nonRefundable)}${nonRefundable ? ' (không hoàn tiền)' : ''}` : pending,
+    refund: currentQuote ? formatQuoteAmount(nonRefundable) : pending,
     returnShipping: currentQuote ? formatQuoteAmount(shipping?.returnInboundShippingFeeMinor) : pending,
     loyalty: unavailable,
     pickupCod: unavailable,

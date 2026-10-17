@@ -1,4 +1,5 @@
 import { PromotionSalesChannel, StoreSelectionMode, type PosStore } from '../../../../apis';
+import { isJavaBackend } from '@/common/config/app.config';
 
 export const PROMOTION_SALES_CHANNEL_LABEL: Record<PromotionSalesChannel, string> = {
   [PromotionSalesChannel.ONLINE]: 'Online',
@@ -14,7 +15,7 @@ export const STORE_SELECTION_MODE_LABEL: Record<StoreSelectionMode, string> = {
 export const APPLICABILITY_CHANNEL_OPTIONS = [
   { value: PromotionSalesChannel.ONLINE, label: PROMOTION_SALES_CHANNEL_LABEL[PromotionSalesChannel.ONLINE] },
   { value: PromotionSalesChannel.POS, label: PROMOTION_SALES_CHANNEL_LABEL[PromotionSalesChannel.POS] },
-];
+].filter(option => !isJavaBackend() || option.value === PromotionSalesChannel.ONLINE);
 
 /**
  * GROUP is intentionally absent: the store directory has no group concept yet,

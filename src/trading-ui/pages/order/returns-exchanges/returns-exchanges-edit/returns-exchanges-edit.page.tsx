@@ -1,4 +1,5 @@
 import { ArrowBack } from '@mui/icons-material';
+import { isJavaBackend } from '@/common/config/app.config';
 import { Box, Stack, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -84,7 +85,7 @@ const ReturnExchangeEditPage = () => {
   const [bankBranch, setBankBranch] = useState('');
   const [evidenceImageUrls, setEvidenceImageUrls] = useState<string[]>([]);
   const [shipperNote, setShipperNote] = useState('');
-  const [shippingCarrier] = useState('GHN');
+  const [shippingCarrier] = useState(isJavaBackend() ? '' : 'GHN');
   const [shippingMethod, setShippingMethod] = useState<ShippingMethod>(ShippingMethod.STANDARD);
   const [carrierServiceId, setCarrierServiceId] = useState(53321);
   const [pickupAddress, setPickupAddress] = useState(INITIAL_PICKUP_ADDRESS);
@@ -98,7 +99,7 @@ const ReturnExchangeEditPage = () => {
     Boolean(shippingCarrier) && pickupAddress.wardCode > 0 && Boolean(pickupAddress.addressLine.trim()) && shippingAddress.wardCode > 0 && Boolean(shippingAddress.addressLine.trim());
 
   const { options: normalizedShippingServiceOptions, isLoading: shippingServiceLoading } = useOrderShippingServiceOptions({
-    enabled: canLoadShippingServices,
+    enabled: !isJavaBackend() && canLoadShippingServices,
     fromWardCode: pickupAddress.wardCode,
     fromAddress: pickupAddress.addressLine,
     toWardCode: shippingAddress.wardCode,
@@ -257,9 +258,10 @@ const ReturnExchangeEditPage = () => {
   const priceDiffLabel = `${priceDiff >= 0 ? '' : '-'}${formatCurrency(Math.abs(priceDiff))}₫`;
   const headerOrderCode = orderSummary?.orderCode?.trim() ?? '';
   const hasExchangeItems = exchangeItems.length > 0;
-  const requestTypeOptions = useMemo(() => getRequestTypeOptions(hasExchangeItems), [hasExchangeItems]);
+  const requestTypeOptions = useMemo(() => getRequestTypeOptions(hasExchangeItems).filter(option => !isJavaBackend() || option.value === OrderReturnType.REFUND || option.value === OrderReturnType.EXCHANGE), [hasExchangeItems]);
 
   const canCalculateReturnShippingFee =
+    !isJavaBackend() &&
     carrierServiceId > 0 &&
     pickupAddress.wardCode > 0 &&
     Boolean(pickupAddress.addressLine.trim()) &&
@@ -619,6 +621,11 @@ const ReturnExchangeEditPage = () => {
           <ReturnExchangeStepperPart step={step} />
           <Box sx={sxStepScrollRegion}>
             {loadingPage ? <Typography sx={sxLoadingHint}>Đang tải dữ liệu yêu cầu đổi trả...</Typography> : null}
+            {isJavaBackend() && step === 3 && orderSummary ? (
+              <Typography sx={sxLoadingHint}>
+                API hiện chưa hỗ trợ báo giá lại riêng cho phiếu đang sửa. Các khoản chưa xác nhận hiển thị —; sau khi lưu, kiểm tra số tiền từ server trong chi tiết phiếu trước khi duyệt.
+              </Typography>
+            ) : null}
 
             {!loadingPage && !orderSummary ? <PageStateComponent variant="empty" title="Không có dữ liệu" description="Vui lòng kiểm tra lại yêu cầu hoặc thử lại sau." /> : null}
 

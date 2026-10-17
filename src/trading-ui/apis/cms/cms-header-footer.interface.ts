@@ -82,6 +82,8 @@ export type FooterMenuColumnInput = {
 };
 
 export type SaveFooterDto = {
+  newsletterHeading?: string;
+  newsletterSubHeading?: string;
   copyrightText?: string;
   footerLogoUrl?: string;
   certificationImageUrl?: string;
@@ -100,6 +102,8 @@ export type FooterMenuColumn = {
 };
 
 export type FooterSetting = {
+  newsletterHeading?: string;
+  newsletterSubHeading?: string;
   id: string;
   tenantCode?: string;
   copyrightText?: string;

@@ -12,7 +12,7 @@ export function JavaCapabilityAlert() {
   const limitation = JAVA_FORM_LIMITATIONS.find(entry => entry.route.test(pathname));
   if (!isJavaBackend() || (!current.length && !limitation)) return null;
   return <Alert severity="warning" sx={{ m: 2 }}>
-    <AlertTitle>Chưa đủ API Java cho một số thao tác trên trang này</AlertTitle>
+    <AlertTitle>{current.length ? 'Chưa đủ API Java cho một số thao tác trên trang này' : 'Lưu ý phạm vi tích hợp Java'}</AlertTitle>
     {limitation?.message ?? "Các thao tác bên dưới chưa thực hiện được. Không có dữ liệu không đồng nghĩa danh sách đang trống."}
     {current.length > 0 && <details><summary>Xem API cần bổ sung</summary>
       {current.map(gap => <Typography component="div" variant="body2" key={gap.method + gap.endpoint}>

@@ -193,6 +193,7 @@ export const useSiteNavigation = () => {
     if (form.type === 'CATEGORY' || form.type === 'PAGE') {
       base.targetId = form.targetId;
       if (form.type === 'CATEGORY' && categoryUrl) base.url = categoryUrl;
+      if (form.type === 'PAGE' && form.url) base.url = form.url;
     }
 
     if (form.type === 'LINK') {

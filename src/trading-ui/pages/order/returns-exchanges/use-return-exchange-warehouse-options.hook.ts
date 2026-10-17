@@ -1,6 +1,7 @@
 // Kho giao/nhận của phiếu đổi trả lấy cùng nguồn với form đơn hàng: OMS `orders/warehouses` (kho WMS, mã tỉnh/phường đã đổi sang mã GHN).
 import { type Dispatch, type SetStateAction, useEffect, useMemo } from 'react';
 import useSWR from 'swr';
+import { isJavaBackend } from '@/common/config/app.config';
 import { getOrderWarehouses } from '../../../apis/order';
 import { SnackbarType, useSnackbar } from '@/hooks/use-snackbar.hook';
 import type { ReturnExchangeStepConfirmPartProps, ReturnExchangeWarehouseOption } from '../order.types';
@@ -28,7 +29,7 @@ export const mapWarehouseOptionToPickupAddress = (warehouse: ReturnExchangeWareh
  */
 export const useReturnExchangeWarehouseOptions = (setPickupAddress: Dispatch<SetStateAction<PickupAddress>>, preferredWarehouseId?: string | null) => {
   const { showSnackbar } = useSnackbar();
-  const { data } = useSWR(ORDER_WAREHOUSES_SWR_KEY, () => getOrderWarehouses(), {
+  const { data } = useSWR(isJavaBackend() ? null : ORDER_WAREHOUSES_SWR_KEY, () => getOrderWarehouses(), {
     revalidateOnFocus: false,
     onError: (error) => {
       console.error('Failed to fetch order warehouses:', error);

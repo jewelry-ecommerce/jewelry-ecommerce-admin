@@ -1,5 +1,6 @@
 import { OrderErrorType, OrderSource, OrderStatus, PaymentMethod, PaymentStatus, ShippingMethod } from '../../../apis/order';
 import { OrderKind } from '../../../apis/order/order.enum';
+import { isJavaBackend } from '@/common/config/app.config';
 import type { CustomerDisplayPrice, IOrder, IOrderItem, IOrderSetLine, IPromotion, OrderErrorLog } from '../../../apis/order/order.interface';
 import { isOrderCancellableStatus, ORDER_CANCEL_ALLOWED_STATUSES } from '../../../common/constant/order/order.constants';
 import { resolveOrderCustomerFullName } from '../../../common/utils/order/create-order.utils';
@@ -332,15 +333,15 @@ export function getOrderActionVisibility(
     /** hủy đơn. */
     showCancelOrder: !isTerminal && ORDER_CANCEL_ALLOWED_STATUSES.includes(status),
     // chỉnh sửa đơn
-    showEditOrder: status === OrderStatus.PENDING,
+    showEditOrder: status === OrderStatus.PENDING || (isJavaBackend() && status === OrderStatus.CONFIRMED),
     // thu hồi đơn
-    showRevokeConfirmation: status === OrderStatus.CONFIRMED,
+    showRevokeConfirmation: !isJavaBackend() && status === OrderStatus.CONFIRMED,
     // in hóa đơn
-    showPrintInvoice: !isTerminal,
+    showPrintInvoice: !isJavaBackend() && !isTerminal,
     // in vận đơn
-    showPrintSlip: !isTerminal,
+    showPrintSlip: !isJavaBackend() && !isTerminal,
     // xác nhận thanh toán — không dùng cho đơn Return (đi đơn qua showConfirmOrder)
-    showConfirmPayment: false,
+    showConfirmPayment: isJavaBackend() && paymentStatus === PaymentStatus.UNPAID && [OrderStatus.PENDING, OrderStatus.CONFIRMED, OrderStatus.SHIPPING].includes(status),
     // thanh toán 1 phần COD
     showCodShortfall: !isTerminal && (paymentStatus === PaymentStatus.PARTIAL || paymentStatus === PaymentStatus.PARTIAL_PAID_COD),
     showModifyActions: status === OrderStatus.PENDING || status === OrderStatus.CONFIRMED,

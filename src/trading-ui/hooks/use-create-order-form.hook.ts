@@ -1,4 +1,5 @@
 import { useForm } from 'react-hook-form';
+import { isJavaBackend } from '@/common/config/app.config';
 import type { CreateOrderFormValues } from '../pages/order/create-order/create-order.interface';
 import { OrderPurpose, OrderSource } from '../apis/order/order.enum';
 import { WAREHOUSE_OPTIONS } from '../common/constant/order/create-order.constants';
@@ -30,7 +31,7 @@ const FORM_DEFAULT_VALUES: CreateOrderFormValues = {
  */
 export const useCreateOrderForm = () =>
   useForm<CreateOrderFormValues>({
-    defaultValues: FORM_DEFAULT_VALUES,
+    defaultValues: isJavaBackend() ? { ...FORM_DEFAULT_VALUES, warehouseId: '', shippingCarrier: '', shippingService: '', provinceName: '', wardName: '' } : FORM_DEFAULT_VALUES,
     mode: 'onChange',
     /** Giảm nháy lỗi/validate UI; formState chỉ subscribe trong CreateOrderFormPart, không ở page. */
     delayError: 250,

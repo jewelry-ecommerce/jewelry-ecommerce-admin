@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { isJavaBackend } from '@/common/config/app.config';
 import { CircularProgress, Stack, Typography } from '@mui/material';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { LayersThree01, Plus, Upload01 } from '@untitledui/icons';
@@ -446,6 +447,7 @@ export const TargetInlineForm = ({
               <ButtonIconContentComponent
                 icon={<Upload01 size={20} color="#737373" />}
                 content="Tải lên file"
+                disabled={isJavaBackend()}
                 onClick={() => setImportOpen(true)}
                 {...promotionListButtonPermission('edit', 'Tải lên file', 'api_promotion_draft_update')}
               />
@@ -542,7 +544,7 @@ export const TargetInlineForm = ({
         requiredMark
         value={values.discountStateFilter}
         onChange={(event) => setField('discountStateFilter', event.target.value as TargetDiscountStateFilter)}
-        options={PROMOTION_TARGET_DISCOUNT_FILTER_OPTIONS}
+        options={PROMOTION_TARGET_DISCOUNT_FILTER_OPTIONS.filter(option => !isJavaBackend() || option.value === TargetDiscountStateFilter.ANY)}
         error={showErrors && Boolean(targetErrors.discountStateFilter)}
         errorMessage={targetErrors.discountStateFilter}
       />

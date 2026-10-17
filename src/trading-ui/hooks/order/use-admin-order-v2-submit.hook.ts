@@ -47,7 +47,7 @@ const useAdminOrderSubmitFailure = (
   return useCallback(
     (error: unknown, payload: IAdminCreateOrderV2Request) => {
       const code = getAdminOrderApiErrorCode(error);
-      if (code === ADMIN_ORDER_V2_ERROR_CODE.PRICE_CHANGED) {
+      if (code === ADMIN_ORDER_V2_ERROR_CODE.PRICE_CHANGED || code === 'ORDER_PRICING_CHANGED') {
         pendingAttemptRef.current = null;
         setHasUncertainAttempt(false);
         onPriceChanged(error);

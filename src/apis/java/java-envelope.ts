@@ -23,7 +23,7 @@ export function normalizeJavaPage(payload: unknown): unknown {
     total, totalPage, hasNextPage: page < totalPage, hasPreviousPage: page > 1, nextPage: page < totalPage, previousPage: page > 1 } };
 }
 export function unwrapJava<T>(payload: T | JavaEnvelope<T>): T {
-  if (payload && typeof payload === 'object' && 'status' in payload && 'data' in payload
-    && typeof payload.status === 'number' && payload.status >= 200 && payload.status < 300) return normalizeJavaPage(payload.data) as T;
+  if (payload && typeof payload === 'object' && 'status' in payload
+    && typeof payload.status === 'number' && payload.status >= 200 && payload.status < 300) return normalizeJavaPage('data' in payload ? payload.data : null) as T;
   return payload as T;
 }

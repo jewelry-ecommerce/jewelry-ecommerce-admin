@@ -2,6 +2,9 @@ import { CmsDemoBlockType, CmsDemoStatus, type CmsDemoBlock, type CmsDemoPage } 
 export const CMS_BLOCK_LABELS: Record<CmsDemoBlockType, string> = {
   BANNER: "Banner",
   PRODUCT_CAROUSEL: "Danh sách sản phẩm dạng carousel",
+  PRODUCT_LIST: "Danh sách sản phẩm (lưới + bộ lọc)",
+  PRODUCT_CATEGORY_NAV: "Danh mục sản phẩm (thanh trục)",
+  PRODUCT_COLLECTION_SHOWCASE: "Bộ sưu tập nổi bật (showcase)",
   INFO_CARDS: "Thẻ thông tin",
   IMAGE_GALLERY: "Thư viện ảnh",
   PRODUCT_EXPANDABLE_DESCRIPTION: "Nội dung mô tả",
@@ -27,6 +30,9 @@ export function newCmsPage(): CmsDemoPage {
 export function newCmsBlock(type: CmsDemoBlockType, position: number): CmsDemoBlock {
   const base = { id: crypto.randomUUID(), blockTypeCode: type, sortOrder: position, isVisible: true };
   if (type === CmsDemoBlockType.BANNER) return { ...base, config: { placementCode: "" } };
+  if (type === CmsDemoBlockType.PRODUCT_LIST)
+    return { ...base, config: { header: { title: '', subtitle: '' }, productDataSource: { filterType: 'ALL_PRODUCTS', sort: 'newest' } } };
+  if (type === CmsDemoBlockType.PRODUCT_CATEGORY_NAV) return { ...base, config: { display: { limit: 0 } } };
   if (type === CmsDemoBlockType.PRODUCT_CAROUSEL)
     return {
       ...base,

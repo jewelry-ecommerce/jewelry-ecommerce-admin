@@ -1,4 +1,5 @@
 import { InfoOutlined, ShoppingBasketOutlined } from '@mui/icons-material';
+import { isJavaBackend } from '@/common/config/app.config';
 import { Box, Stack, Tooltip, Typography } from '@mui/material';
 import { Archive, FlipBackward } from '@untitledui/icons';
 import { StackRowAlignCenter } from '@/trading-ui/adapters/library';
@@ -81,6 +82,7 @@ export const ReturnExchangeStepConfirmPart = ({
   });
   const priceDiffLabel = `${priceDiff >= 0 ? '' : '-'}${formatCurrency(Math.abs(priceDiff))}đ`;
   const quoteDisplay = getOrderReturnQuoteDisplay(quote, quoteLoading, quoteError);
+  const useServerQuote = exchangeOnly || isJavaBackend();
   return (
     <Stack gap={1.5} sx={{ mt: 2 }}>
       <Stack direction="column" gap={1.5}>
@@ -226,7 +228,7 @@ export const ReturnExchangeStepConfirmPart = ({
         <TextInput multiline minRows={3} fullWidth label="Ghi chú nội bộ" placeholder="Ghi chú" value={internalNote} onChange={(e) => onChangeInternalNote(e.target.value)} />
       </Box>
 
-      <ReturnExchangeShippingInfoPart
+      {!isJavaBackend() && <ReturnExchangeShippingInfoPart
         pickupAddress={pickupAddress}
         shippingAddress={shippingAddress}
         shippingMethod={shippingMethod}
@@ -242,53 +244,53 @@ export const ReturnExchangeStepConfirmPart = ({
         onChangeShippingMethod={onChangeShippingMethod}
         onChangeCarrierServiceId={onChangeCarrierServiceId}
         onChangeShipperNote={onChangeShipperNote}
-      />
+      />}
 
       <Box sx={{ border: '1px solid #E4E7EC', borderRadius: 1.5, p: 1.5, bgcolor: '#FFFFFF' }}>
         <Typography sx={{ ...TYPOGRAPHY_STYLES.base.semibold, mb: 1.25 }}>Phí thu hồi và Thanh toán đa phương thức</Typography>
         <Stack gap={0.75}>
           <StackRowAlignCenterJustBetween>
             <Typography sx={{ ...TYPOGRAPHY_STYLES.base.regular, color: '#6B7280' }}>Chênh lệch giá (SP đổi − SP trả)</Typography>
-            <Typography sx={TYPOGRAPHY_STYLES.base.semibold} title={exchangeOnly ? quoteDisplay.differenceHint : undefined}>
-              {exchangeOnly ? quoteDisplay.priceDifference : priceDiffLabel}
+            <Typography sx={TYPOGRAPHY_STYLES.base.semibold} title={useServerQuote ? quoteDisplay.differenceHint : undefined}>
+              {useServerQuote ? quoteDisplay.priceDifference : priceDiffLabel}
             </Typography>
           </StackRowAlignCenterJustBetween>
           <StackRowAlignCenterJustBetween>
             <Typography sx={{ ...TYPOGRAPHY_STYLES.base.regular, color: '#6B7280' }}>Tiền thực thu đơn gốc</Typography>
-            <Typography sx={TYPOGRAPHY_STYLES.base.semibold}>{exchangeOnly ? quoteDisplay.returnAmount : `${formatCurrency(returnActualAmount)}đ`}</Typography>
+            <Typography sx={TYPOGRAPHY_STYLES.base.semibold}>{useServerQuote ? quoteDisplay.returnAmount : `${formatCurrency(returnActualAmount)}đ`}</Typography>
           </StackRowAlignCenterJustBetween>
           {isRefundRequest ? (
             <StackRowAlignCenterJustBetween>
               <Typography sx={{ ...TYPOGRAPHY_STYLES.base.regular, color: '#6B7280' }}>Số tiền hoàn trả khách</Typography>
-              <Typography sx={TYPOGRAPHY_STYLES.base.semibold}>{formatCurrency(returnActualAmount)}đ</Typography>
+              <Typography sx={TYPOGRAPHY_STYLES.base.semibold}>{useServerQuote ? quoteDisplay.returnAmount : `${formatCurrency(returnActualAmount)}đ`}</Typography>
             </StackRowAlignCenterJustBetween>
           ) : null}
           {!isRefundRequest ? (
             <>
               <StackRowAlignCenterJustBetween>
                 <Typography sx={{ ...TYPOGRAPHY_STYLES.base.regular, color: '#6B7280' }}>Tiền bù chênh lệch (COD thu thêm)</Typography>
-                <Typography sx={TYPOGRAPHY_STYLES.base.semibold}>{exchangeOnly ? quoteDisplay.compensation : `${formatCurrency(priceCompensation)}đ`}</Typography>
+                <Typography sx={TYPOGRAPHY_STYLES.base.semibold}>{useServerQuote ? quoteDisplay.compensation : `${formatCurrency(priceCompensation)}đ`}</Typography>
               </StackRowAlignCenterJustBetween>
               <StackRowAlignCenterJustBetween>
-                <Typography sx={{ ...TYPOGRAPHY_STYLES.base.regular, color: '#6B7280' }}>Doanh thu khác</Typography>
-                <Typography sx={TYPOGRAPHY_STYLES.base.semibold}>{exchangeOnly ? quoteDisplay.otherRevenue : `${formatCurrency(otherRevenue)}đ`}</Typography>
+                <Typography sx={{ ...TYPOGRAPHY_STYLES.base.regular, color: '#6B7280' }}>{isJavaBackend() ? 'Số tiền hoàn chênh lệch' : 'Doanh thu khác'}</Typography>
+                <Typography sx={TYPOGRAPHY_STYLES.base.semibold}>{isJavaBackend() ? quoteDisplay.refund : exchangeOnly ? quoteDisplay.otherRevenue : `${formatCurrency(otherRevenue)}đ`}</Typography>
               </StackRowAlignCenterJustBetween>
             </>
           ) : null}
           <StackRowAlignCenterJustBetween>
             <StackRowAlignCenter gap={0.5}>
               <Typography sx={{ ...TYPOGRAPHY_STYLES.base.regular, color: '#6B7280' }}>Phí vận chuyển thu hồi</Typography>
-              <Tooltip title={exchangeOnly ? quoteDisplay.shippingHint : shippingPayerLabel} placement="top">
+              <Tooltip title={useServerQuote ? quoteDisplay.shippingHint : shippingPayerLabel} placement="top">
                 <InfoOutlined sx={{ fontSize: 16, color: '#98A2B3' }} />
               </Tooltip>
             </StackRowAlignCenter>
             <Typography sx={TYPOGRAPHY_STYLES.base.semibold}>
-              {exchangeOnly ? quoteDisplay.returnShipping : returnShippingFeeLoading ? 'Đang tính...' : `${formatCurrency(returnShippingFee)}đ`}
+              {useServerQuote ? quoteDisplay.returnShipping : returnShippingFeeLoading ? 'Đang tính...' : `${formatCurrency(returnShippingFee)}đ`}
             </Typography>
           </StackRowAlignCenterJustBetween>
           <StackRowAlignCenterJustBetween>
             <Typography sx={{ ...TYPOGRAPHY_STYLES.base.regular, color: '#6B7280' }}>Tổng thu thêm khi thu hồi (COD)</Typography>
-            <Typography sx={TYPOGRAPHY_STYLES.base.semibold}>{exchangeOnly ? quoteDisplay.pickupCod : returnShippingFeeLoading ? 'Đang tính...' : `${formatCurrency(totalPickupCod)}đ`}</Typography>
+            <Typography sx={TYPOGRAPHY_STYLES.base.semibold}>{useServerQuote ? quoteDisplay.pickupCod : returnShippingFeeLoading ? 'Đang tính...' : `${formatCurrency(totalPickupCod)}đ`}</Typography>
           </StackRowAlignCenterJustBetween>
         </Stack>
       </Box>

@@ -23,6 +23,8 @@ export interface CreateOrderFormValues {
   note: string;
   provinceCode: number | '';
   wardCode: number | '';
+  provinceName?: string;
+  wardName?: string;
   addressLine: string;
   shippingCarrier: string;
   shippingService: string;
