@@ -19,6 +19,7 @@ coverage
 .env.*
 !.env.example
 !.env.java.example
+!.env.cloud.example
 
 # Editor / OS
 .vscode/*
