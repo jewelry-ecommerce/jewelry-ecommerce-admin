@@ -8,8 +8,8 @@ import { FormFieldShell } from "@/components/form/form-field-shell.component";
 import type { FormFieldBaseProps } from "@/components/form/form-field.interface";
 import { COLOR, STYLE } from "@/theme/design-tokens";
 
-const MAX_FILE_SIZE_MB = 5;
-const ACCEPTED_TYPES = "image/png,image/jpeg,image/webp,image/svg+xml";
+const MAX_FILE_SIZE_MB = 10;
+const ACCEPTED_TYPES = "image/png,image/jpeg,image/gif,image/webp,image/svg+xml";
 const REMOVE_ICON_SIZE = 16;
 const EMPTY_ICON_SIZE = 24;
 

@@ -1,5 +1,6 @@
 import { ArrowBack } from '@mui/icons-material';
 import { isJavaBackend } from '@/common/config/app.config';
+import { BackendHttpError } from '@/apis/backend-request';
 import { Box, Stack, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -35,6 +36,8 @@ import { ReturnExchangeStepReturnPart } from '../parts/returns-exchanges-step-re
 import { ReturnExchangeStepperPart } from '../parts/returns-exchanges-stepper.part';
 import { mapWarehouseOptionToPickupAddress, useReturnExchangeWarehouseOptions } from '../use-return-exchange-warehouse-options.hook';
 import { buildStateFromOrderReturnDetail } from './returns-exchanges-edit.helpers';
+import { useAdminOrderReturnQuote } from '../use-admin-order-return-quote.hook';
+import type { IAdminOrderReturnQuoteRequest } from '../../../../apis/order/order.interface';
 import {
   DEFAULT_ITEM_DIMENSION,
   INITIAL_PICKUP_ADDRESS,
@@ -60,6 +63,7 @@ const ReturnExchangeEditPage = () => {
 
   const [step, setStep] = useState<ReturnExchangeFlowStep>(3);
   const [orderSummary, setOrderSummary] = useState<ReturnExchangeOrderSummary | null>(null);
+  const [originalOrderId, setOriginalOrderId] = useState('');
   const [loadingPage, setLoadingPage] = useState(false);
   const [returnCodeLabel, setReturnCodeLabel] = useState('');
   const [selectedReturnQtyByLineId, setSelectedReturnQtyByLineId] = useState<Record<string, number>>({});
@@ -178,6 +182,7 @@ const ReturnExchangeEditPage = () => {
         setReturnEditFlowStatus(detail.status as OrderReturnStatus);
         setReturnCodeLabel(detail.returnCode ?? '');
         setOrderSummary(hydrated.orderSummary);
+        setOriginalOrderId(orderDetail.id);
         setSelectedReturnQtyByLineId(hydrated.selectedReturnQtyByLineId);
         setExchangeItems(hydrated.exchangeItems);
         setReturnReason(hydrated.returnReason);
@@ -257,6 +262,18 @@ const ReturnExchangeEditPage = () => {
   const priceDiff = useMemo(() => calculatePriceDiff(returnItems, exchangeItems), [exchangeItems, returnItems]);
   const priceDiffLabel = `${priceDiff >= 0 ? '' : '-'}${formatCurrency(Math.abs(priceDiff))}₫`;
   const headerOrderCode = orderSummary?.orderCode?.trim() ?? '';
+  const quoteRequest = useMemo<IAdminOrderReturnQuoteRequest | null>(() => {
+    if (!isJavaBackend() || loadingPage || !orderSummary || step !== 3 || !returnId || !originalOrderId || !returnReason || !returnItems.length) return null;
+    return {
+      returnId, orderId: originalOrderId, reason: returnReason,
+      type: requestType || (exchangeItems.length ? OrderReturnType.EXCHANGE : OrderReturnType.REFUND),
+      returnItems: returnItems.map(line => ({ orderItemId: line.lineId, quantity: line.quantity })),
+      exchangeItems: exchangeItems.map(line => ({ variationId: line.variantId, quantity: line.quantity })),
+      pickupAddress, shippingAddress, shippingMethod, shippingCarrier, carrierServiceId,
+    };
+  }, [loadingPage, orderSummary, step, returnId, originalOrderId, returnReason, requestType, returnItems, exchangeItems,
+    pickupAddress, shippingAddress, shippingMethod, shippingCarrier, carrierServiceId]);
+  const { quote, isLoading: quoteLoading, hasError: quoteError, refresh: refreshQuote } = useAdminOrderReturnQuote(quoteRequest);
   const hasExchangeItems = exchangeItems.length > 0;
   const requestTypeOptions = useMemo(() => getRequestTypeOptions(hasExchangeItems).filter(option => !isJavaBackend() || option.value === OrderReturnType.REFUND || option.value === OrderReturnType.EXCHANGE), [hasExchangeItems]);
 
@@ -524,7 +541,13 @@ const ReturnExchangeEditPage = () => {
 
     try {
       setSubmitUpdating(true);
+      if (isJavaBackend() && (!quote?.quoteReference || quoteLoading || quoteError)) {
+        setStepError('Vui lòng chờ báo giá từ server hoặc lấy lại báo giá trước khi cập nhật.');
+        refreshQuote();
+        return;
+      }
       await updateOrderReturn(returnId, {
+        ...(isJavaBackend() ? { pricingQuote: quote?.quoteReference } : {}),
         type: requestType,
         reason: returnReason,
         returnItems: returnItems.map((item) => ({
@@ -572,8 +595,11 @@ const ReturnExchangeEditPage = () => {
     } catch (error) {
       showSnackbar({
         type: SnackbarType.ERROR,
-        message: (error as { message?: string })?.message || 'Không thể cập nhật yêu cầu đổi trả.',
+        message: error instanceof BackendHttpError && error.code === 'ORDER_RETURN_QUOTE_STALE'
+          ? 'Giá đã thay đổi. Báo giá đang được lấy lại; vui lòng kiểm tra và xác nhận cập nhật lần nữa.'
+          : error instanceof Error ? error.message : 'Không thể cập nhật yêu cầu đổi trả.',
       });
+      if (error instanceof BackendHttpError && error.code === 'ORDER_RETURN_QUOTE_STALE') refreshQuote();
     } finally {
       setSubmitUpdating(false);
     }
@@ -596,7 +622,10 @@ const ReturnExchangeEditPage = () => {
     closeEditPage();
   };
 
-  const diffPrefix = priceDiff === 0 ? '' : `Chênh lệch ${priceDiffLabel} - `;
+  const difference = isJavaBackend()
+    ? quote ? quote.product.exchangeMerchandiseTotalMinor - quote.product.returnedMerchandiseSettlementMinor : null
+    : priceDiff;
+  const diffPrefix = difference == null || difference === 0 ? '' : `Chênh lệch ${isJavaBackend() ? formatCurrency(difference) + '₫' : priceDiffLabel} - `;
   const footerPrimaryLabel = step === 1 ? 'Tiếp tục' : step === 2 ? `${diffPrefix}Tiếp tục` : `${diffPrefix}Cập nhật yêu cầu`;
 
   const titleSuffix = [returnCodeLabel, headerOrderCode].filter(Boolean).join(' — ') || headerOrderCode || returnCodeLabel;
@@ -622,9 +651,14 @@ const ReturnExchangeEditPage = () => {
           <Box sx={sxStepScrollRegion}>
             {loadingPage ? <Typography sx={sxLoadingHint}>Đang tải dữ liệu yêu cầu đổi trả...</Typography> : null}
             {isJavaBackend() && step === 3 && orderSummary ? (
-              <Typography sx={sxLoadingHint}>
-                API hiện chưa hỗ trợ báo giá lại riêng cho phiếu đang sửa. Các khoản chưa xác nhận hiển thị —; sau khi lưu, kiểm tra số tiền từ server trong chi tiết phiếu trước khi duyệt.
-              </Typography>
+              <Stack gap={1}>
+                <Typography sx={sxLoadingHint}>
+                  Số tiền lấy từ báo giá server cho phiếu đang sửa. Nếu giá thay đổi, hãy xem lại báo giá mới trước khi cập nhật.
+                </Typography>
+                <CustomButton variant="outline" onClick={refreshQuote} disabled={quoteLoading}>
+                  Lấy lại báo giá
+                </CustomButton>
+              </Stack>
             ) : null}
 
             {!loadingPage && !orderSummary ? <PageStateComponent variant="empty" title="Không có dữ liệu" description="Vui lòng kiểm tra lại yêu cầu hoặc thử lại sau." /> : null}
@@ -647,6 +681,9 @@ const ReturnExchangeEditPage = () => {
 
             {step === 3 && orderSummary ? (
               <ReturnExchangeStepConfirmPart
+                quote={quote}
+                quoteLoading={quoteLoading}
+                quoteError={quoteError}
                 returnItems={returnItems}
                 exchangeItems={exchangeItems}
                 returnReasonOptions={RETURN_REASON_OPTIONS}
@@ -713,7 +750,7 @@ const ReturnExchangeEditPage = () => {
                 variant="primary"
                 sx={{ ...sxFooterBtn, bgcolor: '#0F172A' }}
                 onClick={() => void goNext()}
-                disabled={loadingPage || !orderSummary || submitUpdating || (step === 3 && (evidenceImageUrls.length === 0 || returnShippingFeeLoading))}
+                disabled={loadingPage || !orderSummary || submitUpdating || (step === 3 && (evidenceImageUrls.length === 0 || returnShippingFeeLoading || (isJavaBackend() && (quoteLoading || quoteError || !quote?.quoteReference))))}
                 {...orderReturnsButtonPermission(step === 3 ? 'update' : 'continue', footerPrimaryLabel, 'api_order_return_update')}
               >
                 {footerPrimaryLabel}

@@ -37,3 +37,9 @@ test('missing phone lookup allows guest entry; authorization errors still propag
   mocks.request.mockRejectedValueOnce(new BackendHttpError('FORBIDDEN', 'Không có quyền', 403));
   await expect(javaOrderCustomersByPhone('0796406514')).rejects.toMatchObject({ status: 403 });
 });
+
+test('customer lookup uses orders permission instead of requiring promotion permission', async () => {
+  mocks.request.mockResolvedValueOnce({ customerId: 2, phone: '0796406514', fullName: 'Khách' });
+  expect(await javaOrderCustomersByPhone('0796406514')).toEqual([{ id: '2', phone: '0796406514', firstName: 'Khách' }]);
+  expect(mocks.request).toHaveBeenCalledWith('admin/orders/customer-audience/by-phone?phone=0796406514');
+});

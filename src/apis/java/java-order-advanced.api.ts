@@ -8,7 +8,7 @@ const JAVA_ORDERS = 'admin/orders';
 type WireOrder = Parameters<typeof javaOrderView>[0];
 export async function javaOrderCustomersByPhone(phone: string): Promise<IOrderCustomerByPhoneItem[]> {
   try {
-    const customer = await backendRequest<{ customerId: number | string; phone: string; fullName?: string }>('admin/promotions/customer-audience/by-phone?phone=' + encodeURIComponent(phone));
+    const customer = await backendRequest<{ customerId: number | string; phone: string; fullName?: string }>(JAVA_ORDERS + '/customer-audience/by-phone?phone=' + encodeURIComponent(phone));
     return [{ id: String(customer.customerId), phone: customer.phone, firstName: customer.fullName }];
   } catch (error) {
     if (error instanceof BackendHttpError && error.status === 404) return [];

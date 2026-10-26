@@ -976,7 +976,7 @@ export interface IOrderReturnQuoteReference {
 export type IAdminOrderReturnQuoteRequest = Pick<
   ICreateOrderReturnRequest,
   'orderId' | 'reason' | 'returnItems' | 'exchangeItems' | 'pickupAddress' | 'shippingAddress' | 'shippingMethod' | 'shippingCarrier' | 'carrierServiceId'
-> & { type?: OrderReturnType };
+> & { type?: OrderReturnType; returnId?: string };
 
 export type IAdminOrderReturnCommitRequest = Omit<
   ICreateOrderReturnRequest,
@@ -1167,6 +1167,7 @@ export interface IOrderReturnDetailResponse extends IOrderReturnListItem {
 }
 
 export interface IUpdateOrderReturnRequest {
+  pricingQuote?: IOrderReturnQuoteReference;
   type?: OrderReturnType;
   reason?: OrderReturnReason;
   note?: string;
