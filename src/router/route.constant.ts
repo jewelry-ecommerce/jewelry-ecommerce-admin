@@ -48,6 +48,7 @@ const LabelFlowDetailPage = lazy(() => import("@/trading-ui/pages/content-displa
 const LabelFlowEditPage = lazy(() => import("@/trading-ui/pages/content-display/label/label-display/label-display-update/label-display-update.page"));
 
 const JavaInventoryPage = lazy(() => import("@/pages/modules/java-inventory.page"));
+const JavaInventoryMovementsPage = lazy(() => import("@/pages/modules/java-inventory-movements.page"));
 const SourceCmsListPage=lazy(()=>import("@/trading-ui/pages/content-display/cms/cms-page-list/cms-page-list.page"));
 const SourceCmsCreatePage=lazy(()=>import("@/trading-ui/pages/content-display/cms/cms-page-create/cms-page-create.page"));
 const SourceCmsDetailPage=lazy(()=>import("@/trading-ui/pages/content-display/cms/cms-page-detail/cms-page-detail.page"));
@@ -130,7 +131,7 @@ export const ROUTE: Record<RoutePathKey, AppRoute> = {
   INVENTORY_STOCK_LIST: dashboardRoute(ROUTE_PATH.INVENTORY_STOCK_LIST, isJavaBackend() ? JavaInventoryPage : ModuleListPage),
   INVENTORY_ADJUSTMENT_LIST: dashboardRoute(ROUTE_PATH.INVENTORY_ADJUSTMENT_LIST, isJavaBackend() ? JavaInventoryPage : ModuleListPage),
   INVENTORY_RECEIPT_LIST: placeholderRoute(ROUTE_PATH.INVENTORY_RECEIPT_LIST),
-  INVENTORY_MOVEMENT_LIST: placeholderRoute(ROUTE_PATH.INVENTORY_MOVEMENT_LIST),
+  INVENTORY_MOVEMENT_LIST: dashboardRoute(ROUTE_PATH.INVENTORY_MOVEMENT_LIST, isJavaBackend() ? JavaInventoryMovementsPage : ModuleListPage),
 
   // Promotions
   PROMOTION_LIST: dashboardRoute(ROUTE_PATH.PROMOTION_LIST,SourcePromotionList),

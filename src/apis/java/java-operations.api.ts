@@ -1,7 +1,10 @@
 import { backendRequest } from "@/apis/backend-request";
 export const JAVA_OPERATIONS = {
   orders: "admin/orders", stock: "admin/inventory/stock-levels", adjustments: "admin/inventory/adjustments",
+  movements: "admin/inventory/movements",
   pageSize: 20, adjustmentReasons: ["RECEIPT", "DAMAGE", "CORRECTION"],
+  reasonLabels: { RECEIPT: "Nhập hàng", DAMAGE: "Hàng hỏng", CORRECTION: "Điều chỉnh" },
+  referenceMaxLength: 100, noteMaxLength: 500,
   transitions: { PENDING: ["CONFIRMED", "CANCELLED"], CONFIRMED: ["SHIPPING", "CANCELLED"],
     SHIPPING: ["DELIVERED", "CANCELLED"], DELIVERED: [], CANCELLED: [], RETURNED: [] } as Record<string, string[]>,
 } as const;
@@ -30,7 +33,13 @@ export function javaChangeOrder(code: string, status: string, note: string, trac
 export function javaStockLevels(search: string): Promise<JavaStock[]> {
   return backendRequest(JAVA_OPERATIONS.stock + "?search=" + encodeURIComponent(search));
 }
-export function javaAdjustStock(skuId: number, quantityDelta: number, reason: string): Promise<JavaStock> {
+export interface JavaStockAdjustmentOptions { reference?: string; note?: string; idempotencyKey: string }
+export function javaAdjustStock(skuId: number, quantityDelta: number, reason: string, options?: JavaStockAdjustmentOptions): Promise<JavaStock> {
   if (!Number.isSafeInteger(quantityDelta) || quantityDelta === 0) throw new Error("Số lượng điều chỉnh phải là số nguyên khác 0.");
-  return backendRequest(JAVA_OPERATIONS.adjustments, "POST", { skuId, quantityDelta, reason });
+  if ((reason === "RECEIPT" && quantityDelta < 0) || (reason === "DAMAGE" && quantityDelta > 0)) {
+    throw new Error("Nhập hàng phải tăng tồn; hàng hỏng phải giảm tồn.");
+  }
+  return backendRequest(JAVA_OPERATIONS.adjustments, "POST", { skuId, quantityDelta, reason,
+    reference: options?.reference, note: options?.note }, true,
+    options ? { "Idempotency-Key": options.idempotencyKey } : {});
 }

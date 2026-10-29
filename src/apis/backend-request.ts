@@ -9,18 +9,18 @@ export class BackendHttpError extends Error {
     super(message);this.name='BackendHttpError';
   }
 }
-export async function backendRequest<TResult>(path: string, method = "GET", body?: unknown, retryAuth = true): Promise<TResult> {
+export async function backendRequest<TResult>(path: string, method = "GET", body?: unknown, retryAuth = true, headers: Record<string, string> = {}): Promise<TResult> {
   const token = store.getState().auth.accessToken;
   const multipart = body instanceof FormData;
   const response = await fetch(getApiBaseUrl().replace(/\/$/, "") + "/" + path, {
     method,
     headers: { Accept: "application/json", ...(multipart ? {} : { "Content-Type": "application/json" }),
-      ...(token ? { Authorization: "Bearer " + token } : {}) },
+      ...(token ? { Authorization: "Bearer " + token } : {}), ...headers },
     body: body === undefined ? undefined : multipart ? body : JSON.stringify(body),
   });
   if (response.status === 401 && isJavaBackend() && retryAuth && token && !path.includes("auth/login") && !path.includes("auth/logout")) {
     const changed = store.getState().auth.accessToken !== token;
-    if (changed || await refreshJavaAdminSession()) return backendRequest<TResult>(path, method, body, false);
+    if (changed || await refreshJavaAdminSession()) return backendRequest<TResult>(path, method, body, false, headers);
   }
   if (!response.ok) {
     const error: BackendErrorPayload = await response.json();
