@@ -20,7 +20,7 @@ export function validateJavaDiscount(kind: JavaDiscountKind, body: JavaDiscountB
   for (const value of [body.maxDiscountAmount, body.minOrderValue, body.usageLimit])
     if (value != null && (!Number.isFinite(value) || value < 0)) throw new Error("Giới hạn và giá trị tối thiểu không được âm.");
   if (body.usageLimit != null && !Number.isInteger(body.usageLimit)) throw new Error("Giới hạn lượt dùng phải là số nguyên.");
-  if (kind === JavaDiscountKind.VOUCHER && body.discountType === JavaDiscountType.FLAT_PRICE) throw new Error("Voucher Java không hỗ trợ đồng giá.");
+  if (kind === JavaDiscountKind.VOUCHER && body.discountType === JavaDiscountType.FLAT_PRICE) throw new Error("Mã giảm giá không hỗ trợ đồng giá.");
   if (kind === JavaDiscountKind.PROMOTION && (!body.productIds?.length || body.productIds.some(id => !Number.isSafeInteger(id) || id < 1)))
     throw new Error("Chọn sản phẩm áp dụng hợp lệ.");
 }

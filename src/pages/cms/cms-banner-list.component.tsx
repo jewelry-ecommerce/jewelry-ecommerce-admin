@@ -28,7 +28,7 @@ function columns(props: Props): DataTableColumn<Placement>[] {
           <PermissionIconButton aria-label="Chỉnh sửa banner" onClick={() => props.edit(row.code)}>
             <Edit02 size={18} />
           </PermissionIconButton>
-          <PermissionIconButton disabled={isJavaBackend()} title={isJavaBackend() ? "Java chưa hỗ trợ xóa vị trí banner" : undefined} aria-label="Xóa vị trí banner" onClick={() => props.remove(row.id)}>
+          <PermissionIconButton disabled={isJavaBackend()} title={isJavaBackend() ? "Chưa thể xóa vị trí banner này" : undefined} aria-label="Xóa vị trí banner" onClick={() => props.remove(row.id)}>
             <Trash01 size={18} />
           </PermissionIconButton>
         </>

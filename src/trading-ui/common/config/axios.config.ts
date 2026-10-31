@@ -9,7 +9,7 @@ function pathWithQuery(path: string, method: string, options?: RequestOptions): 
     const mapped = resolveJavaV7Route(path, method);
     if (mapped) return appendQuery(mapped, options);
     recordJavaCapabilityGap(method,path);
-    throw new BackendHttpError('JAVA_CAPABILITY_NOT_SUPPORTED','Java chưa có API tương ứng cho thao tác: '+path,501);
+    throw new BackendHttpError('JAVA_CAPABILITY_NOT_SUPPORTED','Thao tác này hiện chưa khả dụng.',501);
   }
   return appendQuery(path, options);
 }

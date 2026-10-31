@@ -32,7 +32,7 @@ export default function JavaOrdersPage() {
         customNode: <CustomButton variant="outline" onClick={() => setRevision(value => value + 1)}>Tải lại</CustomButton> }]} /></DataTableFilterCard>
     <DataTableContentCard><DataTable rows={result.rows} columns={columns} getRowId={row => row.id}
       onRowClick={row => setSelected(row.code)} emptyTitle={result.loading ? "Đang tải..." : "Không có đơn hàng"}
-      emptyDescription={result.error ? "Tải lại sau khi kiểm tra kết nối Java." : "Đơn đặt từ client sẽ xuất hiện tại đây."} /></DataTableContentCard>
+      emptyDescription={result.error ? "Không thể tải đơn hàng. Vui lòng thử lại." : "Đơn đặt trên website sẽ xuất hiện tại đây."} /></DataTableContentCard>
     <DataTablePagination page={page} pageSize={JAVA_OPERATIONS.pageSize} totalItems={result.total}
       onPageChange={setPage} onPageSizeChange={() => undefined} />
     <JavaOrderDetail key={code ?? selected ?? "closed"} code={code ?? selected} onClose={() => { setSelected(null); if (code) navigate("/orders"); }}

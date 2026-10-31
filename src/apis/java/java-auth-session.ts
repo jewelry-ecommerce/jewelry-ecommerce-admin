@@ -18,7 +18,7 @@ async function refresh(): Promise<boolean> {
     return false;
   }
   const tokens = unwrapJava<RefreshedTokens>(await response.json());
-  if (!tokens.accessToken || !tokens.refreshToken) throw new Error("Java trả token phiên không hợp lệ.");
+  if (!tokens.accessToken || !tokens.refreshToken) throw new Error("Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.");
   store.dispatch(setAuthTokens(tokens));
   return true;
 }

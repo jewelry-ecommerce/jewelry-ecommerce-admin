@@ -379,7 +379,7 @@ const ModuleListPage = () => {
     <Stack sx={{ height: `calc(100vh - ${STYLE.HEIGHT_HEADER}px)`, boxSizing: "border-box", minHeight: 0 }}>
       <WrapperComponent label={definition.title} tabs={<DataTableStatusTabs tabs={tabs} activeValue={status} onChange={setStatus} />}>
         <Stack gap={2} sx={{ flex: 1, minHeight: 0, minWidth: 0 }}>
-          {getDataSourceMode() === "HTTP" && <Alert severity="info">Màn hình này chưa được nối API. Không hiển thị dữ liệu mẫu trong chế độ Java.</Alert>}
+          {getDataSourceMode() === "HTTP" && <Alert severity="info">Chức năng này hiện chưa khả dụng.</Alert>}
           <DataTableFilterCard>
             <DataTableToolbar
               embedded

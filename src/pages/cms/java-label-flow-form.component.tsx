@@ -26,7 +26,6 @@ export function JavaLabelFlowForm({ initial, onSaved, onClose }: { initial?: Bad
   const templates = useSWR(["java-flow-templates", state.badgeType], () => badgeApi.getListBadgeTemplate({ isPagination: false, status: BadgeStatus.ACTIVE, badgeType: state.badgeType }));
   return <Stack gap={2}>
     {(editor.error || templates.error) && <Alert severity="error">{editor.error || (templates.error instanceof Error ? templates.error.message : "Không thể tải mẫu nhãn.")}</Alert>}
-    {initial && <Alert severity="info">Phạm vi đã lưu được giữ nguyên. ID được hiển thị khi Java chưa trả tên đối tượng.</Alert>}
     <LabelDisplayFormView campaignName={state.name} onCampaignNameChange={value => update("name", value)}
       activeFrom={state.start} onActiveFromChange={value => update("start", value)} activeTo={state.end} onActiveToChange={value => update("end", value)}
       campaignStatus={state.status} onCampaignStatusChange={value => update("status", value)} selectedBadgeType={state.badgeType}

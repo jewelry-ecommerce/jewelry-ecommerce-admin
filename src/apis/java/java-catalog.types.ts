@@ -24,6 +24,6 @@ export function optionKey(attributeId: number | string, value: string): string {
 export function decodeOption(key: string): { attributeId: number; value: string } {
   const separator = key.indexOf('~');
   const attributeId = Number(key.slice(0, separator));
-  if (separator < 1 || !Number.isSafeInteger(attributeId) || attributeId < 1) throw new Error('Giá trị thuộc tính Java không hợp lệ.');
+  if (separator < 1 || !Number.isSafeInteger(attributeId) || attributeId < 1) throw new Error('Giá trị thuộc tính không hợp lệ.');
   return { attributeId, value: decodeURIComponent(key.slice(separator + 1)) };
 }

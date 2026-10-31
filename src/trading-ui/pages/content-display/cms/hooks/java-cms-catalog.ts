@@ -17,7 +17,7 @@ const SCHEMAS = { BANNER:BANNER_SCHEMA, PRODUCT_CAROUSEL:PRODUCT_CAROUSEL_SCHEMA
 export const JAVA_CMS_BLOCK_CATALOG:CmsPageBlockCatalogItem[] = Object.values(CmsDemoBlockType).map(code=>({code,name:CMS_BLOCK_LABELS[code],description:CMS_BLOCK_LABELS[code],schemaDefinition:SCHEMAS[code]}));
 export function newWizardBlock(entry:CmsPageBlockCatalogItem):CmsPageWizardBlock{
   const type=Object.values(CmsDemoBlockType).find(type=>type===entry.code);
-  if(!type)throw new Error('Loại block chưa được Java hỗ trợ.');
+  if(!type)throw new Error('Loại khối nội dung này chưa được hỗ trợ.');
   const block=newCmsBlock(type,0);
   return {clientId:block.id,blockTypeCode:type,title:entry.name,description:entry.description,isActive:true,config:block.config,schemaDefinition:entry.schemaDefinition};
 }

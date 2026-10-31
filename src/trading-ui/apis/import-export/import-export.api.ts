@@ -37,7 +37,7 @@ export const patchImportExportTopicConfig = async (topicConfigId: string, payloa
 
 export const postImportTopicConfigs = async (topicConfigId: string, file: File, options?: PostImportTopicConfigsOptions): Promise<PostImportTopicConfigsResponse> => {
   if (isJavaBackend()) {
-    if (topicConfigId !== JAVA_PRODUCT_IE.importTopic) throw new Error('Java chưa hỗ trợ loại import này.');
+    if (topicConfigId !== JAVA_PRODUCT_IE.importTopic) throw new Error('Loại dữ liệu này chưa hỗ trợ nhập từ file.');
     return javaImportProducts(file, options);
   }
   const formData = new FormData();
@@ -51,7 +51,7 @@ export const postImportTopicConfigs = async (topicConfigId: string, file: File, 
 
 export const postExportTopicConfigs = async (topicConfigId: string, payload: ExportTopicConfigsRequestDto): Promise<{ jobId: string; status: JobProcessStatus }> => {
   if (isJavaBackend()) {
-    if (topicConfigId !== JAVA_PRODUCT_IE.exportTopic) throw new Error('Java chưa hỗ trợ loại export này (bao gồm Fast FBO).');
+    if (topicConfigId !== JAVA_PRODUCT_IE.exportTopic) throw new Error('Loại dữ liệu này chưa hỗ trợ xuất file.');
     return javaExportProducts(payload.filters as ProductExportFiltersDto | undefined);
   }
   return await axiosRequest.post(`${IMPORT_EXPORT_BASE_PATH}/export/topic-config/${topicConfigId}`, payload);

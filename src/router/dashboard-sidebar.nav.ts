@@ -188,6 +188,17 @@ export const DASHBOARD_SIDEBAR_NAV: DashboardSidebarNavGroup[] = [
     ]
   },
   {
+    title: 'Kho vận',
+    icon: 'warehouse',
+    menuCode: 'inventory',
+    path: ROUTE_PATH.INVENTORY_STOCK_LIST,
+    items: [
+      { title: 'Tồn kho', path: ROUTE_PATH.INVENTORY_STOCK_LIST, tabCode: 'stock',
+        relatedPaths: [ROUTE_PATH.INVENTORY_OVERVIEW, ROUTE_PATH.INVENTORY_ADJUSTMENT_LIST] },
+      { title: 'Lịch sử điều chỉnh', path: ROUTE_PATH.INVENTORY_MOVEMENT_LIST, tabCode: 'movement' },
+    ],
+  },
+  {
     "title": "Yêu cầu khách hàng",
     "icon": "support_agent",
     "menuCode": "customer_request",

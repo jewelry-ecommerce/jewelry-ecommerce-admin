@@ -8,8 +8,8 @@ const ORDER_BASE=JAVA_OPERATIONS.orders;
 function resolveCode(id:string):string { return id; }
 type WireItem=Omit<IOrderItem,'id'|'variationId'|'productId'> & {id:number;skuId:number;productId?:number;name:string;imageUrl?:string};
 type WireOrder=Omit<IOrder,'id'|'items'|'status'|'paymentStatus'|'paymentMethod'|'source'|'shippingAddressSnapshot'|'statusHistory'> & {id:number;code:string;placedAt:string;items:WireItem[];status:string;paymentStatus:string;paymentMethod:string;shippingAddressSnapshot?:Partial<IShippingAddress>;timeline?:{status:string;note?:string;occurredAt:string}[]};
-function status(value:string):OrderStatus{const match=Object.values(OrderStatus).find(status=>status.toUpperCase()===value.toUpperCase());if(!match)throw new Error('Trạng thái đơn Java chưa được hỗ trợ: '+value);return match;}
-function payment(value:string):PaymentStatus{const match=Object.values(PaymentStatus).find(status=>status.toUpperCase()===value.toUpperCase());if(!match)throw new Error('Trạng thái thanh toán Java chưa được hỗ trợ: '+value);return match;}
+function status(value:string):OrderStatus{const match=Object.values(OrderStatus).find(status=>status.toUpperCase()===value.toUpperCase());if(!match)throw new Error('Trạng thái đơn hàng chưa được hỗ trợ: '+value);return match;}
+function payment(value:string):PaymentStatus{const match=Object.values(PaymentStatus).find(status=>status.toUpperCase()===value.toUpperCase());if(!match)throw new Error('Trạng thái thanh toán chưa được hỗ trợ: '+value);return match;}
 export function javaOrderView(order:WireOrder):IOrder {
   const method=Object.values(PaymentMethod).find(method=>method===order.paymentMethod);
   const shippingMethod=Object.values(ShippingMethod).find(value=>value.replaceAll('_','').toUpperCase()===order.shippingMethod?.replaceAll('_','').toUpperCase());

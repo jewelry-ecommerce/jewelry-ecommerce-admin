@@ -19,7 +19,7 @@ export default function JavaLabelFlowsPage() {
   const close = () => { setSelected(null); setCreating(false); };
   return <WrapperComponent label="Cấu hình nhãn dán"><Stack gap={2}>
     {result.error && <Alert severity="error">{result.error instanceof Error ? result.error.message : "Không thể tải cấu hình."}</Alert>}
-    <DataTableFilterCard><DataTableToolbar searchValue="" onSearchChange={() => undefined} embedded searchPlaceholder="Java chưa hỗ trợ tìm kiếm cấu hình"
+    <DataTableFilterCard><DataTableToolbar searchValue="" onSearchChange={() => undefined} embedded searchPlaceholder="Tìm kiếm hiện chưa khả dụng"
       actions={[{ key: "create", label: "Tạo cấu hình", variant: "primary", onClick: () => setCreating(true) }]} /></DataTableFilterCard>
     <DataTableContentCard><DataTable rows={result.data?.list ?? []} columns={columns} getRowId={row => row.id} onRowClick={setSelected}
       emptyTitle={result.isLoading ? "Đang tải..." : "Chưa có cấu hình nhãn"} emptyDescription="Tạo mẫu nhãn trước, sau đó chọn phạm vi áp dụng tại đây." /></DataTableContentCard>

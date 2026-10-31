@@ -92,4 +92,4 @@ export async function javaSaveAttribute(input: AttributeRequestDto, id?: string)
     { name: input.name, code: input.code, type: input.isVariantAxis === false ? 'TEXT' : 'SELECT',
       displayType: input.displayType, status: input.status, values }));
 }
-export function unsupportedJavaAction(): never { throw new Error('Backend Java chưa có API cho thao tác này. Không thay đổi dữ liệu.'); }
+export function unsupportedJavaAction(): never { throw new Error('Thao tác này hiện chưa khả dụng. Dữ liệu chưa được thay đổi.'); }

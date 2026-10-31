@@ -1,7 +1,6 @@
 import { Box, Stack } from "@mui/material";
 import { type ReactNode } from "react";
 
-import { JavaCapabilityAlert } from "@/components/feedback/java-capability-alert.component";
 import { DashboardHeader } from "@/components/header/dashboard-header.component";
 import { DashboardSidebar } from "@/components/sidebar/dashboard-sidebar.component";
 import { useAppDispatch, useAppSelector } from "@/redux/store.redux";
@@ -51,7 +50,6 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             borderTopRightRadius: `${STYLE.BORDER_RADIUS_ELEMENT_MIDDLE}px`,
           }}
         >
-          <JavaCapabilityAlert />
           {children}
         </Stack>
       </Box>

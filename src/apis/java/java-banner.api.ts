@@ -34,7 +34,7 @@ export async function javaCreatePlacement(data: CreatePlacementDto): Promise<Pla
 }
 export async function javaUpdatePlacement(id: string, data: UpdatePlacementDto): Promise<Placement> {
   const current = await placementById(id);
-  if (data.code && data.code !== current.code) throw new Error('Java không hỗ trợ đổi mã vị trí banner.');
+  if (data.code && data.code !== current.code) throw new Error('Không thể thay đổi mã vị trí banner sau khi tạo.');
   return placementView(await backendRequest<WirePlacement>(JAVA_BANNER_PATHS.placements + '/' + id, 'PATCH', data));
 }
 function layoutView(row: WireLayout, placement: Placement): PlacementLayout {

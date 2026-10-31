@@ -128,7 +128,7 @@ export const ProductSpuImportDialog = ({ open, onClose, submitting = false, onDo
         {submitting && <LinearProgress sx={{ borderRadius: 1 }} />}
         <ProductSpuImportStatsCard
           label="File mẫu và hướng dẫn"
-          description={isJavaBackend() ? 'Import file CSV theo mẫu Java.' : 'Import file theo mẫu, định dạng .xlsx / .csv.'}
+          description={isJavaBackend() ? 'Nhập sản phẩm bằng file CSV theo mẫu.' : 'Import file theo mẫu, định dạng .xlsx / .csv.'}
           onDownloadTemplate={onDownloadTemplate}
           icon={<File05 size={20} color="#155DFC" />}
           button

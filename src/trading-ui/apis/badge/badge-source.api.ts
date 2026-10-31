@@ -39,7 +39,7 @@ function positions(list:BadgeCampaign[]):BadgeFlowPositionCounts{
 async function getListBadgeFlow(query:FlowQuery={}){
   const result=await javaBadgeFlows({page:query.page,take:query.take,status:query.status,search:query.search});
   const list=await Promise.all(result.list.map(campaign));
-  if(query.displayStatus)throw new Error('Java chưa hỗ trợ lọc trạng thái hiển thị. Bỏ bộ lọc để tải danh sách.');
+  if(query.displayStatus)throw new Error('Chưa hỗ trợ lọc trạng thái hiển thị. Bỏ bộ lọc để tải danh sách.');
   const complete=await allCampaigns();
   return {...result,list:query.isPagination===false?complete:list,positionCounts:positions(complete),pagination:{...result.pagination,total:result.total}};
 }

@@ -13,7 +13,7 @@ export async function javaCmsPages(): Promise<CmsDemoPage[]> {
   return (await backendRequest<JavaCmsPage[]>('admin/cms/pages')).map(view);
 }
 export async function javaSaveCmsPage(page: CmsDemoPage): Promise<CmsDemoPage> {
-  if (page.status === 'ARCHIVED') throw new Error('Java chỉ hỗ trợ Nháp / Xuất bản. Dùng tắt hiển thị để ẩn trang.');
+  if (page.status === 'ARCHIVED') throw new Error('Vui lòng chọn Nháp hoặc Xuất bản. Tắt hiển thị nếu muốn ẩn trang.');
   const existing = /^[1-9]\d*$/.test(page.id);
   const body = { name: page.name, slug: page.slug, locale: page.locale, status: CmsDemoStatus.DRAFT,
     isActive: page.isActive, seo: page.seo, targetDevice:page.targetDevice,

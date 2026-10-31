@@ -27,7 +27,7 @@ function jobView(row: WireJob): JobProcess {
     importTotalRows: row.totalRows, importSuccessRows: row.successRows, importFailedRows: row.failedRows };
 }
 export async function javaImportProducts(file: File, options?: PostImportTopicConfigsOptions) {
-  if (!file.name.toLowerCase().endsWith('.csv')) throw new Error('Java hiện hỗ trợ file CSV. Tải mẫu CSV để nhập sản phẩm.');
+  if (!file.name.toLowerCase().endsWith('.csv')) throw new Error('Vui lòng dùng file CSV theo mẫu để nhập sản phẩm.');
   const body = new FormData(); body.append('file', file);
   if (options?.referenceType) body.append('referenceType', options.referenceType);
   if (options?.referenceId) body.append('referenceId', options.referenceId);
@@ -36,7 +36,7 @@ export async function javaImportProducts(file: File, options?: PostImportTopicCo
 export async function javaExportProducts(filters: ProductExportFiltersDto = {}) {
   const { productIds, orderBy, ...query } = filters;
   const sortField: ProductQuery['orderBy'] = orderBy === 'createdAt' || orderBy === 'updatedAt' ? orderBy : undefined;
-  if (orderBy && !sortField) throw new Error('Java chưa hỗ trợ export theo thứ tự: ' + orderBy);
+  if (orderBy && !sortField) throw new Error('Chưa hỗ trợ xuất file theo thứ tự: ' + orderBy);
   const products = await javaProductList({ ...query, orderBy: sortField, productIds: productIds?.join(','), isPagination: filters.isPagination === true });
   if (!products.list.length) throw new Error('Không có sản phẩm phù hợp để export.');
   const body = { productIds: products.list.map(product => Number(product.id)) };
@@ -44,7 +44,7 @@ export async function javaExportProducts(filters: ProductExportFiltersDto = {}) 
 }
 export async function javaProductJobs(query: Partial<QueryJobDto>) {
   if (query.topicConfigId && ![JAVA_PRODUCT_IE.importTopic, JAVA_PRODUCT_IE.exportTopic].some(code => code === query.topicConfigId))
-    throw new Error('Java chưa hỗ trợ tác vụ của module này.');
+    throw new Error('Chức năng này hiện chưa hỗ trợ thao tác với file.');
   const params = new URLSearchParams({ page: String(query.page ?? 1), take: String(query.take ?? 20) });
   for (const key of ['referenceType', 'referenceId'] as const) if (query[key]) params.set(key, query[key]);
   if (query.status) params.set('status', query.status);

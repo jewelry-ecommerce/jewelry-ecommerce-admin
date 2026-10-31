@@ -117,7 +117,7 @@ export async function javaSaveProduct(input: ProductCreateRequestDto, id?: strin
   if (!Number.isSafeInteger(Number(input.categoryUuid)) || Number(input.categoryUuid) < 1)
     throw new Error('Chọn danh mục hợp lệ trước khi lưu sản phẩm.');
   const current = id ? await javaRawProduct(id) : undefined;
-  if(current && input.spuCode.trim() !== current.code) throw new Error('Java không cho đổi mã sản phẩm. Dữ liệu chưa được thay đổi.');
+  if(current && input.spuCode.trim() !== current.code) throw new Error('Không thể thay đổi mã sản phẩm sau khi tạo.');
   const body = { ...productBody(input, current), ...(id ? {} : { variants: input.skus.map(sku => skuBody(sku, input)) }) };
   const saved = await backendRequest<JavaProduct>(path + (id ? '/' + id : ''), id ? 'PUT' : 'POST', body);
   try { await saveSkus(saved, input, Boolean(id)); }
@@ -130,7 +130,7 @@ export async function javaProductStatus(id: string, status: ProductSpuStatus) {
     && status===ProductSpuStatus.UNPUBLISHED;
   const action = restoring?'restore':status === ProductSpuStatus.PUBLISHED ? 'publish' : status === ProductSpuStatus.ARCHIVED ? 'archive'
     : status === ProductSpuStatus.DISCONTINUED?'discontinue':status === ProductSpuStatus.UNPUBLISHED ? 'unpublish' : undefined;
-  if (!action) throw new Error('Java chưa hỗ trợ trạng thái này.');
+  if (!action) throw new Error('Trạng thái sản phẩm này chưa được hỗ trợ.');
   return javaProductView(await backendRequest<JavaProduct>(path + '/' + id + '/' + action, 'PATCH'));
 }
 export async function javaGetProductForm(id: string) {

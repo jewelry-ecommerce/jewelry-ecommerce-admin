@@ -24,5 +24,5 @@ export function useCmsPageWizard(params:UseCmsPageWizardParams){
     setBlockConfig:(id:string,config:Record<string,unknown>)=>changeConfig(id,config),mergeBlockConfig:(id:string,config:Record<string,unknown>)=>changeConfig(id,config,true),
     toggleBlock:(id:string,isActive:boolean)=>draft.setBlocks(blocks=>blocks.map(block=>block.clientId===id?{...block,isActive}:block)),
     removeBlock:(id:string)=>draft.setBlocks(blocks=>blocks.filter(block=>block.clientId!==id)),handleDragEnd,
-    createBannerPlacementDraft:createCmsBannerPlacement,createBlockType:async(_dto:unknown)=>{throw new Error('Java dùng các loại block có sẵn, không hỗ trợ tạo loại block mới.');}};
+    createBannerPlacementDraft:createCmsBannerPlacement,createBlockType:async(_dto:unknown)=>{throw new Error('Vui lòng chọn loại khối nội dung có sẵn.');}};
 }
