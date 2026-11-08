@@ -6,11 +6,14 @@ import { isJavaBackend } from '@/common/config/app.config';
 import { JAVA_ORDER_ACTIONS } from '@/apis/java/java-ui-policy';
 import { changeJavaSourceOrder } from '@/trading-ui/apis/order/order-java.adapter';
 import type { IOrder } from '@/trading-ui/apis/order/order.interface';
+import { PaymentMethod, PaymentStatus } from '@/trading-ui/apis/order/order.enum';
 
 export function JavaOrderActions({ order, onSuccess }: { order: IOrder; onSuccess: () => Promise<boolean> }) {
   const [open, setOpen] = useState(false), [loading, setLoading] = useState(false);
   const { showSnackbar } = useSnackbar();
   const action = order.status in JAVA_ORDER_ACTIONS ? JAVA_ORDER_ACTIONS[order.status as keyof typeof JAVA_ORDER_ACTIONS] : undefined;
+  const waitingForMomo = order.paymentMethod === PaymentMethod.MOMO_WALLET && order.paymentStatus !== PaymentStatus.PAID
+    && (action?.target === 'SHIPPING' || action?.target === 'DELIVERED');
   if (!isJavaBackend() || !action) return null;
   async function confirm() {
     if (!action || loading) return;
@@ -25,7 +28,7 @@ export function JavaOrderActions({ order, onSuccess }: { order: IOrder; onSucces
     } finally { setLoading(false); }
   }
   return <>
-    <CustomButton fullWidth={false} variant="primary" disabled={loading} onClick={() => setOpen(true)}>{action.label}</CustomButton>
+    <CustomButton fullWidth={false} variant="primary" disabled={loading || waitingForMomo} onClick={() => setOpen(true)}>{waitingForMomo ? 'Chờ thanh toán MoMo' : action.label}</CustomButton>
     <DialogConfirmComponent open={open} title={action.label} confirmVariant="primary" cancelLabel="Hủy" confirmLabel="Xác nhận"
       loading={loading} onCancel={() => { if (!loading) setOpen(false); }} onConfirm={() => void confirm()}>
       {'Xác nhận thao tác cho đơn ' + order.orderCode + '?'}

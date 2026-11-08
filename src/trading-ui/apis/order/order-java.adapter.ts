@@ -11,7 +11,7 @@ type WireOrder=Omit<IOrder,'id'|'items'|'status'|'paymentStatus'|'paymentMethod'
 function status(value:string):OrderStatus{const match=Object.values(OrderStatus).find(status=>status.toUpperCase()===value.toUpperCase());if(!match)throw new Error('Trạng thái đơn hàng chưa được hỗ trợ: '+value);return match;}
 function payment(value:string):PaymentStatus{const match=Object.values(PaymentStatus).find(status=>status.toUpperCase()===value.toUpperCase());if(!match)throw new Error('Trạng thái thanh toán chưa được hỗ trợ: '+value);return match;}
 export function javaOrderView(order:WireOrder):IOrder {
-  const method=Object.values(PaymentMethod).find(method=>method===order.paymentMethod);
+  const method=order.paymentMethod==='MOMO'?PaymentMethod.MOMO_WALLET:Object.values(PaymentMethod).find(method=>method===order.paymentMethod);
   const shippingMethod=Object.values(ShippingMethod).find(value=>value.replaceAll('_','').toUpperCase()===order.shippingMethod?.replaceAll('_','').toUpperCase());
   return {...order,id:String(order.id),orderCode:order.code,source:'source' in order && String(order.source).toUpperCase()==='ADMIN'?OrderSource.MANUAL:OrderSource.WEBSITE,status:status(order.status),paymentStatus:payment(order.paymentStatus),paymentMethod:method,
     shippingMethod,customerId:order.customerId==null?undefined:String(order.customerId),
