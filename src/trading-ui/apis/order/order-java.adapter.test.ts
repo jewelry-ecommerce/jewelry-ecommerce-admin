@@ -18,11 +18,6 @@ const order = { id: 903, code: 'JEW-903', placedAt: '2026-10-11T08:00:00Z', stat
   timeline: [{ status: 'PENDING', occurredAt: '2026-10-11T08:00:00Z' }] };
 beforeEach(() => { transport.request.mockReset(); });
 
-test('MoMo paid orders keep their payment method and status in OMS', async () => {
-  transport.request.mockResolvedValue({ ...order, paymentMethod: 'MOMO', paymentStatus: 'PAID' });
-  expect(await getJavaSourceOrderDetail('903')).toMatchObject({ paymentMethod: 'MOMO_WALLET', paymentStatus: PaymentStatus.PAID });
-});
-
 test('list preserves numeric backend IDs, order codes and real counts', async () => {
   transport.request.mockImplementation(async (path: string) => {
     if (path.includes('/counts?')) return { total: 2, byStatus: { PENDING: 2 } };

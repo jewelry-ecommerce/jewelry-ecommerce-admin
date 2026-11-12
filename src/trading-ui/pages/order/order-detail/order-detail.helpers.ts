@@ -333,8 +333,7 @@ export function getOrderActionVisibility(
     /** hủy đơn. */
     showCancelOrder: !isTerminal && ORDER_CANCEL_ALLOWED_STATUSES.includes(status),
     // chỉnh sửa đơn
-    showEditOrder: (!isJavaBackend() || paymentMethod === PaymentMethod.COD)
-      && (status === OrderStatus.PENDING || (isJavaBackend() && status === OrderStatus.CONFIRMED)),
+    showEditOrder: status === OrderStatus.PENDING || (isJavaBackend() && status === OrderStatus.CONFIRMED),
     // thu hồi đơn
     showRevokeConfirmation: !isJavaBackend() && status === OrderStatus.CONFIRMED,
     // in hóa đơn
@@ -342,7 +341,7 @@ export function getOrderActionVisibility(
     // in vận đơn
     showPrintSlip: !isJavaBackend() && !isTerminal,
     // xác nhận thanh toán — không dùng cho đơn Return (đi đơn qua showConfirmOrder)
-    showConfirmPayment: isJavaBackend() && paymentMethod === PaymentMethod.COD && paymentStatus === PaymentStatus.UNPAID && [OrderStatus.PENDING, OrderStatus.CONFIRMED, OrderStatus.SHIPPING].includes(status),
+    showConfirmPayment: isJavaBackend() && paymentStatus === PaymentStatus.UNPAID && [OrderStatus.PENDING, OrderStatus.CONFIRMED, OrderStatus.SHIPPING].includes(status),
     // thanh toán 1 phần COD
     showCodShortfall: !isTerminal && (paymentStatus === PaymentStatus.PARTIAL || paymentStatus === PaymentStatus.PARTIAL_PAID_COD),
     showModifyActions: status === OrderStatus.PENDING || status === OrderStatus.CONFIRMED,
