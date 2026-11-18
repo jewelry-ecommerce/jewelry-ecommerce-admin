@@ -236,6 +236,7 @@ export const PAYMENT_METHOD_LABELS: Record<string, string> = {
   [PaymentMethod.ATM_CARD]: 'Thẻ ATM nội địa',
   [PaymentMethod.VNPAY]: 'Ví VNPAY',
   MOMO: 'Ví MoMo',
+  PAYOS: 'PayOS',
   [PaymentMethod.CASH]: 'Tiền mặt',
   CARD_POS_PAYOO: 'Thẻ / Chạm',
 };
@@ -291,6 +292,8 @@ export const getPaymentMethodDisplay = (method?: PaymentMethod | string | null):
       return 'Ví VNPAY';
     case 'MOMO':
       return 'Ví MoMo';
+    case 'PAYOS':
+      return 'PayOS';
     case PaymentMethod.CASH:
     case 'CASH':
       return 'Tiền mặt';
