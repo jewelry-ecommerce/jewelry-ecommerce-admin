@@ -55,10 +55,17 @@ const ORDER_SOURCE_LABELS: Record<OrderSource, string> = {
   // [OrderSource.ADMIN]: 'Admin',
 };
 
-export const ORDER_SOURCE_OPTIONS: FieldOption[] = Object.values(OrderSource).map((source) => ({
-  value: source,
-  label: ORDER_SOURCE_LABELS[source],
-}));
+const HIDDEN_ORDER_SOURCES = new Set<OrderSource>([
+  OrderSource.STORE_POS,
+  OrderSource.STORE_SHIP_FROM_STORE,
+]);
+
+export const ORDER_SOURCE_OPTIONS: FieldOption[] = Object.values(OrderSource)
+  .filter((source) => !HIDDEN_ORDER_SOURCES.has(source))
+  .map((source) => ({
+    value: source,
+    label: ORDER_SOURCE_LABELS[source],
+  }));
 
 export const getOrderStatusPillSx = (status: OrderStatus) => {
   switch (status) {

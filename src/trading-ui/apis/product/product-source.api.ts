@@ -7,6 +7,7 @@ import type { AdminProductDetailDto } from './product.interface';
 import type { ProductMutationResponseDto,ProductCreateRequestDto,ProductPatchRequestDto,ProductPatchStatusRequestDto } from './product.interface';
 import { ProductSkuStatus } from './product.enum';
 import { javaSubmitProduct } from '@/apis/java/java-product-approval.api';
+import { assembleJavaAdminProductDetail } from './java-admin-product-detail.mapper';
 function mutation(product:Product):ProductMutationResponseDto{
   return {uuid:product.id,status:product.status,approval:product.approval??undefined,hasPendingApproval:product.hasPendingApproval??false};
 }
@@ -21,17 +22,27 @@ async function patchAdminProduct(id:string,body:ProductPatchRequestDto){
   const input:ProductCreateRequestDto={...current.values,...body,seasonUuid:body.seasonUuid===undefined?current.values.seasonUuid:body.seasonUuid??undefined,skus};
   return mutation(await javaApi.putAdminProduct(id,input));
 }
-async function getAdminProductDetail(id:string):Promise<AdminProductDetailDto>{
-  const product=await javaApi.getProductDetail(id);
-  const {productMixMatch,...detail}=product;
-  const matches=await Promise.all((productMixMatch??[]).map(async relatedId=>{
-    const related=await javaApi.getProductDetail(relatedId);
-    return {id:related.id,name:related.name,spuCode:related.spuCode};
+async function mixMatchItems(ids: readonly string[] | undefined) {
+  return Promise.all((ids ?? []).map(async (relatedId) => {
+    const related = await javaApi.getProductDetail(relatedId);
+    return { id: related.id, name: related.name, spuCode: related.spuCode };
   }));
-  return {...detail,productMixMatch:matches};
+}
+async function getAdminProductDetail(id: string): Promise<AdminProductDetailDto> {
+  const [product, form] = await Promise.all([javaApi.getProductDetail(id), javaApi.getProductForm(id)]);
+  return assembleJavaAdminProductDetail({
+    product,
+    form,
+    preview: (body) => javaApi.postSkuMatrixPreview(body),
+    mixMatch: await mixMatchItems(form.values.productMixMatch ?? product.productMixMatch),
+  });
 }
 async function deleteAdminProduct(id:string):Promise<void>{await backendRequest('admin/catalog/products/'+id,'DELETE');}
 export const productSourceApi={...referenceApi,deleteAdminProduct,getAdminProductList:javaApi.getAdminProductList,getAdminProductDetail,
-  getAdminVariationListByProduct:async(id:string)=>{const variations=(await javaApi.getProductDetail(id)).variations??[];return {list:variations,total:variations.length};},
+  getAdminVariationListByProduct:async(id:string)=>{
+    const detail=await getAdminProductDetail(id);
+    const list=detail.variations??[];
+    return {list,total:list.length};
+  },
   postAdminProduct,patchAdminProduct,patchAdminProductStatus,postSkuMatrixPreview:javaApi.postSkuMatrixPreview,
   postAdminProductSubmit:javaSubmitProduct};

@@ -204,7 +204,6 @@ export const getOrderSourceLabel = (source: OrderSource): string => {
     // [OrderSource.APP]: 'Ứng dụng',
     [OrderSource.TIKTOK]: 'TikTok Shop',
     [OrderSource.SHOPEE]: 'Shopee',
-    [OrderSource.STORE_POS]: 'POS',
   };
   return map[source] ?? source;
 };
