@@ -129,7 +129,8 @@ export const ORDER_SOURCE_FILTER_OPTIONS = [
   // { value: OrderSource.INSTAGRAM, label: 'Instagram' },
   { value: OrderSource.WEBSITE, label: 'Website' },
   // { value: OrderSource.APP, label: 'Ứng dụng' },
-  { value: OrderSource.STORE_POS, label: 'Store POS (Cửa hàng)' },
+  // Thesis jewelry: no POS channel in filters.
+  // { value: OrderSource.STORE_POS, label: 'Store POS (Cửa hàng)' },
   // { value: OrderSource.STORE_SHIP_FROM_STORE, label: 'Store Ship from Store' },
   { value: OrderSource.MANUAL, label: 'Manual (Tạo thủ công)' },
   // { value: OrderSource.AFFILIATE, label: 'Affiliate (Tiếp thị liên kết)' },

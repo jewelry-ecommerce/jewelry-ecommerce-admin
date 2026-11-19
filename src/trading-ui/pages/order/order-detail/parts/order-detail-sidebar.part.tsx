@@ -11,13 +11,10 @@ import {
   getOrderSourceLabel,
   getPaymentMethodDisplay,
   isExchangeReleasedOrder,
-  isPosOrder,
   ORDER_DETAIL_COLORS,
   resolveExchangeReleasedPaymentBreakdown,
   // parseOrderAmount,
 } from '../order-detail.helpers';
-import { OrderDetailCounterPaymentRows } from './order-detail-counter-payment-rows.part';
-import { OrderDetailPosInfo } from './order-detail-pos-info.part';
 import { OrderDetailColumn, OrderDetailRow } from './order-detail-row-column.part';
 import { OrderKind } from '../../../../apis/order/order.enum';
 
@@ -66,15 +63,10 @@ export function OrderDetailSidebar({ order, payLabel, subtotal, discount, ship, 
                   )}
                 </Stack>
               ) : null}
-              {isPosOrder(order) ? (
-                <OrderDetailPosInfo order={order} />
-              ) : (
-                <>
-                  <OrderDetailColumn label="Kênh" value={getOrderSourceLabel(order.source)} />
-                  <OrderDetailColumn label="Nguồn" value="—" />
-                  <OrderDetailColumn label="Nhân viên phụ trách" value="—" />
-                </>
-              )}
+              <OrderDetailColumn label="Kênh" value={getOrderSourceLabel(order.source)} />
+              <OrderDetailColumn label="Nguồn" value="—" />
+              <OrderDetailColumn label="Nhân viên phụ trách" value="—" />
+
             </Stack>
           </CardContent>
         </Card>
@@ -89,7 +81,6 @@ export function OrderDetailSidebar({ order, payLabel, subtotal, discount, ship, 
                 <Typography sx={{ ...TYPOGRAPHY_STYLES.base.regular, color: '#6B7280' }}>Trạng thái</Typography>
                 <Chip size="small" label={payLabel} sx={getPaymentStatusChipSx(order.paymentStatus)} />
               </Stack>
-              <OrderDetailCounterPaymentRows order={order} />
               <Divider />
               {/* <OrderDetailRow label="Đã thanh toán trước đó" value={`${formatCurrency(normalizedAmountReceived)} đ`} />
               <Divider /> */}

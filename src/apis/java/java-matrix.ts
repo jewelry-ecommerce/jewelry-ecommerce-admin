@@ -12,10 +12,15 @@ export async function javaMatrix(input: SkuMatrixPreviewRequestDto): Promise<Sku
   function nodes(depth: number, selected: string[]): SkuMatrixPreviewMatrixNode[] {
     const attribute = input.attributes[depth];
     if (!attribute) return [];
-    return attribute.values.map(value => {
+    return attribute.values.map((value) => {
       if (!values[value.valueUuid]) throw new Error('Giá trị thuộc tính đã thay đổi, chọn lại thuộc tính.');
-      const path = [...selected, value.valueUuid], children = nodes(depth + 1, path);
-      return { valueUuid: value.valueUuid, children, canonicalKey: children.length ? null : path.join('|') };
+      const path = [...selected, value.valueUuid];
+      const children = nodes(depth + 1, path);
+      // FE flatten expects Nest-style pairs `attributeId:valueUuid` (see valueUuidsFromCanonicalKey).
+      const canonicalKey = children.length
+        ? null
+        : path.map((valueUuid, index) => `${input.attributes[index].attributeId}:${valueUuid}`).join('|');
+      return { valueUuid: value.valueUuid, children, canonicalKey };
     });
   }
   return { attributeOrder: definitions.map(attribute => attribute.id), attributes, values, matrix: nodes(0, []) };

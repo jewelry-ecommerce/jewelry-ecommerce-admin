@@ -17,6 +17,18 @@ export default defineConfig(({ mode }) => {
           target: env.VITE_CMS_DEMO_CLIENT_URL || 'http://127.0.0.1:3100',
           changeOrigin: true,
         },
+        // Browser → localhost (no CORS). Proxy strips localhost Origin so Render cloud CORS accepts the hop.
+        '/api': {
+          target: env.VITE_DEV_PROXY_TARGET || 'https://jewelry-ecommerce-be-java.onrender.com',
+          changeOrigin: true,
+          secure: true,
+          configure: (proxy) => {
+            proxy.on('proxyReq', (proxyReq) => {
+              proxyReq.removeHeader('origin');
+              proxyReq.removeHeader('referer');
+            });
+          },
+        },
       },
     },
     preview: {
