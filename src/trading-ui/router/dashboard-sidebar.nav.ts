@@ -68,10 +68,15 @@ export const DASHBOARD_SIDEBAR_NAV: DashboardSidebarNavGroup[] = [
     menuCode: 'order',
     path: ROUTE_PATH.ORDER,
     items: [
+      { title: 'Tổng quan', path: ROUTE_PATH.HOME, tabCode: 'overview', menuCode: 'dashboard' },
       { title: 'Danh sách đơn hàng', path: ROUTE_PATH.ORDER, tabCode: 'list' },
       { title: 'Vận chuyển & Giao nhận', path: ROUTE_PATH.SHIPPING, tabCode: 'shipping' },
-      { title: 'Quản lý đổi/trả', path: ROUTE_PATH.EXCHANGE, tabCode: 'returns' },
-      { title: 'Yêu cầu hoàn tiền', path: ROUTE_PATH.REFUND_PROPOSAL, tabCode: 'refunds' },
+      {
+        title: 'Đổi trả & hoàn tiền',
+        path: ROUTE_PATH.EXCHANGE,
+        tabCode: 'returns',
+        relatedPaths: [ROUTE_PATH.REFUND_PROPOSAL, ROUTE_PATH.REFUND_PROPOSAL_DETAIL],
+      },
       {
         title: 'Đơn đặt trước',
         tabCode: 'pre_order',
@@ -96,7 +101,6 @@ export const DASHBOARD_SIDEBAR_NAV: DashboardSidebarNavGroup[] = [
           },
         ],
       },
-      { title: 'Hóa đơn & chứng từ', path: ROUTE_PATH.INVOICE, tabCode: 'invoice' },
     ],
   },
   {

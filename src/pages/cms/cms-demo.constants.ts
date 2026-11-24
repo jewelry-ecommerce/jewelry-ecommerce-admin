@@ -7,10 +7,10 @@ export const CMS_BLOCK_LABELS: Record<CmsDemoBlockType, string> = {
   PRODUCT_COLLECTION_SHOWCASE: "Bộ sưu tập nổi bật (showcase)",
   INFO_CARDS: "Thẻ thông tin",
   IMAGE_GALLERY: "Thư viện ảnh",
-  PRODUCT_EXPANDABLE_DESCRIPTION: "Nội dung mô tả",
+  PRODUCT_EXPANDABLE_DESCRIPTION: "Nội dung mô tả trang",
   CTA_BLOCK: "Khối CTA điều hướng",
   NEWSLETTER_SIGNUP: "Form đăng ký nhận tin",
-  TEXT_BLOCK: "Khối Văn Bản",
+  TEXT_BLOCK: "Khối Văn Bản (CKEditor)",
 };
 export const CMS_BANNER_PLACEMENTS: string[] = [];
 export const CMS_DEMO_SEED_IMAGE = "";

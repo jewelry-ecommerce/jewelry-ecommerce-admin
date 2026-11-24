@@ -5,26 +5,26 @@ import type { FormSelectOption } from "@/components/form/form-field.interface";
 import type { StatusTone } from "@/theme/design-tokens";
 
 export const DASHBOARD_RANGE_OPTIONS: FormSelectOption<DashboardRange>[] = [
-  { value: "LAST_7_DAYS", label: "Last 7 days" },
-  { value: "LAST_30_DAYS", label: "Last 30 days" },
-  { value: "LAST_12_MONTHS", label: "Last 12 months" },
+  { value: "LAST_7_DAYS", label: "7 ngày gần nhất" },
+  { value: "LAST_30_DAYS", label: "30 ngày gần nhất" },
+  { value: "LAST_12_MONTHS", label: "12 tháng gần nhất" },
 ];
 
 export const DEFAULT_DASHBOARD_RANGE: DashboardRange = "LAST_30_DAYS";
 
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
-  PENDING: "Pending",
-  CONFIRMED: "Confirmed",
-  PREPARING: "Preparing",
-  PACKED: "Packed",
-  SHIPPING: "Shipping",
-  DELIVERED: "Delivered",
-  CANCELLED: "Cancelled",
-  DELIVERY_FAILED: "Delivery failed",
-  RETURN_REQUESTED: "Return requested",
-  RETURNED: "Returned",
-  REFUND_PENDING: "Refund pending",
-  REFUNDED: "Refunded",
+  PENDING: "Chờ xử lý",
+  CONFIRMED: "Đã xác nhận",
+  PREPARING: "Đang chuẩn bị",
+  PACKED: "Đã đóng gói",
+  SHIPPING: "Đang giao",
+  DELIVERED: "Đã giao",
+  CANCELLED: "Đã hủy",
+  DELIVERY_FAILED: "Giao thất bại",
+  RETURN_REQUESTED: "Yêu cầu đổi trả",
+  RETURNED: "Đã trả hàng",
+  REFUND_PENDING: "Chờ hoàn tiền",
+  REFUNDED: "Đã hoàn tiền",
 };
 
 export const ORDER_STATUS_TONES: Record<OrderStatus, StatusTone> = {
@@ -43,12 +43,12 @@ export const ORDER_STATUS_TONES: Record<OrderStatus, StatusTone> = {
 };
 
 export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
-  UNPAID: "Unpaid",
-  DEPOSIT_PAID: "Deposit paid",
-  PAID: "Paid",
-  REFUND_PENDING: "Refund pending",
-  REFUNDED: "Refunded",
-  FAILED: "Failed",
+  UNPAID: "Chưa thanh toán",
+  DEPOSIT_PAID: "Đã đặt cọc",
+  PAID: "Đã thanh toán",
+  REFUND_PENDING: "Chờ hoàn tiền",
+  REFUNDED: "Đã hoàn tiền",
+  FAILED: "Thanh toán thất bại",
 };
 
 /** Renders a KPI according to the format the API declared, so no screen guesses the unit. */

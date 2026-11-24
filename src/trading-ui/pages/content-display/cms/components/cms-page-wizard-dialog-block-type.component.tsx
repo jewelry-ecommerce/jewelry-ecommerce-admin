@@ -125,7 +125,7 @@ export const CmsPageWizardDialogBlockType: React.FC<CmsPageWizardDialogBlockType
           render={({ field }) => (
             <Box>
               <TextInput label="Mã loại khối" requiredMark value={field.value} placeholder="BANNER" onChange={field.onChange} error={Boolean(errors.code)} errorMessage={errors.code?.message} />
-              <Typography sx={{ ...TYPOGRAPHY_STYLES.xs.regular, color: '#6B7280', mt: 0.5 }}>VD: BANNER, TOP_LINE_BANNER, PRODUCT_CAROUSEL (viết HOA, dùng dấu gạch dưới).</Typography>
+              <Typography sx={{ ...TYPOGRAPHY_STYLES.xs.regular, color: '#6B7280', mt: 0.5 }}>VD: BANNER, TEXT_BLOCK, PRODUCT_CAROUSEL (viết HOA, dùng dấu gạch dưới).</Typography>
             </Box>
           )}
         />
