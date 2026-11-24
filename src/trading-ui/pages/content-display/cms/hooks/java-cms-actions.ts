@@ -48,6 +48,10 @@ export function useJavaCmsActions({draft,handleSubmit,setActiveStep}:Params){
       if(nextStep===null)navigate(ROUTE_PATH.CMS_PAGE_LIST);else setActiveStep(nextStep);
     }catch(error){showSnackbar({type:SnackbarType.ERROR,message:error instanceof Error?error.message:'Không thể lưu trang.'});}
     finally{setLoading(false);}
+  },()=>{
+    // Form invalid (thường ở bước SEO) — không gọi API; báo rõ và kéo về bước thông tin trang.
+    setActiveStep(0);
+    showSnackbar({type:SnackbarType.ERROR,message:'Thiếu thông tin trang/SEO. Kiểm tra lại tên, đường dẫn, tiêu đề và mô tả SEO.'});
   });
   return {loading,blockValidationErrors,onContinueStep0:submit(1),onContinueStep2:submit(2),onSaveStep0:submit(null),onSaveStep2:submit(null),onSaveDraft:submit(null,CmsDemoStatus.DRAFT),onPublish:submit(null,CmsDemoStatus.PUBLISHED)};
 }

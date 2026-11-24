@@ -41,9 +41,11 @@ export const cmsPageFormSchema: yup.ObjectSchema<CmsPageFormValues> = yup
     isActive: yup.boolean().required(),
     seoTitle: yup.string().trim().required('Vui lòng nhập tiêu đề SEO'),
     seoDescription: yup.string().trim().required('Vui lòng nhập mô tả SEO'),
-    seoKeywords: yup.string().trim().required('Vui lòng nhập từ khóa SEO'),
+    // Keywords / ảnh SEO optional — trang seed Java thường chỉ có title + description;
+    // required sẽ làm Lưu/Tiếp tục ở bước khối im lặng (không gọi API).
+    seoKeywords: yup.string().trim().optional(),
     canonicalUrl: yup.string().trim().optional(),
-    seoImageUrl: yup.string().trim().required('Vui lòng chọn ảnh SEO'),
+    seoImageUrl: yup.string().trim().optional(),
   })
   .required();
 
