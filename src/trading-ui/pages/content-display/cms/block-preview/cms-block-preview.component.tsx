@@ -341,6 +341,41 @@ const NewsletterPreview = () => (
   </Box>
 );
 
+const CtaBlockPreview = () => (
+  <Box
+    sx={{
+      width: '100%',
+      bgcolor: '#FFFFFF',
+      border: '1px solid transparent',
+      borderRadius: '40px',
+      py: 6,
+      px: 3,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: 2,
+    }}
+  >
+    <Typography sx={{ ...TYPOGRAPHY_STYLES.xl.bold, textAlign: 'center' }}>Khám phá bộ sưu tập bạc mới</Typography>
+    <Typography sx={{ ...TYPOGRAPHY_STYLES.sm.regular, textAlign: 'center', color: '#4B5563', maxWidth: 520 }}>
+      Trang sức bạc và hợp kim tinh xảo — phong cách tối giản, dễ phối mỗi ngày.
+    </Typography>
+    <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', justifyContent: 'center' }}>
+      <Box sx={{ bgcolor: '#0A0A0A', color: '#fff', px: 3, py: 1.5, ...TYPOGRAPHY_STYLES.sm.bold }}>Xem sản phẩm</Box>
+      <Box sx={{ border: '1px solid #0A0A0A', px: 3, py: 1.5, ...TYPOGRAPHY_STYLES.sm.bold }}>Bộ sưu tập</Box>
+    </Box>
+  </Box>
+);
+
+const TopLineBannerPreview = () => (
+  <Box sx={{ width: '100%', bgcolor: '#111827', color: '#fff', py: 1.25, px: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+    <Box sx={{ bgcolor: '#F59E0B', color: '#111827', px: 1, py: 0.25, ...TYPOGRAPHY_STYLES.xs.bold }}>MỚI</Box>
+    <Typography sx={{ ...TYPOGRAPHY_STYLES.sm.regular, flex: 1 }}>
+      Freeship đơn từ 500K · Đổi trả 7 ngày · Chỉ bạc & hợp kim cao cấp
+    </Typography>
+  </Box>
+);
+
 const FallbackPreview = ({ blockCode }: { blockCode: string }) => (
   <Box sx={{ p: 4, textAlign: 'center', bgcolor: '#F9FAFB' }}>
     <Typography sx={{ ...TYPOGRAPHY_STYLES.md.semibold, color: '#101828' }}>Chưa có giao diện xem trước</Typography>
@@ -372,6 +407,10 @@ export const CmsBlockPreview = ({ blockCode }: CmsBlockPreviewProps) => {
       return <ImageGalleryPreview />;
     case 'NEWSLETTER_SIGNUP':
       return <NewsletterPreview />;
+    case 'CTA_BLOCK':
+      return <CtaBlockPreview />;
+    case 'TOP_LINE_BANNER':
+      return <TopLineBannerPreview />;
     default:
       return <FallbackPreview blockCode={code} />;
   }
