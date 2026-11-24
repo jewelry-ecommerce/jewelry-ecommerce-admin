@@ -10,6 +10,7 @@ import { TYPOGRAPHY_STYLES } from '../../../../common/constant/typography.consta
 import { ProductKind, ProductUnitOfMeasure, PRODUCT_UNIT_OF_MEASURE_OPTIONS } from '../../../../apis/product/product.enum';
 import { PRODUCT_KIND_OPTIONS } from '../product-spu.constant';
 import { ProductSpuInfosForm } from './product-spu-infos-form.component';
+import { isJavaBackend } from '@/common/config/app.config';
 
 export type ProductSpuGeneralFormValues = Pick<ProductSpuCreateFormValues, 'spuCode' | 'name' | 'productKind' | 'categoryUuid' | 'brandId' | 'taxRateOverride'> & {
   seasonUuid: string;
@@ -69,6 +70,8 @@ export const ProductSpuForm = <TFieldValues extends FieldValues = FieldValues>({
   isUpdate = false,
   disabled = false,
 }: ProductSpuFormProps<TFieldValues>) => {
+  const hidePimExtras = isJavaBackend();
+
   return (
     <Box component="form" noValidate onSubmit={(event) => event.preventDefault()}>
       <Stack sx={{ width: '100%' }}>
@@ -107,7 +110,7 @@ export const ProductSpuForm = <TFieldValues extends FieldValues = FieldValues>({
           />
         </StackRow>
 
-        {showProductKind ? (
+        {hidePimExtras ? null : showProductKind ? (
           <StackRow>
             <Controller
               control={control}
@@ -184,43 +187,47 @@ export const ProductSpuForm = <TFieldValues extends FieldValues = FieldValues>({
                 />
               )}
             />
+            {hidePimExtras ? null : (
+              <Controller
+                control={control}
+                name={'seasonUuid' as Path<TFieldValues>}
+                render={({ field, fieldState }) => (
+                  <SelectInput
+                    {...field}
+                    value={field.value ?? ''}
+                    label="Mùa vụ"
+                    placeholder="Không bắt buộc"
+                    options={[...seasonOptions]}
+                    error={!!fieldState.error}
+                    errorMessage={fieldState.error?.message}
+                    disabled={disabled}
+                  />
+                )}
+              />
+            )}
+          </StackRow>
+        )}
+        {hidePimExtras ? null : (
+          <StackRow>
             <Controller
               control={control}
-              name={'seasonUuid' as Path<TFieldValues>}
+              name={'taxRateOverride' as Path<TFieldValues>}
               render={({ field, fieldState }) => (
-                <SelectInput
+                <TextInput
                   {...field}
+                  type="number"
                   value={field.value ?? ''}
-                  label="Mùa vụ"
-                  placeholder="Không bắt buộc"
-                  options={[...seasonOptions]}
+                  label="Thuế ghi đè sản phẩm (%)"
+                  placeholder="Để trống = dùng thuế danh mục"
                   error={!!fieldState.error}
                   errorMessage={fieldState.error?.message}
                   disabled={disabled}
                 />
               )}
             />
+            {hideTaxonomy ? null : <TextInput type="number" value={categoryTaxRate ?? ''} label="Thuế danh mục (%)" disabled />}
           </StackRow>
         )}
-        <StackRow>
-          <Controller
-            control={control}
-            name={'taxRateOverride' as Path<TFieldValues>}
-            render={({ field, fieldState }) => (
-              <TextInput
-                {...field}
-                type="number"
-                value={field.value ?? ''}
-                label="Thuế ghi đè sản phẩm (%)"
-                placeholder="Để trống = dùng thuế danh mục"
-                error={!!fieldState.error}
-                errorMessage={fieldState.error?.message}
-                disabled={disabled}
-              />
-            )}
-          />
-          {hideTaxonomy ? null : <TextInput type="number" value={categoryTaxRate ?? ''} label="Thuế danh mục (%)" disabled />}
-        </StackRow>
         <ProductSpuInfosForm control={control as unknown as Control<{ productInfos?: ProductInfoFormItem[] }>} disabled={disabled} />
       </Stack>
     </Box>

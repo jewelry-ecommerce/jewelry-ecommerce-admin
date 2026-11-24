@@ -30,6 +30,7 @@ import { getErrorMessage } from '../../../../common/utils';
 import type { ProductSpuPageSection } from '../product-spu.interface';
 import { buildProductSpuDetailSwrKey, revalidateProductSpuDetail } from '../utils/product-spu-detail-cache.utils';
 import { ProductSpuInfosReadonly } from '../components/product-spu-infos-readonly.component';
+import { isJavaBackend } from '@/common/config/app.config';
 
 const ProductSpuDetailPage = () => {
   const navigate = useNavigate();
@@ -177,22 +178,26 @@ const ProductSpuDetailPage = () => {
                   {detail.name}
                 </AttributeInfoField>
               </StackRowAlignCenterJustBetween>
-              <StackRowAlignCenterJustBetween>
-                <AttributeInfoField sx={{ gap: 0.5 }} label="Loại sản phẩm">
-                  {PRODUCT_KIND_OPTIONS.find((item) => item.value === detail.productKind)?.label ?? detail.productKind ?? '—'}
-                </AttributeInfoField>
-                <AttributeInfoField sx={{ gap: 0.5 }} label="Đơn vị tính">
-                  {PRODUCT_UNIT_OF_MEASURE_OPTIONS.find((item) => item.value === detail.unitOfMeasure)?.label ?? detail.unitOfMeasure ?? '—'}
-                </AttributeInfoField>
-              </StackRowAlignCenterJustBetween>
+              {isJavaBackend() ? null : (
+                <StackRowAlignCenterJustBetween>
+                  <AttributeInfoField sx={{ gap: 0.5 }} label="Loại sản phẩm">
+                    {PRODUCT_KIND_OPTIONS.find((item) => item.value === detail.productKind)?.label ?? detail.productKind ?? '—'}
+                  </AttributeInfoField>
+                  <AttributeInfoField sx={{ gap: 0.5 }} label="Đơn vị tính">
+                    {PRODUCT_UNIT_OF_MEASURE_OPTIONS.find((item) => item.value === detail.unitOfMeasure)?.label ?? detail.unitOfMeasure ?? '—'}
+                  </AttributeInfoField>
+                </StackRowAlignCenterJustBetween>
+              )}
               {isPackagingProduct ? null : (
                 <StackRowAlignCenterJustBetween>
                   <AttributeInfoField sx={{ gap: 0.5 }} label="Danh mục">
                     {detail.category?.name ?? '—'}
                   </AttributeInfoField>
-                  <AttributeInfoField sx={{ gap: 0.5 }} label="Mùa">
-                    {detail.season?.name ?? '—'}
-                  </AttributeInfoField>
+                  {isJavaBackend() ? null : (
+                    <AttributeInfoField sx={{ gap: 0.5 }} label="Mùa">
+                      {detail.season?.name ?? '—'}
+                    </AttributeInfoField>
+                  )}
                 </StackRowAlignCenterJustBetween>
               )}
               <StackRowAlignCenterJustBetween>
@@ -290,7 +295,11 @@ const ProductSpuDetailPage = () => {
           },
     ];
 
-    return blocks.filter((block): block is ProductSpuPageSection => Boolean(block));
+    return blocks.filter((block): block is ProductSpuPageSection => {
+      if (!block) return false;
+      if (isJavaBackend() && (block.key === ProductSpuSidebarKey.MARKETING || block.key === ProductSpuSidebarKey.PACKAGING)) return false;
+      return true;
+    });
   }, [appliedSummaries, detail, matrixAttributeOrder, matrixFlatRows, selectedKeys]);
 
   return !spuId || (detailSwr.error && !detail) ? (

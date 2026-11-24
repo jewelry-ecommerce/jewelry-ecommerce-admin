@@ -118,7 +118,6 @@ export const DASHBOARD_SIDEBAR_NAV: DashboardSidebarNavGroup[] = [
         ],
       },
       { title: 'Danh sách sản phẩm', path: ROUTE_PATH.PRODUCT_SPU_LIST, tabCode: 'list' },
-      { title: 'Bộ sản phẩm', path: ROUTE_PATH.PRODUCT_SET_LIST, tabCode: 'set' },
       { title: 'Thuộc tính & Bộ lọc', path: ROUTE_PATH.PRODUCT_ATTRIBUTE_LIST, tabCode: 'attributes' },
       { title: 'Đánh giá', path: ROUTE_PATH.PRODUCT_REVIEW_LIST, tabCode: 'reviews' },
     ],
