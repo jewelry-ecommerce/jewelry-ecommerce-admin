@@ -23,23 +23,23 @@ export const DashboardLowStock = ({ rows }: DashboardLowStockProps) => {
 
   return (
     <DashboardPanel
-      title="Replenishment needed"
-      description="Available quantity at or below the reorder point."
+      title="Cần nhập thêm hàng"
+      description="Tồn khả dụng bằng hoặc dưới điểm đặt hàng lại."
       action={
         <CustomButton
           variant="outline"
           size="sm"
           onClick={() => navigate(ROUTE_PATH.INVENTORY_STOCK_LIST)}
-          {...dashboardButtonPermission("detail", "Open stock levels", "api_inventory_stock_list")}
+          {...dashboardButtonPermission("detail", "Mở tồn kho", "api_inventory_stock_list")}
         >
-          Open inventory
+          Mở tồn kho
         </CustomButton>
       }
     >
       {rows.length === 0 ? (
         <EmptyComponent
-          title="Every SKU is above its reorder point"
-          description="Nothing needs replenishing right now."
+          title="Mọi SKU đều trên điểm đặt hàng lại"
+          description="Hiện không có mặt hàng nào cần nhập thêm."
           sx={{ minHeight: 160 }}
         />
       ) : (
@@ -59,9 +59,9 @@ export const DashboardLowStock = ({ rows }: DashboardLowStockProps) => {
               </Typography>
             </Stack>
             <Stack alignItems="flex-end" spacing={0.5} sx={{ flexShrink: 0 }}>
-              <StatusPill label={`${formatNumber(row.available)} left`} tone={row.available <= 0 ? "danger" : "warning"} />
+              <StatusPill label={`Còn ${formatNumber(row.available)}`} tone={row.available <= 0 ? "danger" : "warning"} />
               <Typography sx={{ ...TYPOGRAPHY_STYLES.xs.regular, color: COLOR.NEUTRAL[400] }}>
-                Reorder at {formatNumber(row.reorderPoint)}
+                Đặt lại khi ≤ {formatNumber(row.reorderPoint)}
               </Typography>
             </Stack>
           </Stack>

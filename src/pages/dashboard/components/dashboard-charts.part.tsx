@@ -13,6 +13,9 @@ import { COLOR } from "@/theme/design-tokens";
 
 const CHART_HEIGHT = 220;
 
+/** Series name from BE — accept both VI label and legacy English key. */
+const isRevenueSeries = (name: string) => name === "Doanh thu" || name === "Revenue";
+
 export interface DashboardChartsProps {
   revenue: DashboardOverview["revenue"];
   ordersByStatus: DashboardOverview["ordersByStatus"];
@@ -22,13 +25,13 @@ export const DashboardCharts = ({ revenue, ordersByStatus }: DashboardChartsProp
   const revenueSeries = useMemo<ChartSeries[]>(
     () =>
       revenue.series
-        .filter((entry) => entry.name === "Revenue")
-        .map((entry) => ({ name: entry.name, values: entry.values, color: COLOR.BRAND[500] })),
+        .filter((entry) => isRevenueSeries(entry.name))
+        .map((entry) => ({ name: "Doanh thu", values: entry.values, color: COLOR.BRAND[500] })),
     [revenue.series],
   );
 
   const orderStatusSeries = useMemo<ChartSeries[]>(
-    () => [{ name: "Orders", values: ordersByStatus.map((entry) => entry.count), color: COLOR.NEUTRAL[700] }],
+    () => [{ name: "Đơn hàng", values: ordersByStatus.map((entry) => entry.count), color: COLOR.NEUTRAL[700] }],
     [ordersByStatus],
   );
 
@@ -36,11 +39,11 @@ export const DashboardCharts = ({ revenue, ordersByStatus }: DashboardChartsProp
 
   return (
     <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 3fr) minmax(0, 2fr)" } }}>
-      <DashboardPanel title="Revenue trend" description="Net revenue of confirmed through delivered orders.">
+      <DashboardPanel title="Xu hướng doanh thu" description="Doanh thu thuần của đơn đã xác nhận đến đã giao.">
         {revenueSeries.length === 0 ? (
           <EmptyComponent
-            title="No revenue yet"
-            description="Revenue appears once an order reaches the confirmed state."
+            title="Chưa có doanh thu"
+            description="Doanh thu xuất hiện khi đơn hàng đạt trạng thái đã xác nhận."
             sx={{ minHeight: CHART_HEIGHT }}
           />
         ) : (
@@ -53,11 +56,11 @@ export const DashboardCharts = ({ revenue, ordersByStatus }: DashboardChartsProp
         )}
       </DashboardPanel>
 
-      <DashboardPanel title="Orders by status" description="Where the current order book sits.">
+      <DashboardPanel title="Đơn theo trạng thái" description="Phân bố đơn hàng trong khoảng thời gian đang chọn.">
         {ordersByStatus.length === 0 ? (
           <EmptyComponent
-            title="No orders yet"
-            description="The distribution fills in as orders arrive."
+            title="Chưa có đơn hàng"
+            description="Biểu đồ sẽ cập nhật khi có đơn mới."
             sx={{ minHeight: CHART_HEIGHT }}
           />
         ) : (

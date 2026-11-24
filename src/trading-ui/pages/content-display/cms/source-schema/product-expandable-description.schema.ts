@@ -1,21 +1,25 @@
 import type { CmsBlockSchemaDefinition } from '@/trading-ui/apis/cms/cms-schema-definition.interface';
+
+/** Nội dung mô tả trang — title + rich text (CKEditor). */
 export const PRODUCT_EXPANDABLE_DESCRIPTION_SCHEMA: CmsBlockSchemaDefinition = {
   type: 'object',
   required: ['title', 'description'],
   properties: {
     title: {
       type: 'string',
-      title: 'Tieu de',
+      title: 'Tiêu đề',
     },
     description: {
       type: 'string',
-      title: 'Noi dung mo ta',
+      title: 'Nội dung mô tả',
+      format: 'richtext',
     },
     maxCollapsedLines: {
       type: 'number',
-      title: 'So dong khi thu gon',
+      title: 'Số dòng khi thu gọn',
       default: 3,
       minimum: 1,
     },
   },
+  'x-propertyOrder': ['title', 'description', 'maxCollapsedLines'],
 };

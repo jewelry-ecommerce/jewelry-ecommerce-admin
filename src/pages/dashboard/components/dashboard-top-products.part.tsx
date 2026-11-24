@@ -24,21 +24,21 @@ export const DashboardTopProducts = ({ rows }: DashboardTopProductsProps) => {
 
   return (
     <DashboardPanel
-      title="Top products"
-      description="Ranked by revenue across revenue-bearing orders."
+      title="Sản phẩm bán chạy"
+      description="Xếp theo doanh thu của các đơn có doanh thu."
       action={
         <CustomButton
           variant="outline"
           size="sm"
           onClick={() => navigate(ROUTE_PATH.PRODUCT_LIST)}
-          {...dashboardButtonPermission("detail", "Open the product list", "api_product_list")}
+          {...dashboardButtonPermission("detail", "Mở danh sách sản phẩm", "api_product_list")}
         >
-          Open catalog
+          Mở danh mục
         </CustomButton>
       }
     >
       {rows.length === 0 ? (
-        <EmptyComponent title="No sales yet" description="Best sellers appear once orders are confirmed." sx={{ minHeight: 160 }} />
+        <EmptyComponent title="Chưa có doanh số" description="Sản phẩm bán chạy hiện khi có đơn đã xác nhận." sx={{ minHeight: 160 }} />
       ) : (
         rows.map((row, index) => (
           <Stack
@@ -60,7 +60,7 @@ export const DashboardTopProducts = ({ rows }: DashboardTopProductsProps) => {
             <Stack sx={{ flex: 1, minWidth: 0 }}>
               <TypographyOneLine sx={{ ...TYPOGRAPHY_STYLES.base.medium, color: COLOR.NEUTRAL[900] }}>{row.productName}</TypographyOneLine>
               <Typography sx={{ ...TYPOGRAPHY_STYLES.sm.regular, color: COLOR.NEUTRAL[500] }}>
-                {row.categoryName} · {formatNumber(row.unitsSold)} sold
+                {row.categoryName} · đã bán {formatNumber(row.unitsSold)}
               </Typography>
             </Stack>
             <Typography sx={{ ...TYPOGRAPHY_STYLES.base.semiBold, color: COLOR.NEUTRAL[900], flexShrink: 0 }}>
