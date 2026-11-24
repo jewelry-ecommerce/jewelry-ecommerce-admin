@@ -8,7 +8,7 @@ import { SelectInput, TextInput } from '../../../../components/form';
 import { formLabelSx } from '../../../../components/form/form-field.styles';
 import { TYPOGRAPHY_STYLES } from '../../../../common/constant/typography.constant';
 import { StackRowAlignCenter } from '../../../../components/styled';
-import { CMS_PAGE_TARGET_DEVICE_OPTIONS, SCHEDULE_START_REQUIRED_MESSAGE } from '../cms-page.constants';
+import { CMS_PAGE_TARGET_DEVICE_OPTIONS } from '../cms-page.constants';
 import { CmsPageWizardStepActions } from './cms-page-wizard-step-actions.component';
 
 export interface CmsPageWizardStepLayoutProps {
@@ -57,14 +57,7 @@ export const CmsPageWizardStepLayout: React.FC<CmsPageWizardStepLayoutProps> = (
   const [scheduleStartError, setScheduleStartError] = useState<string | null>(null);
 
   const runIfScheduleStartValid = (action: () => void) => {
-    if (viewMode) {
-      action();
-      return;
-    }
-    if (!scheduleStart) {
-      setScheduleStartError(SCHEDULE_START_REQUIRED_MESSAGE);
-      return;
-    }
+    // Lịch hiển thị là tùy chọn — không chặn Lưu/Tiếp tục khi chưa chọn ngày bắt đầu.
     setScheduleStartError(null);
     action();
   };
@@ -109,14 +102,7 @@ export const CmsPageWizardStepLayout: React.FC<CmsPageWizardStepLayoutProps> = (
             <Typography sx={{ ...TYPOGRAPHY_STYLES.sm.medium, color: '#101828', mb: 1 }}>Lên lịch hiển thị (tùy chọn)</Typography>
             <StackRowAlignCenter sx={{ flexWrap: 'wrap', alignItems: 'flex-start' }}>
               <Box sx={{ flex: 1, minWidth: 220, pr: { sm: 1 } }}>
-                <Typography sx={formLabelSx}>
-                  Bắt đầu
-                  {!fieldsDisabled ? (
-                    <Box component="span" sx={{ color: '#FB2C36', ml: 0.5 }}>
-                      *
-                    </Box>
-                  ) : null}
-                </Typography>
+                <Typography sx={formLabelSx}>Bắt đầu</Typography>
                 <DateTimePicker
                   value={scheduleStart}
                   onChange={(value) => {
