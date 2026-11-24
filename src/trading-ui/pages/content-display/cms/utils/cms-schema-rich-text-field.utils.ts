@@ -9,7 +9,7 @@ export function isCmsRichTextHtmlEmpty(value: string): boolean {
 }
 
 export function isCmsRichTextStringSchema(schema: CmsBlockStringSchemaDefinition): boolean {
-  if (schema.format === 'html') return true;
+  if (schema.format === 'html' || schema.format === 'richtext') return true;
 
   // PRODUCT_EXPANDABLE_DESCRIPTION.description — FE render HTML; schema chưa gắn format:html.
   const title = (schema.title ?? '').toLowerCase();
