@@ -1,14 +1,14 @@
 import { expect, test } from 'vitest';
 import { JAVA_CMS_BLOCK_CATALOG, newWizardBlock } from './java-cms-catalog';
 
-test('Java catalog exposes eleven supported blocks including CTA, top line and newsletter', () => {
+test('Java catalog exposes eleven supported blocks including CTA, text and newsletter', () => {
   expect(JAVA_CMS_BLOCK_CATALOG).toHaveLength(11);
   for (const code of [
     'PRODUCT_LIST',
     'PRODUCT_CATEGORY_NAV',
     'PRODUCT_COLLECTION_SHOWCASE',
     'CTA_BLOCK',
-    'TOP_LINE_BANNER',
+    'TEXT_BLOCK',
     'NEWSLETTER_SIGNUP',
   ]) {
     const entry = JAVA_CMS_BLOCK_CATALOG.find((block) => block.code === code);
@@ -16,7 +16,8 @@ test('Java catalog exposes eleven supported blocks including CTA, top line and n
     if (!entry) throw new Error('Missing block: ' + code);
     expect(newWizardBlock(entry).blockTypeCode).toBe(code);
   }
-  expect(JAVA_CMS_BLOCK_CATALOG.some((block) => block.code === 'TOP_LINE_BANNER')).toBe(true);
+  expect(JAVA_CMS_BLOCK_CATALOG.some((block) => block.code === 'TEXT_BLOCK')).toBe(true);
+  expect(JAVA_CMS_BLOCK_CATALOG.some((block) => block.code === 'TOP_LINE_BANNER')).toBe(false);
   expect(JAVA_CMS_BLOCK_CATALOG.some((block) => block.code === 'NEWSLETTER_SIGNUP')).toBe(true);
 });
 

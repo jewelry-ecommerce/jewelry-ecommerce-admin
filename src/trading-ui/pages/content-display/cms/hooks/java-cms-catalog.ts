@@ -7,8 +7,8 @@ import { PRODUCT_LIST_SCHEMA } from '../source-schema/product-list.schema';
 import { PRODUCT_CATEGORY_NAV_SCHEMA } from '../source-schema/product-category-nav.schema';
 import { PRODUCT_COLLECTION_SHOWCASE_SCHEMA } from '../source-schema/product-collection-showcase.schema';
 import { CTA_BLOCK_SCHEMA } from '../source-schema/cta-block.schema';
-import { TOP_LINE_BANNER_SCHEMA } from '../source-schema/top-line-banner.schema';
 import { NEWSLETTER_SIGNUP_SCHEMA } from '../source-schema/newsletter-signup.schema';
+import { TEXT_BLOCK_SCHEMA } from '../source-schema/text-block.schema';
 import { CmsDemoBlockType } from '@/apis/cms-demo/cms-demo.interface';
 import { CMS_BLOCK_LABELS, newCmsBlock } from '@/pages/cms/cms-demo.constants';
 import type { CmsPageBlockCatalogItem, CmsPageWizardBlock } from '../cms-page.interface';
@@ -23,8 +23,8 @@ const SCHEMAS = {
   PRODUCT_CATEGORY_NAV: PRODUCT_CATEGORY_NAV_SCHEMA,
   PRODUCT_COLLECTION_SHOWCASE: PRODUCT_COLLECTION_SHOWCASE_SCHEMA,
   CTA_BLOCK: CTA_BLOCK_SCHEMA,
-  TOP_LINE_BANNER: TOP_LINE_BANNER_SCHEMA,
   NEWSLETTER_SIGNUP: NEWSLETTER_SIGNUP_SCHEMA,
+  TEXT_BLOCK: TEXT_BLOCK_SCHEMA,
 };
 
 export const JAVA_CMS_BLOCK_CATALOG: CmsPageBlockCatalogItem[] = Object.values(CmsDemoBlockType).map((code) => ({

@@ -9,8 +9,8 @@ export const CMS_BLOCK_LABELS: Record<CmsDemoBlockType, string> = {
   IMAGE_GALLERY: "Thư viện ảnh",
   PRODUCT_EXPANDABLE_DESCRIPTION: "Nội dung mô tả",
   CTA_BLOCK: "Khối CTA điều hướng",
-  TOP_LINE_BANNER: "Thanh top banner chạy chữ",
   NEWSLETTER_SIGNUP: "Form đăng ký nhận tin",
+  TEXT_BLOCK: "Khối Văn Bản",
 };
 export const CMS_BANNER_PLACEMENTS: string[] = [];
 export const CMS_DEMO_SEED_IMAGE = "";
@@ -58,20 +58,8 @@ export function newCmsBlock(type: CmsDemoBlockType, position: number): CmsDemoBl
       },
     };
   }
-  if (type === CmsDemoBlockType.TOP_LINE_BANNER) {
-    return {
-      ...base,
-      config: {
-        settings: {
-          isClosable: true,
-          animationType: "STATIC",
-          animationSpeed: 3,
-          backgroundColor: "#000000",
-          textColor: "#FFFFFF",
-        },
-        items: [{ text: "", actionType: "NONE" }],
-      },
-    };
+  if (type === CmsDemoBlockType.TEXT_BLOCK) {
+    return { ...base, config: { title: "", content: "" } };
   }
   if (type === CmsDemoBlockType.NEWSLETTER_SIGNUP) {
     return {
