@@ -26,6 +26,7 @@ import { TextFieldUpload } from '../../../../components/text-field-upload/text-f
 import { EmptyComponent } from '@/components/empty/empty.component';
 import { uploadMultipleImages } from '../../../../common/utils/image-upload.utils';
 import { MediaVisibility } from '../../../../apis/file';
+import { isJavaBackend } from '@/common/config/app.config';
 import {
   getProductSkuStatusLabelVi,
   mapTaxSourceDisplayLabel,
@@ -198,8 +199,9 @@ const ProductSpuVariantMatrixInner: FC<ProductSpuVariantMatrixProps> = ({
 
   const columns = useMemo<Array<DataTableColumn<VariantMatrixRowVm>>>(() => {
     const cascadeGroupNumericTooltip = (row: VariantMatrixRowVm) => (row.isGroup && row.descendantRowCount > 0 ? `Áp dụng giá trị này cho ${row.descendantRowCount} biến thể bên dưới` : undefined);
+    const hideTaxColumns = isJavaBackend();
 
-    return [
+    const allColumns: Array<DataTableColumn<VariantMatrixRowVm>> = [
       {
         id: 'variant',
         label: 'Biến thể',
@@ -562,6 +564,9 @@ const ProductSpuVariantMatrixInner: FC<ProductSpuVariantMatrixProps> = ({
         ),
       },
     ];
+
+    if (!hideTaxColumns) return allColumns;
+    return allColumns.filter((column) => column.id !== 'effectiveTaxRate' && column.id !== 'taxRateOverride' && column.id !== 'taxSource');
   }, [collapsedGroupRowIds, isSkuCodeLocked, leafFieldError, onParentCascadeFieldBlur, openMediaDialog, patchField, readOnly, toggleCollapsedRow]);
 
   return (

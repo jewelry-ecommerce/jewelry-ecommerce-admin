@@ -52,6 +52,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { parseNullableNumber } from '../utils/product-spu-pricing.utils';
 import { isOnlyProductSkuApiFieldValidationError, mapProductSkuApiValidationErrors, mapRhfSkuRowErrorsToLeafFieldErrors } from '../utils/product-spu-sku-field-errors.utils';
 import { CategoryStatus } from '../../../../apis/category/category.enum';
+import { isJavaBackend } from '@/common/config/app.config';
 
 const createDefaultPackagingSku = (productKind: ProductKind): ProductSkuCreateRequestDto => ({
   clientKey: 'packaging-default',
@@ -503,7 +504,12 @@ const ProductSpuCreatePage = () => {
             ),
           },
     ];
-    return blocks.filter((block): block is ProductSpuPageSection => Boolean(block) && block?.key!==ProductSpuSidebarKey.PACKAGING);
+    return blocks.filter((block): block is ProductSpuPageSection => {
+      if (!block) return false;
+      if (block.key === ProductSpuSidebarKey.PACKAGING) return false;
+      if (isJavaBackend() && block.key === ProductSpuSidebarKey.MARKETING) return false;
+      return true;
+    });
   }, [
     appliedAttributeSummaries,
     attributeSelectOpen,

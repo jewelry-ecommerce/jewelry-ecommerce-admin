@@ -34,6 +34,7 @@ import { SnackbarType, useSnackbar } from '@/hooks/use-snackbar.hook';
 import { getErrorMessage } from '../../../../common/utils';
 import { LoadingComponent } from '../../../../components/loading/loading.component';
 import { EmptyComponent } from '../../../../components/empty/empty.component';
+import { isJavaBackend } from '@/common/config/app.config';
 import {
   attributeApi,
   brandApi,
@@ -691,7 +692,12 @@ const ProductSpuUpdatePage = () => {
           },
     ];
 
-    return blocks.filter((block): block is ProductSpuPageSection => Boolean(block) && block?.key!==ProductSpuSidebarKey.PACKAGING);
+    return blocks.filter((block): block is ProductSpuPageSection => {
+      if (!block) return false;
+      if (block.key === ProductSpuSidebarKey.PACKAGING) return false;
+      if (isJavaBackend() && block.key === ProductSpuSidebarKey.MARKETING) return false;
+      return true;
+    });
   }, [
     appliedAttributeSummaries,
     attributeTreeLoading,

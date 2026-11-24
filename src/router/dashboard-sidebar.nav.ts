@@ -145,11 +145,6 @@ export const DASHBOARD_SIDEBAR_NAV: DashboardSidebarNavGroup[] = [
         "tabCode": "list"
       },
       {
-        "title": "Bộ sản phẩm",
-        "path": ROUTE_PATH.SET_LIST,
-        "tabCode": "set"
-      },
-      {
         "title": "Thuộc tính & Bộ lọc",
         "path": ROUTE_PATH.ATTRIBUTE_LIST,
         "tabCode": "attributes"
