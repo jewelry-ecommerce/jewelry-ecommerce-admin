@@ -15,7 +15,7 @@ export interface CmsBlockObjectSchemaDefinition extends CmsBlockSchemaBase {
 
 export interface CmsBlockStringSchemaDefinition extends CmsBlockSchemaBase {
   type: 'string';
-  format?: 'html' | 'textarea' | 'json';
+  format?: 'html' | 'richtext' | 'textarea' | 'json';
   enum?: string[];
   enumNames?: string[];
 }
