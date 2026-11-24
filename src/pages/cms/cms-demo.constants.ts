@@ -8,6 +8,9 @@ export const CMS_BLOCK_LABELS: Record<CmsDemoBlockType, string> = {
   INFO_CARDS: "Thẻ thông tin",
   IMAGE_GALLERY: "Thư viện ảnh",
   PRODUCT_EXPANDABLE_DESCRIPTION: "Nội dung mô tả",
+  CTA_BLOCK: "Khối CTA điều hướng",
+  TOP_LINE_BANNER: "Thanh top banner chạy chữ",
+  NEWSLETTER_SIGNUP: "Form đăng ký nhận tin",
 };
 export const CMS_BANNER_PLACEMENTS: string[] = [];
 export const CMS_DEMO_SEED_IMAGE = "";
@@ -43,6 +46,42 @@ export function newCmsBlock(type: CmsDemoBlockType, position: number): CmsDemoBl
       },
     };
   if (type === CmsDemoBlockType.PRODUCT_EXPANDABLE_DESCRIPTION) return { ...base, config: { title: "", description: "" } };
+  if (type === CmsDemoBlockType.CTA_BLOCK) {
+    return {
+      ...base,
+      config: {
+        title: "",
+        description: "",
+        buttons: [],
+        alignment: "CENTER",
+        background: { color: "#FFFFFF", borderColor: "transparent", borderRadius: 40 },
+      },
+    };
+  }
+  if (type === CmsDemoBlockType.TOP_LINE_BANNER) {
+    return {
+      ...base,
+      config: {
+        settings: {
+          isClosable: true,
+          animationType: "STATIC",
+          animationSpeed: 3,
+          backgroundColor: "#000000",
+          textColor: "#FFFFFF",
+        },
+        items: [{ text: "", actionType: "NONE" }],
+      },
+    };
+  }
+  if (type === CmsDemoBlockType.NEWSLETTER_SIGNUP) {
+    return {
+      ...base,
+      config: {
+        heading: "Đăng ký nhận tin",
+        consentText: "Bằng cách đăng ký, bạn đồng ý với chính sách bảo mật thông tin.",
+      },
+    };
+  }
   return { ...base, config: { header: { title: "", subtitle: "" }, display: { columns: 3 }, items: [] } };
 }
 export function moveCmsBlock(blocks: CmsDemoBlock[], index: number, direction: number): CmsDemoBlock[] {

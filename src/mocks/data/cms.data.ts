@@ -95,7 +95,6 @@ export const STOREFRONT_GLOBAL_CONFIG: StorefrontGlobalConfig = {
       title: "Services",
       links: [
         { label: "AI stylist", href: "/stylist" },
-        { label: "Set builder", href: "/set-builder" },
         { label: "Order tracking", href: "/orders/track" },
         { label: "Salon information", href: "/stores" },
       ],

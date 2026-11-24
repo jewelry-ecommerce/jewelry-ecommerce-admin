@@ -15,7 +15,6 @@ export type CmsBlockType =
   | "CURATED_SET"
   | "EDITORIAL_CONTENT"
   | "AI_STYLIST_CTA"
-  | "SET_BUILDER_CTA"
   | "MEMBERSHIP_CTA"
   | "TRUST_SIGNALS"
   | "NEWSLETTER"
@@ -48,7 +47,6 @@ export type CmsBlockConfigMap = {
   CURATED_SET: { title: string; description: string; setIds: string[] };
   EDITORIAL_CONTENT: { title: string; body: string; image: string; imagePosition: "left" | "right"; cta: CmsCtaLink | null };
   AI_STYLIST_CTA: { title: string; description: string; image: string; cta: CmsCtaLink };
-  SET_BUILDER_CTA: { title: string; description: string; image: string; cta: CmsCtaLink };
   MEMBERSHIP_CTA: { title: string; description: string; tiers: string[]; cta: CmsCtaLink };
   TRUST_SIGNALS: { items: { icon: string; title: string; description: string }[] };
   NEWSLETTER: { title: string; description: string; placeholder: string; submitLabel: string };
