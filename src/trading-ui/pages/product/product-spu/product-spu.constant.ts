@@ -109,17 +109,14 @@ export const productCreateRequestDtoSchema = yup
         otherwise: (schema) => schema.required('Danh mục không được để trống'),
       }),
     productKind: yup.mixed<ProductKind>().oneOf(Object.values(ProductKind)).default(ProductKind.MERCHANDISE).optional(),
-    unitOfMeasure: yup.mixed<ProductUnitOfMeasure>().oneOf(Object.values(ProductUnitOfMeasure), 'Đơn vị tính không hợp lệ').required('Đơn vị tính không được để trống'),
+    unitOfMeasure: yup
+      .mixed<ProductUnitOfMeasure>()
+      .transform((value) => (value === '' || value == null ? undefined : value))
+      .oneOf([...Object.values(ProductUnitOfMeasure), undefined], 'Đơn vị tính không hợp lệ')
+      .optional(),
     brandId: yup.string().trim().optional(),
-    seasonUuid: yup
-      .string()
-      .trim()
-      .when('productKind', {
-        is: (value: ProductKind) => isPackagingLikeProductKind(value),
-        then: (schema) => schema.optional(),
-        otherwise: (schema) => schema.optional(),
-      }),
-    taxRateOverride: yup.number().min(0).max(100).optional(),
+    seasonUuid: yup.string().trim().optional(),
+    taxRateOverride: yup.number().min(0).max(100).nullable().optional(),
     description: yup.string().trim().optional(),
     weight: yup.number().optional(),
     length: yup.number().optional(),
@@ -245,7 +242,11 @@ export const productUpdateRequestDtoSchema = yup
   .object({
     spuCode: yup.string().trim().required('Mã sản phẩm không được để trống'),
     productKind: yup.mixed<ProductKind>().oneOf(Object.values(ProductKind)).optional(),
-    unitOfMeasure: yup.mixed<ProductUnitOfMeasure>().oneOf(Object.values(ProductUnitOfMeasure), 'Đơn vị tính không hợp lệ').required('Đơn vị tính không được để trống'),
+    unitOfMeasure: yup
+      .mixed<ProductUnitOfMeasure>()
+      .transform((value) => (value === '' || value == null ? undefined : value))
+      .oneOf([...Object.values(ProductUnitOfMeasure), undefined], 'Đơn vị tính không hợp lệ')
+      .optional(),
     name: yup.string().trim().required('Tên sản phẩm không được để trống'),
     categoryUuid: yup
       .string()
@@ -256,15 +257,8 @@ export const productUpdateRequestDtoSchema = yup
         otherwise: (schema) => schema.required('Danh mục không được để trống'),
       }),
     brandId: yup.string().trim().optional(),
-    seasonUuid: yup
-      .string()
-      .trim()
-      .when('productKind', {
-        is: (value: ProductKind) => isPackagingLikeProductKind(value),
-        then: (schema) => schema.optional(),
-        otherwise: (schema) => schema.required('Mùa vụ không được để trống'),
-      }),
-    taxRateOverride: yup.number().min(0).max(100).optional(),
+    seasonUuid: yup.string().trim().optional(),
+    taxRateOverride: yup.number().min(0).max(100).nullable().optional(),
     description: yup.string().trim().optional(),
     weight: yup.number().optional(),
     length: yup.number().optional(),
