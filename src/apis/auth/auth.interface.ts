@@ -1,11 +1,23 @@
-/** Roles available in the mock RBAC model. Codes are stable and shared with `role.constant.ts`. */
-export type AdminRoleCode = "ADMIN" | "CATALOG_MANAGER" | "ORDER_MANAGER" | "VIEWER";
+/** Roles available in the mock/Java RBAC model. */
+export type AdminRoleCode = "ROOT" | "ADMIN" | "CATALOG_MANAGER" | "ORDER_MANAGER" | "VIEWER";
+
+export type PagePermissionGrant = {
+  pageCode: string;
+  view: boolean;
+  edit: boolean;
+  delete: boolean;
+};
 
 export type AdminUser = {
   id: string;
   email: string;
   displayName: string;
+  /** Primary role for legacy gates; prefer `roles` + `root`. */
   role: AdminRoleCode;
+  roles: AdminRoleCode[];
+  root: boolean;
+  /** Java session luôn gửi mảng (có thể rỗng). Mock bỏ field → FE dùng ROLE_PERMISSIONS. */
+  pagePermissions?: PagePermissionGrant[];
   avatar: string | null;
   jobTitle: string;
   lastLoginAt: string | null;

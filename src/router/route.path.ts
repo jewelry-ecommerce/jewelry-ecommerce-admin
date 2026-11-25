@@ -93,6 +93,8 @@ export const ROUTE_PATH = {
   SETTING_SEO: "/settings/seo",
   SETTING_ANALYTICS: "/settings/analytics",
   SETTING_LIVE_CHAT: "/settings/live-chat",
+  /** Phân quyền trang theo user — chỉ ROOT. */
+  USER_PAGE_PERMISSIONS: "/settings/user-permissions",
 
   SHIPPING: "/shipping",
   EXCHANGE: "/exchange",

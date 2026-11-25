@@ -294,7 +294,20 @@ export const DASHBOARD_SIDEBAR_NAV: DashboardSidebarNavGroup[] = [
         ]
       }
     ]
-  }
+  },
+  {
+    title: "Phân quyền",
+    icon: "account",
+    menuCode: "permission",
+    path: ROUTE_PATH.USER_PAGE_PERMISSIONS,
+    items: [
+      {
+        title: "Phân quyền người dùng",
+        path: ROUTE_PATH.USER_PAGE_PERMISSIONS,
+        tabCode: "access",
+      },
+    ],
+  },
 ];
 
 export const isNavActive = (pathname: string, path: string): boolean => pathname === path || pathname.startsWith(path + '/');

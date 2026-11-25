@@ -14,13 +14,21 @@ export type MockAdminAccount = AdminUser & {
   password: string;
 };
 
+const withRoleFields = (
+  base: Omit<AdminUser, "roles" | "root" | "pagePermissions"> & { role: AdminRoleCode },
+): Pick<AdminUser, "roles" | "root"> => ({
+  roles: [base.role],
+  root: base.role === "ROOT",
+});
+
 export const MOCK_ADMIN_ACCOUNTS: MockAdminAccount[] = [
   {
     id: "adm-owner",
     email: "admin@aurelia.test",
     password: "admin1234",
     displayName: "Aurelia Owner",
-    role: "ADMIN",
+    role: "ROOT",
+    ...withRoleFields({ id: "adm-owner", email: "admin@aurelia.test", displayName: "Aurelia Owner", role: "ROOT", avatar: null, jobTitle: "", lastLoginAt: null }),
     avatar: buildThumbImage("Aurelia Owner", "charcoal"),
     jobTitle: "Platform administrator",
     lastLoginAt: "2026-09-08T01:05:00.000Z",
@@ -31,6 +39,7 @@ export const MOCK_ADMIN_ACCOUNTS: MockAdminAccount[] = [
     password: "catalog1234",
     displayName: "Mai Catalog",
     role: "CATALOG_MANAGER",
+    ...withRoleFields({ id: "adm-catalog", email: "catalog@aurelia.test", displayName: "Mai Catalog", role: "CATALOG_MANAGER", avatar: null, jobTitle: "", lastLoginAt: null }),
     avatar: buildThumbImage("Mai Catalog", "gold"),
     jobTitle: "Merchandising lead",
     lastLoginAt: "2026-09-07T08:40:00.000Z",
@@ -41,6 +50,7 @@ export const MOCK_ADMIN_ACCOUNTS: MockAdminAccount[] = [
     password: "orders1234",
     displayName: "Khanh Orders",
     role: "ORDER_MANAGER",
+    ...withRoleFields({ id: "adm-order", email: "orders@aurelia.test", displayName: "Khanh Orders", role: "ORDER_MANAGER", avatar: null, jobTitle: "", lastLoginAt: null }),
     avatar: buildThumbImage("Khanh Orders", "sage"),
     jobTitle: "Fulfilment supervisor",
     lastLoginAt: "2026-09-08T00:20:00.000Z",
@@ -51,6 +61,7 @@ export const MOCK_ADMIN_ACCOUNTS: MockAdminAccount[] = [
     password: "viewer1234",
     displayName: "Linh Viewer",
     role: "VIEWER",
+    ...withRoleFields({ id: "adm-viewer", email: "viewer@aurelia.test", displayName: "Linh Viewer", role: "VIEWER", avatar: null, jobTitle: "", lastLoginAt: null }),
     avatar: buildThumbImage("Linh Viewer", "blush"),
     jobTitle: "Business analyst",
     lastLoginAt: "2026-09-06T03:15:00.000Z",
@@ -66,6 +77,6 @@ export const findAdminAccountByEmail = (email: string): MockAdminAccount | undef
   MOCK_ADMIN_ACCOUNTS.find((account) => account.email.toLowerCase() === email.trim().toLowerCase());
 
 export const toAdminUser = (account: MockAdminAccount): AdminUser => {
-  const { id, email, displayName, role, avatar, jobTitle, lastLoginAt } = account;
-  return { id, email, displayName, role, avatar, jobTitle, lastLoginAt };
+  const { id, email, displayName, role, roles, root, avatar, jobTitle, lastLoginAt } = account;
+  return { id, email, displayName, role, roles, root, avatar, jobTitle, lastLoginAt };
 };

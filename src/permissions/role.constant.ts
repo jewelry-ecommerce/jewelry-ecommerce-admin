@@ -1,13 +1,9 @@
-import type { AdminRoleCode } from "@/apis/auth/auth.interface";
+import type { AdminRoleCode, PagePermissionGrant } from "@/apis/auth/auth.interface";
 import type { RolePermissionGrant } from "@/permissions/permission.interface";
 
 /** Read-only actions every role with tab access may perform. */
 const READ_ACTIONS = ["view", "detail", "export_excel", "refresh"] as const;
 
-/**
- * Full action vocabulary of the console. Every `actionCode` a screen declares must appear here,
- * otherwise the non-admin roles would silently lose the control.
- */
 const WRITE_ACTIONS = [
   "view",
   "detail",
@@ -27,87 +23,25 @@ const WRITE_ACTIONS = [
   "validate_import",
   "start_import",
   "request_export",
+  "submit",
+  "cancel_approval",
+  "restore_published",
 ] as const;
 
-const CATALOG_MENUS = ["dashboard", "product", "set", "cms"];
-const CATALOG_TABS = [
-  "product.list",
-  "product.category",
-  "product.collection",
-  "product.attribute",
-  "product.material",
-  "product.gemstone",
-  "product.import",
-  "product.export",
-  "set.list",
-  "cms.page",
-  "cms.banner",
-  "cms.navigation",
-  "dashboard.overview",
-];
+const DELETE_ACTIONS = ["delete", "archive"] as const;
 
-const ORDER_MENUS = ["dashboard", "order", "inventory", "customer", "loyalty", "inquiry", "report"];
-const ORDER_TABS = [
-  "order.list",
-  "inventory.overview",
-  "inventory.warehouse",
-  "inventory.stock",
-  "inventory.adjustment",
-  "inventory.receipt",
-  "inventory.movement",
-  "customer.list",
-  "loyalty.account",
-  "loyalty.tier",
-  "inquiry.list",
-  "report.sales",
-  "report.orders",
-  "report.inventory",
-  "report.customers",
-  "dashboard.overview",
-];
+const EDIT_ACTIONS = WRITE_ACTIONS.filter((action) => !DELETE_ACTIONS.includes(action as (typeof DELETE_ACTIONS)[number]) && action !== "view" && action !== "detail" && action !== "export_excel" && action !== "refresh");
 
-const buildWriteActions = (tabCodes: string[]): string[] =>
-  tabCodes.flatMap((tabCode) => WRITE_ACTIONS.map((action) => `${tabCode}.${action}`));
-
-const buildReadActions = (tabCodes: string[]): string[] =>
-  tabCodes.flatMap((tabCode) => READ_ACTIONS.map((action) => `${tabCode}.${action}`));
-
-/**
- * Mock RBAC grants.
- *
- * `menuCodes` gates sidebar groups, `tabCodes` gates screens (`menu.tab`), `actionCodes` gates
- * individual controls (`menu.tab.action`), and `apiCodes` gates the requests those controls make.
- * `'*'` means unrestricted, which is how the ADMIN role is expressed.
- */
 export const ROLE_PERMISSIONS: Record<AdminRoleCode, RolePermissionGrant> = {
-  ADMIN: {
-    menuCodes: "*",
-    tabCodes: "*",
-    actionCodes: "*",
-    apiCodes: "*",
-  },
-  CATALOG_MANAGER: {
-    menuCodes: CATALOG_MENUS,
-    tabCodes: CATALOG_TABS,
-    actionCodes: buildWriteActions(CATALOG_TABS),
-    apiCodes: "*",
-  },
-  ORDER_MANAGER: {
-    menuCodes: ORDER_MENUS,
-    tabCodes: ORDER_TABS,
-    actionCodes: buildWriteActions(ORDER_TABS),
-    apiCodes: "*",
-  },
-  VIEWER: {
-    menuCodes: [...new Set([...CATALOG_MENUS, ...ORDER_MENUS])],
-    tabCodes: [...new Set([...CATALOG_TABS, ...ORDER_TABS])],
-    // Read-only: no create / update / delete anywhere.
-    actionCodes: buildReadActions([...new Set([...CATALOG_TABS, ...ORDER_TABS])]),
-    apiCodes: "*",
-  },
+  ROOT: { menuCodes: "*", tabCodes: "*", actionCodes: "*", apiCodes: "*" },
+  ADMIN: { menuCodes: "*", tabCodes: "*", actionCodes: "*", apiCodes: "*" },
+  CATALOG_MANAGER: { menuCodes: ["dashboard", "product", "content", "promotion"], tabCodes: "*", actionCodes: "*", apiCodes: "*" },
+  ORDER_MANAGER: { menuCodes: ["dashboard", "order", "inventory", "customer_request"], tabCodes: "*", actionCodes: "*", apiCodes: "*" },
+  VIEWER: { menuCodes: "*", tabCodes: "*", actionCodes: [], apiCodes: "*" },
 };
 
 export const ROLE_LABELS: Record<AdminRoleCode, string> = {
+  ROOT: "Root",
   ADMIN: "Administrator",
   CATALOG_MANAGER: "Catalog manager",
   ORDER_MANAGER: "Order manager",
@@ -117,3 +51,35 @@ export const ROLE_LABELS: Record<AdminRoleCode, string> = {
 export const buildTabKey = (menuCode: string, tabCode: string): string => `${menuCode}.${tabCode}`;
 
 export const buildActionKey = (menuCode: string, tabCode: string, actionCode: string): string => `${menuCode}.${tabCode}.${actionCode}`;
+
+/** Map page grant → RolePermissionGrant for PermissionProvider. */
+export const grantsToPermissionGrant = (pagePermissions: readonly PagePermissionGrant[]): RolePermissionGrant => {
+  const menuCodes = new Set<string>();
+  const tabCodes = new Set<string>();
+  const actionCodes = new Set<string>();
+
+  for (const grant of pagePermissions) {
+    if (!grant.view && !grant.edit && !grant.delete) continue;
+    const [menuCode, ...rest] = grant.pageCode.split(".");
+    const tabCode = rest.join(".") || "list";
+    if (!menuCode) continue;
+    menuCodes.add(menuCode);
+    tabCodes.add(buildTabKey(menuCode, tabCode));
+    if (grant.view || grant.edit || grant.delete) {
+      for (const action of READ_ACTIONS) actionCodes.add(buildActionKey(menuCode, tabCode, action));
+    }
+    if (grant.edit) {
+      for (const action of EDIT_ACTIONS) actionCodes.add(buildActionKey(menuCode, tabCode, action));
+    }
+    if (grant.delete) {
+      for (const action of DELETE_ACTIONS) actionCodes.add(buildActionKey(menuCode, tabCode, action));
+    }
+  }
+
+  return {
+    menuCodes: [...menuCodes],
+    tabCodes: [...tabCodes],
+    actionCodes: [...actionCodes],
+    apiCodes: "*",
+  };
+};

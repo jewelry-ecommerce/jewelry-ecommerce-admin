@@ -2,7 +2,7 @@ import { useMemo, type ReactNode } from "react";
 
 import type { AdminRoleCode } from "@/apis/auth/auth.interface";
 import type { PermissionContextValue, RolePermissionGrant } from "@/permissions/permission.interface";
-import { buildActionKey, buildTabKey, ROLE_PERMISSIONS } from "@/permissions/role.constant";
+import { buildActionKey, buildTabKey, grantsToPermissionGrant, ROLE_PERMISSIONS } from "@/permissions/role.constant";
 import { ALWAYS_ALLOWED_PATHS, DENY_ALL, PermissionContext } from "@/permissions/use-permission-context.hook";
 import { useAppSelector } from "@/redux/store.redux";
 import { collectNavLeaves, resolveLeafMenuCode, isNavItemWithChildren, type DashboardSidebarNavItem, type DashboardSidebarNavGroup } from "@/router/dashboard-sidebar.nav";
@@ -17,10 +17,24 @@ type GrantSets = {
 
 const toGrantSet = (grant: string[] | "*"): Set<string> | "all" => (grant === "*" ? "all" : new Set(grant));
 
-const buildGrantSets = (role: AdminRoleCode | null): GrantSets => {
-  if (!role) return { isSuperAdmin: false, menuCodes: new Set(), tabCodes: new Set(), actionCodes: new Set(), apiCodes: new Set() };
+const resolveGrant = (
+  role: AdminRoleCode | null,
+  root: boolean,
+  pagePermissions: RolePermissionGrant | null,
+  usePageGrants: boolean,
+): RolePermissionGrant | null => {
+  if (root) return ROLE_PERMISSIONS.ROOT;
+  // Java session: grants array is the source of truth (empty = no pages).
+  if (usePageGrants) return pagePermissions ?? grantsToPermissionGrant([]);
+  if (pagePermissions && (pagePermissions.menuCodes === "*" || pagePermissions.menuCodes.length > 0)) {
+    return pagePermissions;
+  }
+  if (!role) return null;
+  return ROLE_PERMISSIONS[role] ?? null;
+};
 
-  const grant: RolePermissionGrant = ROLE_PERMISSIONS[role];
+const buildGrantSets = (grant: RolePermissionGrant | null): GrantSets => {
+  if (!grant) return { isSuperAdmin: false, menuCodes: new Set(), tabCodes: new Set(), actionCodes: new Set(), apiCodes: new Set() };
   return {
     isSuperAdmin: grant.menuCodes === "*" && grant.tabCodes === "*" && grant.actionCodes === "*",
     menuCodes: toGrantSet(grant.menuCodes),
@@ -45,11 +59,17 @@ const resolveRouteScope = (pathname: string): { menuCode: string; tabCode: strin
 };
 
 export const PermissionProvider = ({ children }: { children: ReactNode }) => {
-  const role = useAppSelector((state) => state.auth.user?.role ?? null);
+  const user = useAppSelector((state) => state.auth.user);
+  const role = user?.role ?? null;
+  const root = Boolean(user?.root || user?.roles?.includes("ROOT"));
+  /** Java login always sends pagePermissions (may be []); empty = no page access. Mock may omit and fall back to role matrix. */
+  const usePageGrants = !root && Array.isArray(user?.pagePermissions);
+  const fromPages = usePageGrants ? grantsToPermissionGrant(user?.pagePermissions ?? []) : null;
 
   const value = useMemo<PermissionContextValue>(() => {
-    if (!role) return DENY_ALL;
-    const grants = buildGrantSets(role);
+    const grant = resolveGrant(role, root, fromPages, usePageGrants);
+    if (!grant) return DENY_ALL;
+    const grants = buildGrantSets(grant);
 
     const canAccessMenu = (menuCode: string): boolean => (menuCode ? isGranted(grants.menuCodes, menuCode) : true);
 
@@ -72,7 +92,6 @@ export const PermissionProvider = ({ children }: { children: ReactNode }) => {
     const canAccessRoute = (pathname: string): boolean => {
       if (ALWAYS_ALLOWED_PATHS.includes(pathname)) return true;
       const scope = resolveRouteScope(pathname);
-      // Unmapped routes stay reachable; the page's own view gate is the authority for them.
       if (!scope) return true;
       return canAccessMenuTab(scope.menuCode, scope.tabCode);
     };
@@ -80,17 +99,28 @@ export const PermissionProvider = ({ children }: { children: ReactNode }) => {
     const filterSidebarNav = (groups: DashboardSidebarNavGroup[]): DashboardSidebarNavGroup[] =>
       groups
         .map((group) => {
-          if (!group.items?.length) return canAccessMenu(group.menuCode) ? group : null;
-
-          const items = group.items.flatMap<DashboardSidebarNavItem>((item) => {
-            if (!isNavItemWithChildren(item)) return canAccessMenuTab(resolveLeafMenuCode(group, item), item.tabCode) ? [item] : [];
-            const children = item.children.filter(leaf => canAccessMenuTab(resolveLeafMenuCode(group, leaf), leaf.tabCode));
-            return children.length ? [{ ...item, children }] : [];
-          });
-          if (items.length === 0) return null;
-          return { ...group, items };
+          if (group.menuCode === "permission" && !grants.isSuperAdmin && !root) return null;
+          if (!canAccessMenu(group.menuCode) && !(group.items ?? []).some((item) => {
+            if (isNavItemWithChildren(item)) {
+              return item.children.some((child) => canAccessMenuTab(resolveLeafMenuCode(group, child), child.tabCode));
+            }
+            return canAccessMenuTab(resolveLeafMenuCode(group, item), item.tabCode);
+          })) {
+            return null;
+          }
+          const items = (group.items ?? [])
+            .map((item): DashboardSidebarNavItem | null => {
+              if (isNavItemWithChildren(item)) {
+                const children = item.children.filter((child) => canAccessMenuTab(resolveLeafMenuCode(group, child), child.tabCode));
+                return children.length ? { ...item, children } : null;
+              }
+              if (item.hiddenFromNav) return item;
+              return canAccessMenuTab(resolveLeafMenuCode(group, item), item.tabCode) ? item : null;
+            })
+            .filter((item): item is DashboardSidebarNavItem => Boolean(item));
+          return items.length ? { ...group, items } : null;
         })
-        .filter((group): group is DashboardSidebarNavGroup => group !== null);
+        .filter((group): group is DashboardSidebarNavGroup => Boolean(group));
 
     return {
       isSuperAdmin: grants.isSuperAdmin,
@@ -101,7 +131,7 @@ export const PermissionProvider = ({ children }: { children: ReactNode }) => {
       canAccessRoute,
       filterSidebarNav,
     };
-  }, [role]);
+  }, [fromPages, role, root, usePageGrants]);
 
   return <PermissionContext.Provider value={value}>{children}</PermissionContext.Provider>;
 };
