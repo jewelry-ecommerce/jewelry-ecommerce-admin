@@ -60,7 +60,7 @@ const LabelContentListPage=lazy(()=>import('@/trading-ui/pages/content-display/l
 const LabelContentCreatePage=lazy(()=>import('@/trading-ui/pages/content-display/label/label-content/label-content-create/label-content-create.page'));
 const LabelContentDetailPage=lazy(()=>import('@/trading-ui/pages/content-display/label/label-content/label-content-detail/label-content-detail.page'));
 const LabelContentUpdatePage=lazy(()=>import('@/trading-ui/pages/content-display/label/label-content/label-content-update/label-content-update.page'));
-import { CollectionListPage, CollectionFormPage, CollectionDetailPage, CategoryPage, AttributeListPage, AttributeDetailPage, AttributeEditPage, AttributeCreatePage, CmsBannerPage, DashboardPage, LoginPage, ModuleListPage, NoAccessPage, NotFoundPage } from "@/router/route.lazy-pages";
+import { CollectionListPage, CollectionFormPage, CollectionDetailPage, CategoryPage, AttributeListPage, AttributeDetailPage, AttributeEditPage, AttributeCreatePage, CmsBannerPage, DashboardPage, LoginPage, ModuleListPage, NoAccessPage, NotFoundPage, UserPagePermissionsPage } from "@/router/route.lazy-pages";
 import { RouteType } from "@/router/route.enum";
 import type { AppRoute } from "@/router/route.interface";
 import { ROUTE_PATH, type RoutePathKey } from "@/router/route.path";
@@ -167,6 +167,7 @@ export const ROUTE: Record<RoutePathKey, AppRoute> = {
   SETTING_SEO: placeholderRoute(ROUTE_PATH.SETTING_SEO),
   SETTING_ANALYTICS: placeholderRoute(ROUTE_PATH.SETTING_ANALYTICS),
   SETTING_LIVE_CHAT: placeholderRoute(ROUTE_PATH.SETTING_LIVE_CHAT),
+  USER_PAGE_PERMISSIONS: dashboardRoute(ROUTE_PATH.USER_PAGE_PERMISSIONS, UserPagePermissionsPage),
 
   SHIPPING: dashboardRoute(ROUTE_PATH.SHIPPING,SourceShipping),
   EXCHANGE: dashboardRoute(ROUTE_PATH.EXCHANGE,SourceExchange),

@@ -10,6 +10,7 @@ export const DashboardPage = lazy(() => import("@/pages/dashboard/dashboard.page
 
 export const NoAccessPage = lazy(() => import("@/pages/error/no-access.page"));
 export const NotFoundPage = lazy(() => import("@/pages/error/not-found.page"));
+export const UserPagePermissionsPage = lazy(() => import("@/pages/permission/user-page-permissions.page"));
 
 /** Shared "coming next" screen — parameterised by route so it can name the module it stands in for. */
 export const ModulePlaceholderPage = lazy(() => import("@/pages/placeholder/module-placeholder.page"));
