@@ -1,5 +1,5 @@
-import { Box, Checkbox, FormControlLabel, MenuItem, Stack, TextField, Typography } from "@mui/material";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Box, Checkbox, MenuItem, Stack, TextField, Typography } from "@mui/material";
+import { useCallback, useMemo, useState } from "react";
 import useSWR from "swr";
 
 import {
@@ -17,14 +17,30 @@ import { TYPOGRAPHY_STYLES } from "@/trading-ui/common/constant/typography.const
 import { SnackbarType, useSnackbar } from "@/hooks/use-snackbar.hook";
 import { getErrorMessage } from "@/trading-ui/common/utils";
 import { useAppSelector } from "@/redux/store.redux";
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { ROUTE_PATH } from "@/router/route.path";
 
 const emptyGrant = (pageCode: string): PagePermissionGrant => ({ pageCode, view: false, edit: false, delete: false });
 
+const buildDraftFromServer = (
+  pages: PermissionPageCatalogItem[],
+  grants: PagePermissionGrant[] | undefined,
+): Record<string, PagePermissionGrant> => {
+  const next: Record<string, PagePermissionGrant> = {};
+  for (const page of pages) next[page.code] = emptyGrant(page.code);
+  for (const grant of grants ?? []) {
+    next[grant.pageCode] = {
+      pageCode: grant.pageCode,
+      view: Boolean(grant.view),
+      edit: Boolean(grant.edit),
+      delete: Boolean(grant.delete),
+    };
+  }
+  return next;
+};
+
 const UserPagePermissionsPage = () => {
   const { showSnackbar } = useSnackbar();
-  const navigate = useNavigate();
   const me = useAppSelector((state) => state.auth.user);
   const isRoot = Boolean(me?.root || me?.roles?.includes("ROOT"));
 
@@ -41,51 +57,45 @@ const UserPagePermissionsPage = () => {
     [usersSwr.data],
   );
 
-  const [selectedUserId, setSelectedUserId] = useState<string>("");
-  const [draft, setDraft] = useState<Record<string, PagePermissionGrant>>({});
+  const [pickedUserId, setPickedUserId] = useState<string | null>(null);
+  const selectedUserId = pickedUserId ?? (staffUsers[0] ? String(staffUsers[0].id) : "");
+
+  const [localDraft, setLocalDraft] = useState<Record<string, PagePermissionGrant> | null>(null);
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    if (!isRoot) navigate(ROUTE_PATH.NO_ACCESS, { replace: true });
-  }, [isRoot, navigate]);
-
-  useEffect(() => {
-    if (!selectedUserId && staffUsers[0]) setSelectedUserId(String(staffUsers[0].id));
-  }, [selectedUserId, staffUsers]);
 
   const grantsSwr = useSWR(
     isRoot && selectedUserId ? `admin/users/${selectedUserId}/page-permissions` : null,
     () => getUserPagePermissions(selectedUserId),
   );
 
-  useEffect(() => {
-    const pages = pagesSwr.data ?? [];
-    const next: Record<string, PagePermissionGrant> = {};
-    for (const page of pages) next[page.code] = emptyGrant(page.code);
-    for (const grant of grantsSwr.data ?? []) {
-      next[grant.pageCode] = {
-        pageCode: grant.pageCode,
-        view: Boolean(grant.view),
-        edit: Boolean(grant.edit),
-        delete: Boolean(grant.delete),
-      };
-    }
-    setDraft(next);
-  }, [grantsSwr.data, pagesSwr.data]);
+  const serverDraft = useMemo(
+    () => buildDraftFromServer(pagesSwr.data ?? [], grantsSwr.data),
+    [grantsSwr.data, pagesSwr.data],
+  );
+  const draft = localDraft ?? serverDraft;
 
-  const patchGrant = useCallback((pageCode: string, key: "view" | "edit" | "delete", value: boolean) => {
-    setDraft((prev) => {
-      const current = prev[pageCode] ?? emptyGrant(pageCode);
-      const next = { ...current, [key]: value };
-      if (key === "edit" && value) next.view = true;
-      if (key === "delete" && value) next.view = true;
-      if (key === "view" && !value) {
-        next.edit = false;
-        next.delete = false;
-      }
-      return { ...prev, [pageCode]: next };
-    });
+  const selectUser = useCallback((userId: string) => {
+    setPickedUserId(userId);
+    setLocalDraft(null);
   }, []);
+
+  const patchGrant = useCallback(
+    (pageCode: string, key: "view" | "edit" | "delete", value: boolean) => {
+      setLocalDraft((prev) => {
+        const base = prev ?? serverDraft;
+        const current = base[pageCode] ?? emptyGrant(pageCode);
+        const next = { ...current, [key]: value };
+        if (key === "edit" && value) next.view = true;
+        if (key === "delete" && value) next.view = true;
+        if (key === "view" && !value) {
+          next.edit = false;
+          next.delete = false;
+        }
+        return { ...base, [pageCode]: next };
+      });
+    },
+    [serverDraft],
+  );
 
   const handleSave = useCallback(async () => {
     if (!selectedUserId) return;
@@ -94,6 +104,7 @@ const UserPagePermissionsPage = () => {
       const items = Object.values(draft).filter((item) => item.view || item.edit || item.delete);
       await putUserPagePermissions(selectedUserId, items);
       showSnackbar({ message: "Đã lưu phân quyền trang.", type: SnackbarType.SUCCESS });
+      setLocalDraft(null);
       await grantsSwr.mutate();
     } catch (error) {
       showSnackbar({ message: getErrorMessage(error), type: SnackbarType.ERROR });
@@ -102,7 +113,7 @@ const UserPagePermissionsPage = () => {
     }
   }, [draft, grantsSwr, selectedUserId, showSnackbar]);
 
-  if (!isRoot) return null;
+  if (!isRoot) return <Navigate to={ROUTE_PATH.NO_ACCESS} replace />;
   if (pagesSwr.isLoading || usersSwr.isLoading) return <LoadingComponent />;
 
   const pages: PermissionPageCatalogItem[] = pagesSwr.data ?? [];
@@ -120,7 +131,7 @@ const UserPagePermissionsPage = () => {
           select
           label="Tài khoản"
           value={selectedUserId}
-          onChange={(event) => setSelectedUserId(event.target.value)}
+          onChange={(event) => selectUser(event.target.value)}
           sx={{ maxWidth: 420 }}
         >
           {staffUsers.length === 0 ? <MenuItem value="">Chưa có user staff</MenuItem> : null}
@@ -167,10 +178,17 @@ const UserPagePermissionsPage = () => {
         ) : null}
 
         <Stack direction="row" gap={1.5} alignItems="center">
-          <CustomButton variant="primary" fullWidth={false} disabled={!selectedUserId || saving || grantsSwr.isLoading} onClick={() => void handleSave()}>
+          <CustomButton
+            variant="primary"
+            fullWidth={false}
+            disabled={!selectedUserId || saving || grantsSwr.isLoading}
+            onClick={() => void handleSave()}
+          >
             {saving ? "Đang lưu…" : "Lưu phân quyền"}
           </CustomButton>
-          {grantsSwr.isValidating ? <FormControlLabel control={<span />} label="Đang tải…" /> : null}
+          {grantsSwr.isValidating ? (
+            <Typography sx={{ ...TYPOGRAPHY_STYLES.sm.regular, color: "#667085" }}>Đang tải…</Typography>
+          ) : null}
         </Stack>
       </Stack>
     </Box>

@@ -96,31 +96,33 @@ export const PermissionProvider = ({ children }: { children: ReactNode }) => {
       return canAccessMenuTab(scope.menuCode, scope.tabCode);
     };
 
-    const filterSidebarNav = (groups: DashboardSidebarNavGroup[]): DashboardSidebarNavGroup[] =>
-      groups
-        .map((group) => {
-          if (group.menuCode === "permission" && !grants.isSuperAdmin && !root) return null;
-          if (!canAccessMenu(group.menuCode) && !(group.items ?? []).some((item) => {
+    const filterSidebarNav = (groups: DashboardSidebarNavGroup[]): DashboardSidebarNavGroup[] => {
+      const next: DashboardSidebarNavGroup[] = [];
+      for (const group of groups) {
+        if (group.menuCode === "permission" && !grants.isSuperAdmin && !root) continue;
+        const sourceItems = group.items ?? [];
+        const hasMenuAccess =
+          canAccessMenu(group.menuCode) ||
+          sourceItems.some((item) => {
             if (isNavItemWithChildren(item)) {
               return item.children.some((child) => canAccessMenuTab(resolveLeafMenuCode(group, child), child.tabCode));
             }
             return canAccessMenuTab(resolveLeafMenuCode(group, item), item.tabCode);
-          })) {
-            return null;
+          });
+        if (!hasMenuAccess) continue;
+        const items: DashboardSidebarNavItem[] = [];
+        for (const item of sourceItems) {
+          if (isNavItemWithChildren(item)) {
+            const children = item.children.filter((child) => canAccessMenuTab(resolveLeafMenuCode(group, child), child.tabCode));
+            if (children.length) items.push({ ...item, children });
+            continue;
           }
-          const items = (group.items ?? [])
-            .map((item): DashboardSidebarNavItem | null => {
-              if (isNavItemWithChildren(item)) {
-                const children = item.children.filter((child) => canAccessMenuTab(resolveLeafMenuCode(group, child), child.tabCode));
-                return children.length ? { ...item, children } : null;
-              }
-              if (item.hiddenFromNav) return item;
-              return canAccessMenuTab(resolveLeafMenuCode(group, item), item.tabCode) ? item : null;
-            })
-            .filter((item): item is DashboardSidebarNavItem => Boolean(item));
-          return items.length ? { ...group, items } : null;
-        })
-        .filter((group): group is DashboardSidebarNavGroup => Boolean(group));
+          if (item.hiddenFromNav || canAccessMenuTab(resolveLeafMenuCode(group, item), item.tabCode)) items.push(item);
+        }
+        if (items.length) next.push({ ...group, items });
+      }
+      return next;
+    };
 
     return {
       isSuperAdmin: grants.isSuperAdmin,
