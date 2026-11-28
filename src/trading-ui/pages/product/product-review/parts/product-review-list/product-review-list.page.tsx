@@ -2,9 +2,10 @@ import { STYLE } from '@/trading-ui/adapters/library';
 import { Box, Stack, Typography } from '@mui/material';
 import { WrapperComponent } from '../../../../../components/wrapper';
 import { DataTableStatusTabs, DataTableToolbar, type DataTableToolbarAction } from '../../../../../components/data-table';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import useSWR from 'swr';
 import { isJavaBackend } from '@/common/config/app.config';
-import { recordJavaCapabilityGap } from '@/apis/java/java-capability-gaps';
+import { javaApproveProductReview, javaListProductReviews, javaRejectProductReview, javaReplyProductReview } from '@/apis/java/java-product-review.api';
 import { createSharedTimeFilterToolbarAction } from '../../../../../components/time-filter/shared-time-filter';
 import { CheckCircleBroken, Send01, XCircle } from '@untitledui/icons';
 import { TYPOGRAPHY_STYLES } from '../../../../../common/constant/typography.constant';
@@ -19,10 +20,19 @@ import { EmptyComponent } from '../../../../../components/empty/empty.component'
 import { ProductReviewApproveDialog } from '../../components/product-review-approve-dialog.component';
 import { ProductReviewRejectDialog } from '../../components/product-review-reject-dialog.component';
 import { ProductReviewReplyDialog } from '../../components/product-review-reply-dialog.component';
-import { ProductReviewStatus } from '../../product-review.interface';
+import { ProductReviewStatus, type ProductReview } from '../../product-review.interface';
+import { SnackbarType, useSnackbar } from '@/hooks/use-snackbar.hook';
+import { getErrorMessage } from '../../../../../common/utils';
+
+const mapJavaStatus = (status: string): ProductReviewStatus => {
+  if (status === 'APPROVED') return ProductReviewStatus.APPROVED;
+  if (status === 'REJECTED') return ProductReviewStatus.REJECTED;
+  return ProductReviewStatus.PENDING;
+};
 
 export const ProductReviewListPage = () => {
   const canViewList = useListPageViewAccess(PRODUCT_REVIEWS_PAGE_SCOPE, { listApiCode: 'api_product_review_list' });
+  const { showSnackbar } = useSnackbar();
   const [activeTab, setActiveTab] = useState<ProductReviewStatus>(ProductReviewStatus.PENDING);
   const [searchValue, setSearchValue] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -41,12 +51,30 @@ export const ProductReviewListPage = () => {
     toggle: false,
   });
 
+  const javaStatus = activeTab === ProductReviewStatus.APPROVED ? 'APPROVED' : activeTab === ProductReviewStatus.REJECTED ? 'REJECTED' : 'PENDING';
+  const reviewsSwr = useSWR(canViewList && isJavaBackend() ? ['admin/product-reviews', javaStatus] : null, () => javaListProductReviews(javaStatus));
+
   const filteredReviews = useMemo(() => {
-    return isJavaBackend() ? [] : MOCK_PRODUCT_REVIEWS.filter((r) => r.status === activeTab);
-  }, [activeTab]);
-  useEffect(() => {
-    if (isJavaBackend()) recordJavaCapabilityGap('CONTRACT', 'Product review list/moderation API chưa được tích hợp');
-  }, []);
+    const q = searchValue.trim().toLowerCase();
+    if (isJavaBackend()) {
+      const rows: ProductReview[] = (reviewsSwr.data ?? []).map((row) => ({
+        id: row.id,
+        authorName: row.authorName,
+        orderCode: '—',
+        productName: `SP #${row.productId}`,
+        productSku: row.productId,
+        productImage: row.images?.[0] || '',
+        rating: row.rating,
+        reviewTitle: row.title,
+        reviewContent: row.content,
+        reviewImages: row.images ?? [],
+        createdAt: row.createdAt || '',
+        status: mapJavaStatus(row.status),
+      }));
+      return q ? rows.filter((r) => `${r.authorName} ${r.reviewTitle} ${r.reviewContent}`.toLowerCase().includes(q)) : rows;
+    }
+    return MOCK_PRODUCT_REVIEWS.filter((r) => r.status === activeTab);
+  }, [activeTab, reviewsSwr.data, searchValue]);
   const statusTabs = PRODUCT_REVIEW_STATUS_TABS.map(tab => ({ ...tab, count: isJavaBackend() ? undefined : tab.count }));
 
   const toolbarActions = useMemo<DataTableToolbarAction[]>(
@@ -227,9 +255,20 @@ export const ProductReviewListPage = () => {
           count={isApproveDialogOpen.data.length}
           onClose={() => setIsApproveDialogOpen({ data: [], toggle: false })}
           onConfirm={() => {
-            console.log('Confirmed Approve for:', isApproveDialogOpen.data);
-            setIsApproveDialogOpen({ data: [], toggle: false });
-            setSelectedIds([]);
+            void (async () => {
+              try {
+                if (isJavaBackend()) {
+                  await Promise.all(isApproveDialogOpen.data.map((id) => javaApproveProductReview(id)));
+                  await reviewsSwr.mutate();
+                }
+                showSnackbar({ type: SnackbarType.SUCCESS, message: 'Đã duyệt đánh giá.' });
+              } catch (error) {
+                showSnackbar({ type: SnackbarType.ERROR, message: getErrorMessage(error) });
+              } finally {
+                setIsApproveDialogOpen({ data: [], toggle: false });
+                setSelectedIds([]);
+              }
+            })();
           }}
         />
       )}
@@ -239,9 +278,20 @@ export const ProductReviewListPage = () => {
           count={isRejectDialogOpen.data.length}
           onClose={() => setIsRejectDialogOpen({ data: [], toggle: false })}
           onConfirm={(reason) => {
-            console.log('Confirmed Reject for:', isRejectDialogOpen.data, 'Reason:', reason);
-            setIsRejectDialogOpen({ data: [], toggle: false });
-            setSelectedIds([]);
+            void (async () => {
+              try {
+                if (isJavaBackend()) {
+                  await Promise.all(isRejectDialogOpen.data.map((id) => javaRejectProductReview(id, reason)));
+                  await reviewsSwr.mutate();
+                }
+                showSnackbar({ type: SnackbarType.SUCCESS, message: 'Đã từ chối đánh giá.' });
+              } catch (error) {
+                showSnackbar({ type: SnackbarType.ERROR, message: getErrorMessage(error) });
+              } finally {
+                setIsRejectDialogOpen({ data: [], toggle: false });
+                setSelectedIds([]);
+              }
+            })();
           }}
         />
       )}
@@ -249,9 +299,21 @@ export const ProductReviewListPage = () => {
         <ProductReviewReplyDialog
           open={isReplyDialogOpen.toggle}
           onClose={() => setIsReplyDialogOpen({ data: [], toggle: false })}
-          onConfirm={() => {
-            setIsReplyDialogOpen({ data: [], toggle: false });
-            setSelectedIds([]);
+          onConfirm={(reply) => {
+            void (async () => {
+              try {
+                if (isJavaBackend()) {
+                  await Promise.all(isReplyDialogOpen.data.map((id) => javaReplyProductReview(id, reply)));
+                  await reviewsSwr.mutate();
+                }
+                showSnackbar({ type: SnackbarType.SUCCESS, message: 'Đã gửi phản hồi.' });
+              } catch (error) {
+                showSnackbar({ type: SnackbarType.ERROR, message: getErrorMessage(error) });
+              } finally {
+                setIsReplyDialogOpen({ data: [], toggle: false });
+                setSelectedIds([]);
+              }
+            })();
           }}
         />
       )}

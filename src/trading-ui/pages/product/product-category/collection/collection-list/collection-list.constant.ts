@@ -42,7 +42,7 @@ export const collectionCreateFormSchema: yup.ObjectSchema<ProductCollectionCreat
 export const collectionFormSchema: yup.ObjectSchema<ProductCollectionDialogFormValues> = yup
   .object({
     name: yup.string().trim().required('Vui lòng nhập tên bộ sưu tập').max(255, 'Tên bộ sưu tập không được quá 255 ký tự'),
-    brandId: yup.string().required('Vui lòng chọn thương hiệu'),
+    brandId: yup.string().trim().optional(),
     // categoryId: yup.string().required('Vui lòng chọn danh mục'),
     // type: yup.string().required('Vui lòng chọn loại'),
     status: yup.string().oneOf(Object.values(CollectionStatus)).required(),

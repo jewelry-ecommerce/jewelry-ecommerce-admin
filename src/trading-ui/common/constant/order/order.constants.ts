@@ -30,20 +30,16 @@ import { TYPOGRAPHY_STYLES } from '../typography.constant';
 import { type SxProps, type Theme } from '@mui/material';
 import { type ReturnExchangeAdvancedFilters, type ReturnExchangeAdvancedFilterStatus } from '../../../pages/order/returns-exchanges/parts/returns-exchanges-advanced-filter-dialog.part';
 
+/** Tab list khớp BE Java: PENDING→CONFIRMED→SHIPPING→DELIVERED (+ hủy/trả/hoàn). Bỏ Hỏa tốc + WMS pick/pack. */
 export const ORDER_STATUS_OPTIONS: OrderStatusOption[] = [
   { value: 'all', label: 'Tất cả' },
-  { value: 'express', label: 'Hỏa tốc', highlighted: true },
   { value: ApiOrderStatus.PENDING, label: 'Chờ xác nhận' },
   { value: ApiOrderStatus.CONFIRMED, label: 'Đã xác nhận' },
-  { value: ApiOrderStatus.PICKING, label: 'Đang nhặt hàng' },
-  { value: ApiOrderStatus.PACKED, label: 'Đã đóng gói' },
   { value: 'shippingCombined', label: 'Đang giao' },
   { value: ApiOrderStatus.DELIVERED, label: 'Giao thành công' },
-  { value: ApiOrderStatus.DELIVERY_FAILED, label: 'Giao thất bại' },
   { value: ApiOrderStatus.CANCELLED, label: 'Đã hủy' },
   { value: 'returnCombined', label: 'Trả hàng' },
   { value: ApiOrderStatus.REFUNDED, label: 'Hoàn tiền' },
-  { value: ApiOrderStatus.COMPLETED, label: 'Hoàn thành' },
 ];
 
 /** Tab danh sách đơn → `orderStatus` string gửi BE (`OrderStatus` enum, không gửi key tab gộp). */
@@ -158,17 +154,11 @@ export const ORDER_INITIAL_ADVANCED_FILTERS: OrderAdvancedFilters = {
 export const ORDER_SUPPORTED_STATUS_FILTERS = [
   ApiOrderStatus.PENDING,
   ApiOrderStatus.CONFIRMED,
-  ApiOrderStatus.PICKING,
-  ApiOrderStatus.PACKED,
   ApiOrderStatus.SHIPPING,
-  ApiOrderStatus.IN_TRANSIT,
   ApiOrderStatus.DELIVERED,
-  ApiOrderStatus.DELIVERY_FAILED,
-  ApiOrderStatus.RETURN_PROCESSING,
   ApiOrderStatus.CANCELLED,
   ApiOrderStatus.RETURNED,
   ApiOrderStatus.REFUNDED,
-  ApiOrderStatus.COMPLETED,
 ] as const;
 
 export const ORDER_API_SORT_FIELD_MAP: Partial<Record<OrderSortField, OrderSortBy>> = {

@@ -20,7 +20,6 @@ import { CmsPageWizardStepBasic } from './cms-page-wizard-step-basic.component';
 
 import { CmsPageWizardStepBlocks } from './cms-page-wizard-step-blocks.component';
 import { CmsPageWizardStepPublish } from './cms-page-wizard-step-publish.component';
-import { CmsPageWizardDialogPreview } from './cms-page-wizard-dialog-preview.component';
 import { CmsPageWizardDialogBlockType } from './cms-page-wizard-dialog-block-type.component';
 import { CmsPageWizardDialogPlacementBuilder } from './cms-page-wizard-dialog-placement-builder.component';
 
@@ -78,7 +77,13 @@ export const CmsPageWizardPageContent: React.FC<CmsPageWizardPageContentProps> =
         subtitle={subtitle}
         onBack={() => navigate(ROUTE_PATH.CMS_PAGE_LIST)}
         showPreviewAction={!viewMode && wizard.activeStep === 2}
-        onPreview={() => wizard.setPreviewOpen(true)}
+        onPreview={() => {
+          const base = (import.meta.env.VITE_CMS_DEMO_CLIENT_URL || 'https://jewelry-ecommerce-client.vercel.app').replace(/\/$/, '');
+          const slug = (slugWatch || '').replace(/^\//, '');
+          const exp = Date.now() + 15 * 60 * 1000;
+          const url = `${base}/${slug || ''}?preview=1&exp=${exp}`;
+          window.open(url, '_blank', 'noopener,noreferrer');
+        }}
         viewMode={viewMode}
         onEdit={onEdit}
         editPermission={editPermission}
@@ -196,9 +201,6 @@ export const CmsPageWizardPageContent: React.FC<CmsPageWizardPageContentProps> =
               setPlacementTargetBlockId(null);
             }}
           />
-
-          <CmsPageWizardDialogPreview open={wizard.previewOpen} onClose={() => wizard.setPreviewOpen(false)} name={nameWatch} slug={slugWatch} blocks={wizard.blocks} />
-
 
         </React.Fragment>
       ) : null}

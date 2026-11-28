@@ -47,7 +47,7 @@ export default function JavaInventoryPage() {
   return <WrapperComponent label="Tồn kho sản phẩm"><Stack gap={2}>
     {error && <Alert severity="error">{error}</Alert>}
     <DataTableFilterCard><DataTableToolbar embedded searchValue={search} onSearchChange={setSearch} searchPlaceholder="Tìm tên hoặc mã SKU..."
-      actions={[{ key: "history", label: "Lịch sử điều chỉnh", onClick: () => navigate(ROUTE_PATH.INVENTORY_MOVEMENT_LIST) }]} /></DataTableFilterCard>
+      actions={[{ key: "history", label: "Lịch sử tồn kho", onClick: () => navigate(ROUTE_PATH.INVENTORY_MOVEMENT_LIST) }]} /></DataTableFilterCard>
     <DataTableContentCard><DataTable rows={rows} columns={columns} getRowId={row => row.skuId} onRowClick={setSelected}
       emptyTitle="Không có SKU" emptyDescription={error ? "Không thể tải tồn kho. Vui lòng thử lại." : "Thêm biến thể sản phẩm để bắt đầu quản lý tồn kho."} /></DataTableContentCard>
     <Adjustment key={selected?.skuId ?? "closed"} stock={selected} onClose={() => setSelected(null)} onSaved={() => setRevision(value => value + 1)} />

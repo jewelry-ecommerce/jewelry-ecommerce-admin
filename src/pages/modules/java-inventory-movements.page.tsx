@@ -20,12 +20,12 @@ export default function JavaInventoryMovementsPage() {
   const { data, error, isLoading, mutate } = useSWR(invalid ? null : ["java-movements", filters, page, take],
     () => javaInventoryMovements(filters, page, take));
   const updateFilters = (value: JavaMovementFilters) => { setFilters(value); setPage(1); };
-  return <WrapperComponent label="Lịch sử điều chỉnh tồn kho"><Stack gap={2}>
+  return <WrapperComponent label="Lịch sử tồn kho"><Stack gap={2}>
     <Stack direction="row" gap={2}>
       <CustomButton variant="outline" onClick={() => navigate(ROUTE_PATH.INVENTORY_STOCK_LIST)}>Tồn kho</CustomButton>
       <CustomButton variant="outline" onClick={() => void mutate()}>Làm mới</CustomButton>
     </Stack>
-    <Alert severity="info">Lịch sử nhập và điều chỉnh thủ công. Biến động từ đơn hàng, giao và trả hàng chưa nằm trong bảng này.</Alert>
+    <Alert severity="info">Nhật ký mọi lần số tồn đổi (chỉnh tay, nhập kho…). Biến động từ đơn hàng có thể xuất hiện tùy cấu hình BE.</Alert>
     <DataTableFilterCard><MovementFilters value={filters} onChange={updateFilters} /></DataTableFilterCard>
     {invalid && <Alert severity="warning">ID SKU phải là số nguyên dương; từ ngày phải trước hoặc bằng đến ngày.</Alert>}
     {error && <Alert severity="error">{error instanceof Error ? error.message : "Không tải được lịch sử kho."}</Alert>}

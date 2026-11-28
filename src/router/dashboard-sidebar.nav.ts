@@ -81,39 +81,6 @@ export const DASHBOARD_SIDEBAR_NAV: DashboardSidebarNavGroup[] = [
         "path": ROUTE_PATH.EXCHANGE,
         "tabCode": "returns",
         "relatedPaths": [ROUTE_PATH.REFUND_PROPOSAL, ROUTE_PATH.REFUND_PROPOSAL_DETAIL]
-      },
-      {
-        "title": "Đơn đặt trước",
-        "tabCode": "pre_order",
-        "children": [
-          {
-            "title": "Cấu hình chương trình",
-            "path": ROUTE_PATH.PRE_ORDER_CAMPAIGN,
-            "tabCode": "pre_order_campaign",
-            "relatedPaths": [
-              ROUTE_PATH.PRE_ORDER_CAMPAIGN_CREATE,
-              ROUTE_PATH.PRE_ORDER_CAMPAIGN_DETAIL,
-              ROUTE_PATH.PRE_ORDER_CAMPAIGN_UPDATE
-            ]
-          },
-          {
-            "title": "Thống kê",
-            "path": ROUTE_PATH.PRE_ORDER_CAMPAIGN_STATISTICS,
-            "tabCode": "pre_order_statistics",
-            "relatedPaths": [
-              ROUTE_PATH.PRE_ORDER_CAMPAIGN_STATISTICS_DETAIL
-            ]
-          },
-          {
-            "title": "Đơn hàng đặt trước",
-            "path": ROUTE_PATH.PRE_ORDER_ORDER,
-            "tabCode": "pre_order_orders",
-            "relatedPaths": [
-              ROUTE_PATH.PRE_ORDER_ORDER_DETAIL,
-              ROUTE_PATH.PRE_ORDER_ORDER_UPDATE
-            ]
-          }
-        ]
       }
     ]
   },
@@ -168,11 +135,6 @@ export const DASHBOARD_SIDEBAR_NAV: DashboardSidebarNavGroup[] = [
         "tabCode": "list"
       },
       {
-        "title": "Giả lập khuyến mãi",
-        "path": ROUTE_PATH.PROMOTION_SANDBOX,
-        "tabCode": "sandbox"
-      },
-      {
         "title": "Tổng quan khuyến mãi",
         "path": ROUTE_PATH.PROMOTION_DASHBOARD,
         "tabCode": "dashboard"
@@ -187,7 +149,7 @@ export const DASHBOARD_SIDEBAR_NAV: DashboardSidebarNavGroup[] = [
     items: [
       { title: 'Tồn kho', path: ROUTE_PATH.INVENTORY_STOCK_LIST, tabCode: 'stock',
         relatedPaths: [ROUTE_PATH.INVENTORY_OVERVIEW, ROUTE_PATH.INVENTORY_ADJUSTMENT_LIST] },
-      { title: 'Lịch sử điều chỉnh', path: ROUTE_PATH.INVENTORY_MOVEMENT_LIST, tabCode: 'movement' },
+      { title: 'Lịch sử tồn kho', path: ROUTE_PATH.INVENTORY_MOVEMENT_LIST, tabCode: 'movement' },
     ],
   },
   {
@@ -246,19 +208,8 @@ export const DASHBOARD_SIDEBAR_NAV: DashboardSidebarNavGroup[] = [
           },
           {
             "title": "Thiết lập banner",
-            "path": ROUTE_PATH.CMS_BANNER_LIST,
+            "path": ROUTE_PATH.PRODUCT_LIST_BANNER_SETTINGS,
             "tabCode": "banner_settings"
-          }
-        ]
-      },
-      {
-        "title": "Cấu hình hiển thị",
-        "tabCode": "display_config",
-        "children": [
-          {
-            "title": "Nhãn giảm giá",
-            "path": ROUTE_PATH.DISCOUNT_LABEL_SETTINGS,
-            "tabCode": "discount_label"
           }
         ]
       },

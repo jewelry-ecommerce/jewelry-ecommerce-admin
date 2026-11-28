@@ -41,6 +41,8 @@ export const ROUTE_PATH = {
   CMS_PAGE_DETAIL: "/cms/pages/:pageId",
   CMS_PAGE_EDIT: "/cms/pages/:pageId/edit",
   CMS_BANNER_LIST: "/cms/banners",
+  /** Banner xen kẽ trong block PRODUCT_LIST (giống Seva “Thiết lập banner”). */
+  PRODUCT_LIST_BANNER_SETTINGS: "/page/product-list-banners",
   LABEL_DISPLAY_CREATE: "/cms/badge-flow/create",
   LABEL_DISPLAY_DETAIL: "/cms/badge-flow/:displayId",
   LABEL_DISPLAY_UPDATE: "/cms/badge-flow/:displayId/edit",

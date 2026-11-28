@@ -2,12 +2,11 @@ import { Box, Card, CardContent, InputAdornment, Stack, Typography } from '@mui/
 import React, { useEffect, useRef } from 'react';
 import { Controller, type Control, useWatch, type UseFormSetValue } from 'react-hook-form';
 import { File05, Settings01 } from '@untitledui/icons';
-import { SelectInput, TextInput } from '../../../../components/form';
+import { TextInput } from '../../../../components/form';
 import { HighlightStatusToggle } from '../../../../components/switch/highlight-status-toggle.component';
 import { TYPOGRAPHY_STYLES } from '../../../../common/constant/typography.constant';
 import { StackRowAlignCenter } from '../../../../components/styled';
 import type { CmsPageFormValues } from '../cms-page.interface';
-import { CMS_PAGE_LOCALE_OPTIONS } from '../cms-page.constants';
 import { CmsPageWizardStepActions } from './cms-page-wizard-step-actions.component';
 import { TextFieldUploadContent as TextFieldUpload } from '../../components/text-field-upload-content.component';
 import { uploadSingleImage } from '../../../../common/utils/image-upload.utils';
@@ -39,8 +38,6 @@ export interface CmsPageWizardStepBasicProps {
   cancelLabel?: string;
   viewMode?: boolean;
 }
-
-const localeSelectOptions = CMS_PAGE_LOCALE_OPTIONS.map((o) => ({ value: o.value, label: o.label }));
 
 export const CmsPageWizardStepBasic: React.FC<CmsPageWizardStepBasicProps> = ({
   control,
@@ -128,23 +125,6 @@ export const CmsPageWizardStepBasic: React.FC<CmsPageWizardStepBasicProps> = ({
               )}
             />
             <Typography sx={{ ...TYPOGRAPHY_STYLES.xs.regular, color: '#6B7280', mt: 0.5, mb: 2 }}>Chữ thường, không dấu, dùng dấu gạch ngang. VD: san-pham</Typography>
-            <Controller
-              name="locale"
-              control={control}
-              render={({ field, fieldState }) => (
-                <SelectInput
-                  label="Ngôn ngữ"
-                  name={field.name}
-                  value={field.value}
-                  onChange={field.onChange}
-                  options={localeSelectOptions}
-                  error={Boolean(fieldState.error)}
-                  errorMessage={fieldState.error?.message}
-                  disabled={fieldsDisabled}
-                />
-              )}
-            />
-            <Box sx={{ height: 16 }} />
             <Controller
               name="isActive"
               control={control}

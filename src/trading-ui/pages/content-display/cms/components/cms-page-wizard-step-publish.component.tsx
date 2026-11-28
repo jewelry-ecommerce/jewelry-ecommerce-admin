@@ -24,8 +24,8 @@ export interface CmsPageWizardStepPublishProps {
 export const CmsPageWizardStepPublish: React.FC<CmsPageWizardStepPublishProps> = ({
   name,
   slug,
-  locale,
-  targetDevice,
+  locale: _locale,
+  targetDevice: _targetDevice,
   blocks,
   isPublishedVersion = false,
   onBack,
@@ -60,18 +60,6 @@ export const CmsPageWizardStepPublish: React.FC<CmsPageWizardStepPublishProps> =
                 Đường dẫn:{' '}
               </Box>
               /{slug || '—'}
-            </Typography>
-            <Typography sx={{ ...TYPOGRAPHY_STYLES.sm.regular }}>
-              <Box component="span" sx={{ color: '#6B7280' }}>
-                Ngôn ngữ:{' '}
-              </Box>
-              {locale}
-            </Typography>
-            <Typography sx={{ ...TYPOGRAPHY_STYLES.sm.regular }}>
-              <Box component="span" sx={{ color: '#6B7280' }}>
-                Thiết bị:{' '}
-              </Box>
-              {targetDevice}
             </Typography>
             <Typography sx={{ ...TYPOGRAPHY_STYLES.sm.regular }}>
               <Box component="span" sx={{ color: '#6B7280' }}>

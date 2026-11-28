@@ -187,8 +187,8 @@ export const getOrderDetailPath = (orderId: string) => `/orders/${orderId}`;
 export const getOrderEditPath = (orderId: string) => `/order/${orderId}/edit`;
 export const getOrderClonePath = (orderId: string) => `/order/${orderId}/clone`;
 
-export const getLabelContentDetailPath = (labelId: string) => `/content/label-list/${labelId}`;
-export const getLabelContentUpdatePath = (labelId: string) => `/content/label-list/${labelId}/update`;
+export const getLabelContentDetailPath = (labelId: string) => `/cms/labels/${encodeURIComponent(labelId)}`;
+export const getLabelContentUpdatePath = (labelId: string) => `/cms/labels/${encodeURIComponent(labelId)}/edit`;
 
 export const getLabelDisplayDetailPath = (displayId: string) => `/cms/badge-flow/${displayId}`;
 export const getLabelDisplayUpdatePath = (displayId: string) => `/cms/badge-flow/${displayId}/edit`;

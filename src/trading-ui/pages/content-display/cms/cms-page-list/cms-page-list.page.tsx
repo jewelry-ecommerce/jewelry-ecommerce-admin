@@ -124,12 +124,6 @@ const CmsPageListPage = () => {
         ),
       },
       {
-        id: 'locale',
-        label: 'Ngôn ngữ',
-        width: 110,
-        renderCell: (row) => <Typography sx={{ ...TYPOGRAPHY_STYLES.base.medium, color: '#111827' }}>{row.locale}</Typography>,
-      },
-      {
         id: 'displayStatus',
         label: 'Trạng thái',
         width: 140,

@@ -1,8 +1,20 @@
-import { Box, Checkbox, MenuItem, Stack, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  MenuItem,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
 import useSWR from "swr";
 
 import {
+  createAccessUser,
   getUserPagePermissions,
   listAccessUsers,
   listPermissionPages,
@@ -62,6 +74,15 @@ const UserPagePermissionsPage = () => {
 
   const [localDraft, setLocalDraft] = useState<Record<string, PagePermissionGrant> | null>(null);
   const [saving, setSaving] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    fullName: "",
+    phone: "",
+    email: "",
+    password: "",
+    role: "CATALOG_MANAGER",
+  });
 
   const grantsSwr = useSWR(
     isRoot && selectedUserId ? `admin/users/${selectedUserId}/page-permissions` : null,
@@ -124,23 +145,28 @@ const UserPagePermissionsPage = () => {
       <Stack gap={2}>
         <Typography sx={{ ...TYPOGRAPHY_STYLES.xl.semibold, color: "#101828" }}>Phân quyền người dùng</Typography>
         <Typography sx={{ ...TYPOGRAPHY_STYLES.sm.regular, color: "#667085" }}>
-          Chỉ tài khoản ROOT dùng màn này. Chọn user staff rồi tick xem / sửa / xóa theo từng trang.
+          Chỉ tài khoản ROOT dùng màn này. Tạo staff (OTP gửi mail Resend giống client) rồi tick xem / sửa / xóa theo trang.
         </Typography>
 
-        <TextField
-          select
-          label="Tài khoản"
-          value={selectedUserId}
-          onChange={(event) => selectUser(event.target.value)}
-          sx={{ maxWidth: 420 }}
-        >
-          {staffUsers.length === 0 ? <MenuItem value="">Chưa có user staff</MenuItem> : null}
-          {staffUsers.map((user) => (
-            <MenuItem key={user.id} value={String(user.id)}>
-              {user.fullName} ({user.phone}) — {(user.roles ?? []).join(", ")}
-            </MenuItem>
-          ))}
-        </TextField>
+        <Stack direction="row" gap={1.5} alignItems="center" flexWrap="wrap">
+          <TextField
+            select
+            label="Tài khoản"
+            value={selectedUserId}
+            onChange={(event) => selectUser(event.target.value)}
+            sx={{ maxWidth: 420, minWidth: 280 }}
+          >
+            {staffUsers.length === 0 ? <MenuItem value="">Chưa có user staff</MenuItem> : null}
+            {staffUsers.map((user) => (
+              <MenuItem key={user.id} value={String(user.id)}>
+                {user.fullName} ({user.phone}) — {(user.roles ?? []).join(", ")}
+              </MenuItem>
+            ))}
+          </TextField>
+          <CustomButton variant="outline" fullWidth={false} onClick={() => setCreateOpen(true)}>
+            Tạo tài khoản
+          </CustomButton>
+        </Stack>
 
         {selectedUser ? (
           <Box sx={{ border: "1px solid #E5E7EB", borderRadius: 2, overflow: "hidden" }}>
@@ -191,6 +217,89 @@ const UserPagePermissionsPage = () => {
           ) : null}
         </Stack>
       </Stack>
+
+      <Dialog open={createOpen} onClose={creating ? undefined : () => setCreateOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle>Tạo tài khoản staff</DialogTitle>
+        <DialogContent>
+          <Stack gap={2} sx={{ pt: 1 }}>
+            <TextField
+              label="Họ tên"
+              value={createForm.fullName}
+              onChange={(e) => setCreateForm((prev) => ({ ...prev, fullName: e.target.value }))}
+              disabled={creating}
+            />
+            <TextField
+              label="Số điện thoại"
+              value={createForm.phone}
+              onChange={(e) => setCreateForm((prev) => ({ ...prev, phone: e.target.value }))}
+              disabled={creating}
+            />
+            <TextField
+              label="Email"
+              value={createForm.email}
+              onChange={(e) => setCreateForm((prev) => ({ ...prev, email: e.target.value }))}
+              disabled={creating}
+              helperText="OTP welcome gửi qua Resend (OTP_FORWARD_EMAIL) giống client."
+            />
+            <TextField
+              label="Mật khẩu tạm (≥ 8 ký tự)"
+              type="password"
+              value={createForm.password}
+              onChange={(e) => setCreateForm((prev) => ({ ...prev, password: e.target.value }))}
+              disabled={creating}
+            />
+            <TextField
+              select
+              label="Vai trò"
+              value={createForm.role}
+              onChange={(e) => setCreateForm((prev) => ({ ...prev, role: e.target.value }))}
+              disabled={creating}
+            >
+              <MenuItem value="CATALOG_MANAGER">CATALOG_MANAGER</MenuItem>
+              <MenuItem value="ORDER_MANAGER">ORDER_MANAGER</MenuItem>
+              <MenuItem value="ADMIN">ADMIN</MenuItem>
+            </TextField>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <CustomButton variant="outline" fullWidth={false} disabled={creating} onClick={() => setCreateOpen(false)}>
+            Hủy
+          </CustomButton>
+          <CustomButton
+            variant="primary"
+            fullWidth={false}
+            disabled={creating}
+            onClick={() => {
+              void (async () => {
+                setCreating(true);
+                try {
+                  const created = await createAccessUser({
+                    fullName: createForm.fullName.trim(),
+                    phone: createForm.phone.trim(),
+                    email: createForm.email.trim() || undefined,
+                    password: createForm.password,
+                    roles: [createForm.role],
+                  });
+                  showSnackbar({
+                    type: SnackbarType.SUCCESS,
+                    message: "Đã tạo tài khoản. OTP welcome đã gửi mail (nếu cấu hình Resend).",
+                  });
+                  setCreateOpen(false);
+                  setCreateForm({ fullName: "", phone: "", email: "", password: "", role: "CATALOG_MANAGER" });
+                  await usersSwr.mutate();
+                  selectUser(String(created.id));
+                } catch (error) {
+                  showSnackbar({ type: SnackbarType.ERROR, message: getErrorMessage(error) });
+                } finally {
+                  setCreating(false);
+                }
+              })();
+            }}
+          >
+            {creating ? "Đang tạo…" : "Tạo & gửi OTP"}
+          </CustomButton>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

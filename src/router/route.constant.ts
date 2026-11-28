@@ -33,6 +33,7 @@ const SourcePromotionDetail=lazy(()=>import('@/trading-ui/pages/promotion/promot
 const SourceSetList=lazy(()=>import('@/trading-ui/pages/product/product-set/product-set-list.page'));
 const SourceSetDetail=lazy(()=>import('@/trading-ui/pages/product/product-set/product-set-detail.page'));
 const SourceTopBanner=lazy(()=>import('@/trading-ui/pages/content-display/site-layout/site-top-banner/site-top-banner.page'));
+const SourceProductListBannerSettings=lazy(()=>import('@/trading-ui/pages/content-display/cms/product-list-banner-settings/product-list-banner-settings.page'));
 const SourceLogo=lazy(()=>import('@/trading-ui/pages/content-display/site-layout/site-logo/site-logo.page'));
 const SourceNavigation=lazy(()=>import('@/trading-ui/pages/content-display/site-layout/site-navigation/site-navigation.page'));
 const SourceFooter=lazy(()=>import('@/trading-ui/pages/content-display/site-layout/site-footer/site-footer.page'));
@@ -115,6 +116,7 @@ export const ROUTE: Record<RoutePathKey, AppRoute> = {
   CMS_PAGE_DETAIL: dashboardRoute(ROUTE_PATH.CMS_PAGE_DETAIL, SourceCmsDetailPage),
   CMS_PAGE_EDIT: dashboardRoute(ROUTE_PATH.CMS_PAGE_EDIT, SourceCmsEditPage),
   CMS_BANNER_LIST: dashboardRoute(ROUTE_PATH.CMS_BANNER_LIST, CmsBannerPage),
+  PRODUCT_LIST_BANNER_SETTINGS: dashboardRoute(ROUTE_PATH.PRODUCT_LIST_BANNER_SETTINGS, SourceProductListBannerSettings),
   LABEL_DISPLAY_CREATE: dashboardRoute(ROUTE_PATH.LABEL_DISPLAY_CREATE,LabelFlowCreatePage),
   LABEL_DISPLAY_DETAIL: dashboardRoute(ROUTE_PATH.LABEL_DISPLAY_DETAIL,LabelFlowDetailPage),
   LABEL_DISPLAY_UPDATE: dashboardRoute(ROUTE_PATH.LABEL_DISPLAY_UPDATE,LabelFlowEditPage),

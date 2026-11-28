@@ -4,11 +4,10 @@ import { DateTimePicker } from '@mui/x-date-pickers';
 import type { Dayjs } from 'dayjs';
 import { LayersThree01 } from '@untitledui/icons';
 import { type TargetDevice } from '../../../../apis';
-import { SelectInput, TextInput } from '../../../../components/form';
+import { TextInput } from '../../../../components/form';
 import { formLabelSx } from '../../../../components/form/form-field.styles';
 import { TYPOGRAPHY_STYLES } from '../../../../common/constant/typography.constant';
 import { StackRowAlignCenter } from '../../../../components/styled';
-import { CMS_PAGE_TARGET_DEVICE_OPTIONS } from '../cms-page.constants';
 import { CmsPageWizardStepActions } from './cms-page-wizard-step-actions.component';
 
 export interface CmsPageWizardStepLayoutProps {
@@ -30,16 +29,9 @@ export interface CmsPageWizardStepLayoutProps {
   showActions?: boolean;
 }
 
-const deviceOptions = CMS_PAGE_TARGET_DEVICE_OPTIONS.map((o) => ({
-  value: o.value,
-  label: o.label,
-}));
-
 export const CmsPageWizardStepLayout: React.FC<CmsPageWizardStepLayoutProps> = ({
   layoutName,
   onLayoutNameChange,
-  targetDevice,
-  onTargetDeviceChange,
   scheduleStart,
   scheduleEnd,
   onScheduleStartChange,
@@ -90,15 +82,6 @@ export const CmsPageWizardStepLayout: React.FC<CmsPageWizardStepLayoutProps> = (
               disabled={fieldsDisabled}
             /> : null}
             <Box sx={{ height: 16 }} />
-            <SelectInput
-              label="Thiết bị mục tiêu"
-              name="targetDevice"
-              value={targetDevice}
-              onChange={(e) => onTargetDeviceChange(e.target.value as TargetDevice)}
-              options={deviceOptions}
-              disabled={fieldsDisabled}
-            />
-            <Typography sx={{ ...TYPOGRAPHY_STYLES.xs.regular, color: '#6B7280', mt: 0.5, mb: 2 }}>Layout này sẽ hiển thị trên thiết bị nào</Typography>
             <Typography sx={{ ...TYPOGRAPHY_STYLES.sm.medium, color: '#101828', mb: 1 }}>Lên lịch hiển thị (tùy chọn)</Typography>
             <StackRowAlignCenter sx={{ flexWrap: 'wrap', alignItems: 'flex-start' }}>
               <Box sx={{ flex: 1, minWidth: 220, pr: { sm: 1 } }}>

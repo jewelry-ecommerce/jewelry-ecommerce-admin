@@ -129,7 +129,6 @@ const CollectionDetailPage = () => {
             <Typography sx={{ ...TYPOGRAPHY_STYLES['2xl'].semibold, color: '#101828' }}>{d.header.name}</Typography>
           </StackRowAlignCenter>
           {headerDescription ? <Typography sx={{ ...TYPOGRAPHY_STYLES.md.regular, color: '#667085', whiteSpace: 'pre-wrap' }}>{headerDescription}</Typography> : null}
-          <Typography sx={{ ...TYPOGRAPHY_STYLES.md.regular, color: '#667085' }}>{d.header.brandName}</Typography>
         </Stack>
         <StackRowAlignCenter gap={2} sx={{ flexShrink: 0 }}>
           <SwitchContentElement

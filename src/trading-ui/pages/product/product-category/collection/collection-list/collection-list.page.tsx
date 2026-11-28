@@ -114,12 +114,6 @@ const ProductCollectionListPage = () => {
         renderCell: (row) => <Typography sx={{ ...TYPOGRAPHY_STYLES.base.medium, color: '#111827', fontWeight: 500 }}>{row.name}</Typography>,
       },
       {
-        id: 'brandName',
-        label: 'Thương hiệu',
-        width: 220,
-        renderCell: (row) => <Typography sx={{ ...TYPOGRAPHY_STYLES.base.regular, color: '#374151' }}>{row.tenantCode || '-'}</Typography>,
-      },
-      {
         id: 'description',
         label: 'Mô tả',
         width: 220,

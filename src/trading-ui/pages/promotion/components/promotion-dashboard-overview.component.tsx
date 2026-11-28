@@ -305,7 +305,10 @@ export const PromotionDashboardOverview = ({ total, confirmedCount, draftEditing
         </Paper>
 
         <Paper elevation={0} sx={{ flex: 1, p: 2.5, borderRadius: '12px', border: '1px solid #E5E7EB', bgcolor: '#FFFFFF', overflow: 'visible' }}>
-          <Typography sx={{ ...TYPOGRAPHY_STYLES.base.semibold, color: '#101828', mb: 2.5 }}>Biến động chiết khấu ngân sách (7 ngày gần nhất)</Typography>
+          <Typography sx={{ ...TYPOGRAPHY_STYLES.base.semibold, color: '#101828', mb: 1 }}>Chiết khấu đã dùng (7 ngày gần nhất)</Typography>
+          <Typography sx={{ ...TYPOGRAPHY_STYLES.sm.regular, color: '#667085', mb: 2 }}>
+            Cột = số tiền khuyến mãi đã áp dụng mỗi ngày. So với ngân sách còn lại ở thẻ KPI phía trên.
+          </Typography>
           <BudgetBarChartSVG data={[...BUDGET_CHART_DATA]} />
         </Paper>
       </StackRow>

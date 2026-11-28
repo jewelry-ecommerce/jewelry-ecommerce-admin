@@ -34,3 +34,14 @@ export const putUserPagePermissions = (userId: string | number, items: PagePermi
       delete: item.delete,
     })),
   });
+
+export type AdminUserCreatePayload = {
+  fullName: string;
+  phone: string;
+  email?: string;
+  password: string;
+  roles: string[];
+};
+
+export const createAccessUser = (payload: AdminUserCreatePayload) =>
+  backendRequest<AdminAccessUser>('admin/users', 'POST', payload);
